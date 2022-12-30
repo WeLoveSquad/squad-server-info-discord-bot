@@ -1,0 +1,1 @@
+# squad-server-info-discord-bot
