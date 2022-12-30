@@ -1,0 +1,19 @@
+version: "3"
+services:
+  squad-server-info-discord-bot:
+    image: squad-server-info-discord-bot
+    build: .
+    volumes:
+      - "squad-server-info-dc-bot-vol:/home/node/app/storage"
+    environment:
+      - "DISCORD_BOT_TOKEN=CHANGE_ME"
+      - "DISCORD_GUILD=000000000000000000"
+      - "DISCORD_SERVER_INFO_CHANNEL=000000000000000000"
+      - "DISCORD_MESSAGE_UPDATE_INTERVAL_SEC=15"
+      - "DISCORD_AUTHORIZED_ROLES=000000000000000001,000000000000000002"
+      - "LOGGING_LEVEL=debug"
+      - "LOGGING_FORMAT=default"
+      - "STORAGE_PATH=/home/node/app/storage"
+
+volumes:
+  squad-server-info-dc-bot-vol:

@@ -1,0 +1,7 @@
+node_modules/
+build/
+config/*
+!config/default*
+!config/custom-environment-variables*
+storage/*
+.vscode/

@@ -1,0 +1,16 @@
+{
+  discord: {
+    botToken: "XXXXXXXXXXXXXXXXXXXXXXXXXX",
+    guild: "000000000000000000",
+    serverInfoChannel: "000000000000000000",
+    messageUpdateIntervalSec: 15,
+    authorizedRoles: "000000000000000001,000000000000000002"
+  },
+  logging: {
+    level: "debug",
+    format: "default",
+  },
+  storage: {
+    path : "/home/node/app/storage",
+  },
+}

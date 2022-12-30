@@ -1,0 +1,13 @@
+dist/
+.mariadb/
+config/*
+!config/default*
+!config/custom-environment-variables*
+.git
+*Dockerfile*
+*docker-compose*
+.gitignore
+
+*.spec.ts
+test/
+database/cache/

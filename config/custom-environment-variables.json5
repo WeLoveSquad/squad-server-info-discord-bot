@@ -1,0 +1,16 @@
+{
+  discord: {
+    botToken: "DISCORD_BOT_TOKEN",
+    guild: "DISCORD_GUILD",
+    serverInfoChannel: "DISCORD_SERVER_INFO_CHANNEL",
+    messageUpdateIntervalSec: "DISCORD_MESSAGE_UPDATE_INTERVAL_SEC",
+    authorizedRoles: "DISCORD_AUTHORIZED_ROLES",
+  },
+  logging: {
+    level: "LOGGING_LEVEL",
+    format: "LOGGING_FORMAT",
+  },
+  storage: {
+    path : "STORAGE_PATH",
+  },
+}

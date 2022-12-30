@@ -1,0 +1,30 @@
+version: "3"
+services:
+  squad-server-info-discord-bot:
+    container_name: squad-server-info-discord-bot
+    image: squad-server-info-discord-bot
+    build: .
+    restart: unless-stopped
+    environment:
+      - "DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}"
+      - "DISCORD_GUILD=${DISCORD_GUILD}"
+      - "DISCORD_SERVER_INFO_CHANNEL=${DISCORD_SERVER_INFO_CHANNEL}"
+      - "DISCORD_MESSAGE_UPDATE_INTERVAL_SEC=${DISCORD_MESSAGE_UPDATE_INTERVAL_SEC}"
+      - "LOGGING_LEVEL=${LOGGING_LEVEL}"
+      - "LOGGING_FORMAT=${LOGGING_FORMAT}"
+      - "STORAGE_PATH=${STORAGE_PATH}"
+    volumes:
+      - squad-server-info-dc-bot-vol:/home/node/app/storage
+    networks:
+      - proxy
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://172.18.0.17:12201"
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  squad-server-info-dc-bot-vol:
