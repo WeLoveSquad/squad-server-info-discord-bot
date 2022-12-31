@@ -39,6 +39,7 @@ export class ServerQueryService {
       info.name,
       info.map,
       playerCount,
+      info.players.max,
       teamOne,
       teamTwo,
       publicQueue,

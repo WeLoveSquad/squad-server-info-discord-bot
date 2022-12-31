@@ -168,12 +168,12 @@ export class ServerInfoChannelHandler {
         { name: "\u200B", value: "\u200B", inline: true },
         {
           name: "Players Online",
-          value: `${serverInfo.playerCount.toString()}/100`,
+          value: `${serverInfo.playerCount.toString()}/${serverInfo.maxPlayerCount.toString()}`,
           inline: true,
         },
         { name: "Public Queue", value: serverInfo.publicQueue.toString(), inline: true },
         { name: "Whitelist Queue", value: serverInfo.whitelistQueue.toString(), inline: true },
-        { name: "Round time", value: duration.toFormat("hh:mm:ss") }
+        { name: "Round Time", value: duration.toFormat("hh:mm:ss") }
       )
       .setFooter({ text: `Last updated: ${timestamp}` });
   }

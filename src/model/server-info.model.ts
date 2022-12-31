@@ -2,6 +2,7 @@ export class ServerInfo {
   public serverName: string;
   public layer: string;
   public playerCount: number;
+  public maxPlayerCount: number;
   public teamOne: string;
   public teamTwo: string;
   public publicQueue: number;
@@ -12,6 +13,7 @@ export class ServerInfo {
     serverName: string,
     layer: string,
     playerCount: number,
+    maxPlayerCount: number,
     teamOne: string,
     teamTwo: string,
     publicQueue: number,
@@ -21,6 +23,7 @@ export class ServerInfo {
     this.serverName = serverName;
     this.layer = layer;
     this.playerCount = playerCount;
+    this.maxPlayerCount = maxPlayerCount;
     this.teamOne = teamOne;
     this.teamTwo = teamTwo;
     this.publicQueue = publicQueue;
