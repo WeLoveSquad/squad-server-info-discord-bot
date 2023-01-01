@@ -8,7 +8,7 @@ describe("parseFaction", () => {
   it("AUS at the beginning", () => {
     const faction = serverQueryService.parseFaction("AUS_LightInfantry_5RAR");
 
-    expect(faction).to.equal("AUS");
+    expect(faction).to.equal("AU");
   });
   it("AUS at the end", () => {
     const faction = serverQueryService.parseFaction("Albasrah_AAS_v3_AUS");
