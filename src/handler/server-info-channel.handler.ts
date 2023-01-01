@@ -122,7 +122,7 @@ export class ServerInfoChannelHandler {
     const messages = [...this.serverInfoChannel.messages.cache];
 
     for (const [key, message] of messages) {
-      if (!this.serverInfoChannel && message.author.id == client.user?.id) {
+      if (!this.serverInfoMessage && message.author.id === client.user?.id) {
         this.serverInfoMessage = message;
       } else {
         try {
