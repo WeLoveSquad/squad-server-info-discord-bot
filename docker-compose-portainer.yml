@@ -2,8 +2,7 @@ version: "3"
 services:
   squad-server-info-dc-bot:
     container_name: squad-server-info-dc-bot
-    image: squad-server-info-dc-bot
-    build: .
+    image: ghcr.io/welovesquad/squad-server-info-discord-bot:${BOT_IMAGE_TAG:-latest}
     restart: unless-stopped
     environment:
       - "DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}"
