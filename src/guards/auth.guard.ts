@@ -12,9 +12,10 @@ export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<Comman
       container
         .resolve(Logger)
         .warn(
-          "interaction message guild not found for interaction: [%s] by user: [%s]",
+          "interaction message guild not found for interaction: [%s] by user: [%s] with id: [%s]",
           interaction.type,
-          interaction.user
+          interaction.user.username,
+          interaction.user.id
         );
       return;
     }
@@ -34,9 +35,10 @@ export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<Comman
       container
         .resolve(Logger)
         .warn(
-          "An error ocured while trying to check authentication of interaction: [%s] by user: [%s]. Error: [%s]",
+          "An error ocured while trying to check authentication of interaction: [%s] by user: [%s] with id: [%s]. Error: [%s]",
           interaction.type,
-          interaction.user,
+          interaction.user.username,
+          interaction.user.id,
           error
         );
     }
