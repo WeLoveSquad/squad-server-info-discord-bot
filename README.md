@@ -4,24 +4,48 @@ A discord bot to show squad server information in an embed in a discord text cha
 
 ![bot-showcase](https://user-images.githubusercontent.com/24782633/210171593-96470974-541f-45a2-9c08-e6f2d1134512.png)
 
-## Local development
+## Available Commands
 
+- `/add-server <server-address>`
+  - Adds a server to the bot. The bot will query server info from that server and show the info in an embed.
+  - Example: `/add-server 45.91.103.14:27165`
+- `/remove-server <server-address>`
+  - Removes a server from the bot. The server info of that server will not be shown anymore
+  - Example: `/remove-server 45.91.103.14:27165`
+
+The `server-address` has to contain the IP and Query-Port of the squad server in the form of `IP:Port`. IP and Query-Port of a server can be found on [BattleMetrics.](https://www.battlemetrics.com)
+
+## Creating a bot and adding it to your server
+
+How to create and add a discord bot to your server please follow [this guide.](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
+
+## Deployment with docker
+### Config
+
+The bot has to be configured before deployment.
+This can be done in one of two ways:
+
+1. Configure all environment variables in `docker-compose.yml`. These environment variables correspond to the config values configured in `config/custom-environment-variables.json5`. See [Config values](#config-values) for all available configurations.
+2. Copy `default.json5` into `production.json` and configure all config values in that file. When using this approach you have to remove all unneeded environment variables in `docker-compose.yml`. Otherwise these values will overwrite the values in `production.json`.
+
+### Starting the application
+After the bot has been added to your discord server and the configuration has been set the bot can be started.
+```bash
+# Build and start
+docker-compose up --build
+
+# Stop the bot
+docker-compose stop
+```
+
+## Local development
 ### Config
 
 The bot needs to be configured before it can run.
 All available config values can be found in `/config/default.json5`
 
 Create a copy of `default.json5` and rename it to `local-development.json5`.
-In `local-development.json5` you can configure all needed values for local developent.
-
-**Config Values**:
-- `discord.botToken`: Secret Token of your discord bot
-- `discord.guild`: ID of the discord server where the bot will run. You can copy the ID by right-clicking on the server and pressing "Copy ID"
-- `discord.serverInfoChannel`: ID of the discord text channel where the bot will send the squad server info messages. You can copy the ID by right-clicking on the text channel and pressing "Copy ID"
-- `discord.messageUpdateIntervalSec`: Interval in seconds how often the bot will query the squad servers and update the server info messages
-- `discord.authorizedRoles`: Comma separated string of IDs by roles that will be able to add and remove squad servers to the bot. You can copy the IDs in "Server Settings > Roles" by clicking the three dots and pressing "Copy ID"
-- `logging.level`: Log level of log messages in the console. Valid values are "debug", "verbose", "info", "warn" and"error"
-- `logging.level`: Format of log messages in the console. Valid values are "default" and "json"
+In `local-development.json5` you can configure all needed values for local developent. See [Config values](#config-values) for all available configurations.
 
 ### Starting the application
 ```bash
@@ -33,3 +57,12 @@ npm run start
 # or you can start the application with auto reload
 npm run dev
 ```
+
+## Config values
+- `discord.botToken`: Secret Token of your discord bot
+- `discord.guild`: ID of the discord server where the bot will run. You can copy the ID by right-clicking on the server and pressing "Copy ID"
+- `discord.serverInfoChannel`: ID of the discord text channel where the bot will send the squad server info messages. You can copy the ID by right-clicking on the text channel and pressing "Copy ID"
+- `discord.messageUpdateIntervalSec`: Interval in seconds how often the bot will query the squad servers and update the server info messages
+- `discord.authorizedRoles`: Comma separated string of IDs by roles that will be able to add and remove squad servers to the bot. You can copy the IDs in "Server Settings > Roles" by clicking the three dots and pressing "Copy ID"
+- `logging.level`: Log level of log messages in the console. Valid values are "debug", "verbose", "info", "warn" and"error"
+- `logging.level`: Format of log messages in the console. Valid values are "default" and "json"
