@@ -35,7 +35,7 @@ export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<Comman
       container
         .resolve(Logger)
         .warn(
-          "An error ocured while trying to check authentication of interaction: [%s] by user: [%s] with id: [%s]. Error: [%s]",
+          "An error occurred while trying to check authentication of interaction: [%s] by user: [%s] with id: [%s]. Error: [%s]",
           interaction.type,
           interaction.user.username,
           interaction.user.id,
