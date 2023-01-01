@@ -2,6 +2,7 @@
 
 A discord bot to show squad server information in an embed in a discord text channel
 
+![bot-showcase](https://user-images.githubusercontent.com/24782633/210171593-96470974-541f-45a2-9c08-e6f2d1134512.png)
 
 ## Local development
 
