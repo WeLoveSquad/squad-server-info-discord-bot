@@ -25,5 +25,6 @@ COPY --chown=node:node package*.json .
 RUN npm clean-install && npm cache clean --force
 COPY --from=builder /home/node/app/build ./build
 COPY --chown=node:node ./config ./config
+RUN mkdir ./storage
 
 CMD [ "node", "build/main.js" ]

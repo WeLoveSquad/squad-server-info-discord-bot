@@ -22,7 +22,6 @@ In `local-development.json5` you can configure all needed values for local devel
 - `discord.authorizedRoles`: Comma separated string of IDs by roles that will be able to add and remove squad servers to the bot. You can copy the IDs in "Server Settings > Roles" by clicking the three dots and pressing "Copy ID"
 - `logging.level`: Log level of log messages in the console. Valid values are "debug", "verbose", "info", "warn" and"error"
 - `logging.level`: Format of log messages in the console. Valid values are "default" and "json"
-- `storage.path`: The bot does not use a database and thus stores the added servers in a json file in this directory
 
 ### Starting the application
 ```bash

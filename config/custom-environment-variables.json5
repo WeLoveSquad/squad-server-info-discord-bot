@@ -10,7 +10,4 @@
     level: "LOGGING_LEVEL",
     format: "LOGGING_FORMAT",
   },
-  storage: {
-    path : "STORAGE_PATH",
-  },
 }

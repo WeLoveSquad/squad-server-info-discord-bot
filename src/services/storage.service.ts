@@ -1,4 +1,3 @@
-import config from "config";
 import EventEmitter from "events";
 import fs from "fs";
 import { singleton } from "tsyringe";
@@ -7,24 +6,21 @@ import { Logger } from "./logger.service.js";
 
 @singleton()
 export class StorageService extends EventEmitter {
+  private static readonly STORAGE_DIR_PATH = "./storage";
+  private static readonly STORAGE_FILE_PATH = "./storage/storage.json";
+
   public static readonly STORAGE_UPDATED_EVENT = "storageUpdated";
 
   private servers: ServerAddress[] = [];
 
-  private storageDirectoryPath: string;
-  private storageFilePath: string;
-  private storagefileName = "storage.json";
-
   constructor(private logger: Logger) {
     super();
 
-    this.storageDirectoryPath = config.get<string>("storage.path");
-    this.storageFilePath = `${this.storageDirectoryPath}/${this.storagefileName}`;
-    this.logger.debug("Will store servers in file: [%s]", this.storageFilePath);
+    this.logger.debug("Will store servers in file: [%s]", StorageService.STORAGE_FILE_PATH);
 
-    if (fs.existsSync(this.storageFilePath)) {
-      this.logger.info("Found storage file: [%s]", this.storageFilePath);
-      const storage = JSON.parse(fs.readFileSync(this.storageFilePath, "utf-8"));
+    if (fs.existsSync(StorageService.STORAGE_FILE_PATH)) {
+      this.logger.info("Found storage file: [%s]", StorageService.STORAGE_FILE_PATH);
+      const storage = JSON.parse(fs.readFileSync(StorageService.STORAGE_FILE_PATH, "utf-8"));
 
       for (const server of storage.servers) {
         this.logger.verbose("Loaded [%s] from storage", server);
@@ -32,8 +28,8 @@ export class StorageService extends EventEmitter {
       }
     } else {
       this.logger.info(
-        "Storage directory at [%s] does not exist yet and no servers were loaded",
-        this.storageDirectoryPath
+        "Storage file at [%s] does not exist yet and no servers were loaded",
+        StorageService.STORAGE_FILE_PATH
       );
     }
   }
@@ -80,16 +76,16 @@ export class StorageService extends EventEmitter {
   }
 
   private async updateStorage(): Promise<void> {
-    if (!fs.existsSync(this.storageDirectoryPath)) {
+    if (!fs.existsSync(StorageService.STORAGE_DIR_PATH)) {
       this.logger.info("Storage directory: [%s] does not exist yet. Attempting to create it");
       try {
-        await fs.promises.mkdir(this.storageDirectoryPath, { recursive: true });
+        await fs.promises.mkdir(StorageService.STORAGE_DIR_PATH, { recursive: true });
         this.logger.info(
           "Successfully created storage directory at [%s]",
-          this.storageDirectoryPath
+          StorageService.STORAGE_DIR_PATH
         );
       } catch (error: any) {
-        throw new Error(`Could not create storage file at [${this.storageDirectoryPath}]`);
+        throw new Error(`Could not create storage file at [${StorageService.STORAGE_DIR_PATH}]`);
       }
     }
 
@@ -101,7 +97,7 @@ export class StorageService extends EventEmitter {
     }
 
     await fs.promises.writeFile(
-      `${this.storageFilePath}`,
+      `${StorageService.STORAGE_FILE_PATH}`,
       JSON.stringify({ servers: serverAddresses }),
       "utf-8"
     );

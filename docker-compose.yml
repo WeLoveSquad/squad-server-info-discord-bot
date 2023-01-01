@@ -13,7 +13,6 @@ services:
       - "DISCORD_AUTHORIZED_ROLES=000000000000000001,000000000000000002"
       - "LOGGING_LEVEL=debug"
       - "LOGGING_FORMAT=default"
-      - "STORAGE_PATH=/home/node/app/storage"
 
 volumes:
   squad-server-info-dc-bot-vol:
