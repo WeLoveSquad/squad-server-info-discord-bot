@@ -77,7 +77,16 @@ export class ServerInfoChannelHandler {
   private async updateServerInfoMessage(embeds: EmbedBuilder[]) {
     if (embeds.length == 0) {
       if (this.serverInfoMessage) {
-        await this.serverInfoMessage.delete();
+        try {
+          await this.serverInfoMessage.delete();
+        } catch (error: any) {
+          this.logger.warn(
+            "Could not delete server info message with id: [%s]. Error: [%s]",
+            this.serverInfoMessage.id,
+            error
+          );
+        }
+
         this.serverInfoMessage = undefined;
       }
       return;
@@ -91,7 +100,17 @@ export class ServerInfoChannelHandler {
     if (!this.serverInfoMessage) {
       this.serverInfoMessage = await this.serverInfoChannel.send({ embeds: embeds });
     } else {
-      this.serverInfoMessage.edit({ embeds: embeds });
+      try {
+        await this.serverInfoMessage.edit({ embeds: embeds });
+      } catch (error: any) {
+        this.logger.warn(
+          "Could not edit server info message with id: [%s] and will send a new message. Error: [%s]",
+          this.serverInfoMessage.id,
+          error
+        );
+
+        this.serverInfoMessage = await this.serverInfoChannel.send({ embeds: embeds });
+      }
     }
   }
 
@@ -103,12 +122,18 @@ export class ServerInfoChannelHandler {
     const messages = [...this.serverInfoChannel.messages.cache];
 
     for (const [key, message] of messages) {
-      if (message.author.id != client.user?.id) {
-        await message.delete();
-      } else if (!this.serverInfoMessage) {
+      if (!this.serverInfoChannel && message.author.id == client.user?.id) {
         this.serverInfoMessage = message;
       } else {
-        await message.delete();
+        try {
+          await message.delete();
+        } catch (error: any) {
+          this.logger.warn(
+            "Could not delete message: [%s] from server info channel during init. Error: [%s]",
+            message.id,
+            error
+          );
+        }
       }
     }
   }
