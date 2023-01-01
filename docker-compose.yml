@@ -1,7 +1,7 @@
 version: "3"
 services:
-  squad-server-info-discord-bot:
-    image: squad-server-info-discord-bot
+  squad-server-info-dc-bot:
+    image: squad-server-info-dc-bot
     build: .
     volumes:
       - "squad-server-info-dc-bot-vol:/home/node/app/storage"
