@@ -2,7 +2,7 @@
 
 A Discord bot to show [Squad](https://joinsquad.com/) server information in an embed in a Discord text channel
 
-![bot-showcase](https://user-images.githubusercontent.com/24782633/210171593-96470974-541f-45a2-9c08-e6f2d1134512.png)
+![embed-showcase](https://user-images.githubusercontent.com/24782633/210270661-0f1a7353-aaa6-4ded-8f51-28612ecd4345.png)
 
 ## Available Commands
 
