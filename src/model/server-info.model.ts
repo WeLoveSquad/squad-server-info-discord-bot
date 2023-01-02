@@ -1,13 +1,13 @@
 export class ServerInfo {
-  public serverName: string;
-  public layer: string;
-  public playerCount: number;
-  public maxPlayerCount: number;
-  public teamOne: string;
-  public teamTwo: string;
-  public publicQueue: number;
-  public whitelistQueue: number;
-  public playtimeSeconds: number;
+  public readonly serverName: string;
+  public readonly layer: string;
+  public readonly playerCount: number;
+  public readonly maxPlayerCount: number;
+  public readonly teamOne: string;
+  public readonly teamTwo: string;
+  public readonly publicQueue: number;
+  public readonly whitelistQueue: number;
+  public readonly playtimeSeconds: number;
 
   constructor(
     serverName: string,

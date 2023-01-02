@@ -1,8 +1,8 @@
 export class ServerAddress {
   private static ADDRESS_REGEX = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d{1,5})$/;
 
-  public ip: string;
-  public port: number;
+  public readonly ip: string;
+  public readonly port: number;
 
   constructor(address: string) {
     const match = address.match(ServerAddress.ADDRESS_REGEX);
