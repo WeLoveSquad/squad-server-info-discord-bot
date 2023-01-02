@@ -200,7 +200,7 @@ export class ServerInfoChannelHandler {
         { name: "Round Time", value: duration.toFormat("hh:mm:ss") }
       )
       .setFooter({
-        text: `#${position} Last update: ${DateTime.now().toFormat("dd.LL.yyyy HH:mm:ss")}`,
+        text: `#${position} | Last update: ${DateTime.now().toFormat("dd.LL.yyyy HH:mm:ss")}`,
       });
   }
 
@@ -209,7 +209,7 @@ export class ServerInfoChannelHandler {
       .setTitle(`${serverAddress.ip}:${serverAddress.port}`)
       .setDescription("Server query endpoint is unreachable")
       .setFooter({
-        text: `#${position} Last update: ${DateTime.now().toFormat("dd.LL.yyyy HH:mm:ss")}`,
+        text: `#${position} | Last update: ${DateTime.now().toFormat("dd.LL.yyyy HH:mm:ss")}`,
       });
   }
 }
