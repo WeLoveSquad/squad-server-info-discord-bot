@@ -2,7 +2,7 @@ import "reflect-metadata";
 
 import { dirname, importx } from "@discordx/importer";
 import config from "config";
-import { IntentsBitField } from "discord.js";
+import { GatewayIntentBits } from "discord.js";
 import { Client } from "discordx";
 import { container, singleton } from "tsyringe";
 import { Logger } from "./services/logger.service.js";
@@ -13,13 +13,7 @@ class Main {
 
   constructor(private logger: Logger) {
     this.client = new Client({
-      intents: [
-        IntentsBitField.Flags.Guilds,
-        IntentsBitField.Flags.GuildMessages,
-        IntentsBitField.Flags.GuildMessageReactions,
-        IntentsBitField.Flags.DirectMessages,
-        IntentsBitField.Flags.MessageContent,
-      ],
+      intents: [GatewayIntentBits.Guilds],
       silent: false,
     });
 

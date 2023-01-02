@@ -19,6 +19,8 @@ The `server-address` has to contain the IP and Query-Port of the Squad server in
 
 To create and add a Discord bot to your server please follow [this guide.](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
 
+In the `URL Generator` under `OAuth2` the only needed Bot-Permissions are `Send Messages` and `Manage Messages` in the `Text Permissions` column.
+
 ## Deployment with Docker
 ### Config
 
