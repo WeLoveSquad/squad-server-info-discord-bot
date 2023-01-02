@@ -53,36 +53,28 @@ export class ManageServersSlashCommands {
     });
   }
 
-  @Slash({ description: "Remove a server from the server-info-bot", name: "remove-server" })
+  @Slash({
+    description: "Remove a server from the server-info-bot",
+    name: "remove-server",
+  })
   async removeServer(
     @SlashOption({
-      description: "Server Query Address in the format of 'IP:Port'",
-      name: "server-address",
+      description: "Position of the server indicated by the number at the bottom left of the embed",
+      name: "server-position",
       required: true,
-      type: ApplicationCommandOptionType.String,
+      type: ApplicationCommandOptionType.Number,
     })
-    serverQueryAddress: string,
+    position: number,
     interaction: CommandInteraction
   ) {
-    let serverAddress: ServerAddress;
-    try {
-      serverAddress = new ServerAddress(serverQueryAddress);
-    } catch (error: any) {
+    if (await this.storageService.removeServerAtPosition(position - 1)) {
       interaction.reply({
-        content: `${serverQueryAddress} is not a valid Squad Server Query Address. Valid example: '12.13.145.167:12345`,
-        ephemeral: true,
-      });
-      return;
-    }
-
-    if (await this.storageService.removeServer(serverAddress)) {
-      interaction.reply({
-        content: `${serverQueryAddress} has been removed from the server-info-bot`,
+        content: `Server #${position} has been removed from the server-info-bot by`,
         ephemeral: true,
       });
     } else {
       interaction.reply({
-        content: `${serverQueryAddress} was not found in the server-info-bot and could not be removed`,
+        content: `Server #${position} was not found in the server-info-bot and could not be removed`,
         ephemeral: true,
       });
     }

@@ -46,23 +46,25 @@ export class StorageService extends EventEmitter {
     this.emit(StorageService.STORAGE_UPDATED_EVENT);
   }
 
-  async removeServer(serverAddress: ServerAddress): Promise<boolean> {
-    for (let i = 0; i < this.servers.length; i++) {
-      if (this.servers[i].equals(serverAddress)) {
-        this.servers.splice(i, 1);
-        this.logger.info("Removed [%s] from storage", serverAddress.toString());
-
-        await this.updateStorage();
-        this.emit(StorageService.STORAGE_UPDATED_EVENT);
-        return true;
-      }
+  async removeServerAtPosition(position: number): Promise<boolean> {
+    if (position < 0 || position >= this.servers.length) {
+      this.logger.info(
+        "Address at position: [%d] is not a valid position in the storage and could not be removed",
+        position
+      );
+      return false;
     }
 
+    const removedAddress = this.servers.splice(position, 1);
     this.logger.info(
-      "[%s] was not found in the storage and could not be removed",
-      serverAddress.toString()
+      "Removed [%s] at position: [%d] from storage",
+      removedAddress.toString(),
+      position
     );
-    return false;
+
+    await this.updateStorage();
+    this.emit(StorageService.STORAGE_UPDATED_EVENT);
+    return true;
   }
 
   contains(serverAddress: ServerAddress): boolean {
@@ -91,6 +93,7 @@ export class StorageService extends EventEmitter {
 
     const serverAddresses = [];
 
+    this.logger.info("Updating storage");
     for (const server of this.servers) {
       this.logger.verbose("Saving [%s] to storage", server.toString());
       serverAddresses.push(server.toString());

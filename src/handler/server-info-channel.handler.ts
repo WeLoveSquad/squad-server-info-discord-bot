@@ -51,13 +51,13 @@ export class ServerInfoChannelHandler {
     const servers = this.storageService.getServers();
     const embeds: EmbedBuilder[] = [];
 
-    for (const serverAddress of servers) {
+    for (const [index, serverAddress] of servers.entries()) {
       this.logger.verbose("Syncing server infos for server: [%s]", serverAddress.toString());
       let embed;
 
       try {
         const serverInfo = await this.serverQueryService.getServerInfo(serverAddress);
-        embed = this.buildServerInfoEmbed(serverInfo);
+        embed = this.buildServerInfoEmbed(serverInfo, index + 1);
       } catch (error: any) {
         this.logger.error(
           "Could not get server info for server: [%s]. Reason: [%s]",
@@ -65,7 +65,7 @@ export class ServerInfoChannelHandler {
           error
         );
 
-        embed = this.buildServerInfoErrorEmbed(serverAddress);
+        embed = this.buildServerInfoErrorEmbed(serverAddress, index + 1);
       }
 
       embeds.push(embed);
@@ -176,9 +176,8 @@ export class ServerInfoChannelHandler {
     }
   }
 
-  private buildServerInfoEmbed(serverInfo: ServerInfo): EmbedBuilder {
+  private buildServerInfoEmbed(serverInfo: ServerInfo, position: number): EmbedBuilder {
     const duration = Duration.fromObject({ seconds: serverInfo.playtimeSeconds });
-    const timestamp = DateTime.now().toFormat("dd.LL.yyyy HH:mm:ss");
 
     return new EmbedBuilder()
       .setTitle(serverInfo.serverName)
@@ -200,12 +199,17 @@ export class ServerInfoChannelHandler {
         { name: "Whitelist Queue", value: serverInfo.whitelistQueue.toString(), inline: true },
         { name: "Round Time", value: duration.toFormat("hh:mm:ss") }
       )
-      .setFooter({ text: `Last updated: ${timestamp}` });
+      .setFooter({
+        text: `#${position} Last update: ${DateTime.now().toFormat("dd.LL.yyyy HH:mm:ss")}`,
+      });
   }
 
-  private buildServerInfoErrorEmbed(serverAddress: ServerAddress) {
+  private buildServerInfoErrorEmbed(serverAddress: ServerAddress, position: number) {
     return new EmbedBuilder()
       .setTitle(`${serverAddress.ip}:${serverAddress.port}`)
-      .setDescription("Server query endpoint is unreachable");
+      .setDescription("Server query endpoint is unreachable")
+      .setFooter({
+        text: `#${position} Last update: ${DateTime.now().toFormat("dd.LL.yyyy HH:mm:ss")}`,
+      });
   }
 }

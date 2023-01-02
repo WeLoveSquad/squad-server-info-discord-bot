@@ -9,9 +9,9 @@ A Discord bot to show [Squad](https://joinsquad.com/) server information in an e
 - `/add-server <server-address>`
   - Adds a server to the bot. The bot will query server information from that server and show that information in an embed in a configured text channel
   - Example: `/add-server 45.91.103.14:27165`
-- `/remove-server <server-address>`
-  - Removes a server from the bot. The server information of that server will not be shown anymore
-  - Example: `/remove-server 45.91.103.14:27165`
+- `/remove-server <server-position>`
+  - Removes a server from the bot. The server information of that server will not be shown anymore. The position corresponds to the order of the servers in the message by the bot and can also be seen at the bottom left of the embed.
+  - Example: `/remove-server 1`
 
 The `server-address` has to contain the IP and Query-Port of the Squad server in the form of `IP:Port`. IP and Query-Port of a server can be found on [BattleMetrics.](https://www.battlemetrics.com)
 
