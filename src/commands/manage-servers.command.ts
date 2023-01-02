@@ -25,7 +25,7 @@ export class ManageServersSlashCommands {
     })
     serverQueryAddress: string,
     interaction: CommandInteraction
-  ) {
+  ): Promise<void> {
     let serverAddress: ServerAddress;
     try {
       serverAddress = new ServerAddress(serverQueryAddress);
@@ -42,7 +42,7 @@ export class ManageServersSlashCommands {
         content: `${serverQueryAddress} is already stored in the server-info-bot`,
         ephemeral: true,
       });
-      return true;
+      return;
     }
 
     await this.storageService.addServer(serverAddress);
@@ -57,6 +57,7 @@ export class ManageServersSlashCommands {
     description: "Remove a server from the server-info-bot",
     name: "remove-server",
   })
+  @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
   async removeServer(
     @SlashOption({
       description: "Position of the server indicated by the number at the bottom left of the embed",
@@ -66,7 +67,7 @@ export class ManageServersSlashCommands {
     })
     position: number,
     interaction: CommandInteraction
-  ) {
+  ): Promise<void> {
     if (await this.storageService.removeServerAtPosition(position - 1)) {
       interaction.reply({
         content: `Server #${position} has been removed from the server-info-bot by`,
