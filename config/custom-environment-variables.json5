@@ -5,6 +5,7 @@
     serverInfoChannel: "DISCORD_SERVER_INFO_CHANNEL",
     messageUpdateIntervalSec: "DISCORD_MESSAGE_UPDATE_INTERVAL_SEC",
     authorizedRoles: "DISCORD_AUTHORIZED_ROLES",
+    timeZone: "DISCORD_TIME_ZONE",
   },
   logging: {
     level: "LOGGING_LEVEL",

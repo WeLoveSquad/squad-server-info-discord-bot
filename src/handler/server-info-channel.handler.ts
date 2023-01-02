@@ -34,7 +34,7 @@ export class ServerInfoChannelHandler {
   }
 
   @Once({ event: "ready" })
-  async onceReady(_: unknown, client: Client) {
+  async onceReady(_: unknown, client: Client): Promise<void> {
     await this.initServerInfoChannel(client);
 
     this.storageService.addListener(StorageService.STORAGE_UPDATED_EVENT, async () => {
@@ -47,7 +47,7 @@ export class ServerInfoChannelHandler {
     }, config.get<number>("discord.messageUpdateIntervalSec") * 1000);
   }
 
-  private async syncServerInfos() {
+  private async syncServerInfos(): Promise<void> {
     const servers = this.storageService.getServers();
     const embeds: EmbedBuilder[] = [];
 
@@ -74,7 +74,7 @@ export class ServerInfoChannelHandler {
     this.updateServerInfoMessage(embeds);
   }
 
-  private async updateServerInfoMessage(embeds: EmbedBuilder[]) {
+  private async updateServerInfoMessage(embeds: EmbedBuilder[]): Promise<void> {
     if (embeds.length == 0) {
       if (this.serverInfoMessage) {
         try {
@@ -114,7 +114,7 @@ export class ServerInfoChannelHandler {
     }
   }
 
-  private async initServerInfoChannel(client: Client) {
+  private async initServerInfoChannel(client: Client): Promise<void> {
     this.guild = await this.getGuild(client);
     this.serverInfoChannel = await this.getServerInfoChannel(client);
 
@@ -200,16 +200,22 @@ export class ServerInfoChannelHandler {
         { name: "Round Time", value: duration.toFormat("hh:mm:ss") }
       )
       .setFooter({
-        text: `#${position} | Last update: ${DateTime.now().toFormat("dd.LL.yyyy HH:mm:ss")}`,
+        text: `#${position} | Last update: ${this.getTimestamp()}`,
       });
   }
 
-  private buildServerInfoErrorEmbed(serverAddress: ServerAddress, position: number) {
+  private buildServerInfoErrorEmbed(serverAddress: ServerAddress, position: number): EmbedBuilder {
     return new EmbedBuilder()
       .setTitle(`${serverAddress.ip}:${serverAddress.port}`)
       .setDescription("Server query endpoint is unreachable")
       .setFooter({
-        text: `#${position} | Last update: ${DateTime.now().toFormat("dd.LL.yyyy HH:mm:ss")}`,
+        text: `#${position} | Last update: ${this.getTimestamp()}`,
       });
+  }
+
+  private getTimestamp(): string {
+    return DateTime.now()
+      .setZone(config.get<string>("discord.timeZone"))
+      .toFormat("dd.LL.yyyy HH:mm:ss");
   }
 }
