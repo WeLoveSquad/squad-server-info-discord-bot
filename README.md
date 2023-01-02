@@ -17,7 +17,7 @@ The `server-address` has to contain the IP and Query-Port of the Squad server in
 
 ## Creating a bot and adding it to your server
 
-How to create and add a Discord bot to your server please follow [this guide.](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
+To create and add a Discord bot to your server please follow [this guide.](https://discordjs.guide/preparations/adding-your-bot-to-servers.html#bot-invite-links)
 
 ## Deployment with Docker
 ### Config
