@@ -79,7 +79,10 @@ export class StorageService extends EventEmitter {
 
   private async updateStorage(): Promise<void> {
     if (!fs.existsSync(StorageService.STORAGE_DIR_PATH)) {
-      this.logger.info("Storage directory: [%s] does not exist yet. Attempting to create it");
+      this.logger.info(
+        "Storage directory: [%s] does not exist yet. Attempting to create it",
+        StorageService.STORAGE_DIR_PATH
+      );
       try {
         await fs.promises.mkdir(StorageService.STORAGE_DIR_PATH, { recursive: true });
         this.logger.info(
