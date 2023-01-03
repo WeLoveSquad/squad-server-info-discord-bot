@@ -5,3 +5,4 @@ config/*
 !config/custom-environment-variables*
 storage/*
 .vscode/
+docker-compose-local.yml
