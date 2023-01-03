@@ -27,7 +27,7 @@ export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<Comman
         await next();
       } else {
         interaction.reply({
-          content: "You do not have the required permissions to perform this action",
+          content: "You do not have the required permissions to perform this action!",
           ephemeral: true,
         });
       }

@@ -31,7 +31,7 @@ export class ManageServersSlashCommands {
       serverAddress = new ServerAddress(serverQueryAddress);
     } catch (error: any) {
       interaction.reply({
-        content: `${serverQueryAddress} is not a valid Squad Server Query Address. Valid example: '12.13.145.167:12345`,
+        content: `${serverQueryAddress} is not a valid Squad Server Query Address. Valid example: "12.13.145.167:12345"`,
         ephemeral: true,
       });
       return;
