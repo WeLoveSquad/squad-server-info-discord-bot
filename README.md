@@ -68,5 +68,5 @@ npm run dev
 - `discord.messageUpdateIntervalSec`: Interval in seconds how often the bot will query the Squad servers and update the server info messages
 - `discord.authorizedRoles`: Comma separated string of IDs by roles that will be able to add and remove Squad servers to the bot. You can copy the IDs in "Server Settings > Roles" by clicking the three dots and pressing "Copy ID"
 - `discord.timeZone`: The time zone in which the "last update" message in the embed will be shown. Must be an IANA time zone database value like 'Europe/Berlin'. You can find available time zone names [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
-- `logging.level`: Log level of log messages in the console. Valid values are "debug", "verbose", "info", "warn" and"error"
+- `logging.level`: Log level of log messages in the console. Valid values are "debug", "verbose", "info", "warn" and "error"
 - `logging.level`: Format of log messages in the console. Valid values are "default" and "json"
