@@ -115,8 +115,20 @@ describe("parseFaction", () => {
     expect(faction).to.equal("RUS");
   });
 
-  it("Unknown", () => {
+  it("Logar_Seed_v1", () => {
+    const faction = serverQueryService.parseFaction("Logar_Seed_v1");
+
+    expect(faction).to.equal("RUS");
+  });
+
+  it("Tallil_RAAS_v8", () => {
     const faction = serverQueryService.parseFaction("Tallil_RAAS_v8");
+
+    expect(faction).to.equal("GB");
+  });
+
+  it("Unknown", () => {
+    const faction = serverQueryService.parseFaction("Map_Gamemode_v1");
 
     expect(faction).to.equal("Unknown");
   });

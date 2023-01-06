@@ -89,10 +89,13 @@ export class ServerQueryService {
       }
     }
 
-    if (team.includes("RU")) {
+    if (team.includes("RU") || team == "Logar_Seed_v1") {
       return "RUS";
+    } else if (team == "Tallil_RAAS_v8") {
+      return "GB";
     }
 
+    this.logger.warn("Could not parse faction from team: [%s]", team);
     return "Unknown";
   }
 }
