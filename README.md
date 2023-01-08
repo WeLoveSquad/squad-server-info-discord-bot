@@ -7,14 +7,27 @@ A Discord bot to show [Squad](https://joinsquad.com/) server information in an e
 
 ## Available Commands
 
+- `/init`
+  - Initialize the bot in a channel. The bot will send the server information in the channel where the `/init` command was used.
+  - If the bot has already been initialized in a channel it is possible to use `/init` in another channel. The bot will then delete it's current message and send all future server information in the other channel that was newly initialized.
+  - Example: `/init`
 - `/add-server <server-address>`
   - Adds a server to the bot. The bot will query server information from that server and show that information in an embed in a configured text channel
+  - `<server-address>` has to contain the IP and Query-Port of the Squad server in the form of `IP:Port`. IP and Query-Port of a server can be found on [BattleMetrics](https://www.battlemetrics.com)
   - Example: `/add-server 45.91.103.14:27165`
 - `/remove-server <server-position>`
   - Removes a server from the bot. The server information of that server will not be shown anymore. The position corresponds to the order of the servers in the message by the bot and can also be seen at the bottom left of the embed.
   - Example: `/remove-server 1`
-
-The `server-address` has to contain the IP and Query-Port of the Squad server in the form of `IP:Port`. IP and Query-Port of a server can be found on [BattleMetrics.](https://www.battlemetrics.com)
+- `/set-interval <interval>`
+  - Sets the interval in seconds in which the bot will query the Squad Servers and update the server info message
+  - The default interval is `15 seconds`
+  - The smalles allowed interval is `5 seconds`
+  - Example: `/set-interval 5`
+- `/set-time-zone <time-zone>`
+  - The bot shows date and time in the bottom left corner in each embed to show when that embed was updated for the last time. This command allows you to modify the time-zone for that date
+  - `<time-zone>` must be a valid IANA time zone database value. You can find available time zone names [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+  - The default time zone is `Europe/Berlin`
+  - Example: `/set-time-zone America/New_York`
 
 ## Creating a bot and adding it to your server
 
@@ -63,10 +76,6 @@ npm run dev
 
 ## Config values
 - `discord.botToken`: Secret Token of your Discord bot
-- `discord.guild`: ID of the Discord server where the bot will run. You can copy the ID by right-clicking on the server and pressing "Copy ID"
-- `discord.serverInfoChannel`: ID of the Discord text channel where the bot will send the Squad server info messages. You can copy the ID by right-clicking on the text channel and pressing "Copy ID"
-- `discord.messageUpdateIntervalSec`: Interval in seconds how often the bot will query the Squad servers and update the server info messages
-- `discord.authorizedRoles`: Comma separated string of IDs by roles that will be able to add and remove Squad servers to the bot. You can copy the IDs in "Server Settings > Roles" by clicking the three dots and pressing "Copy ID"
-- `discord.timeZone`: The time zone in which the "last update" message in the embed will be shown. Must be an IANA time zone database value like 'Europe/Berlin'. You can find available time zone names [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
-- `logging.level`: Log level of log messages in the console. Valid values are "debug", "verbose", "info", "warn" and "error"
-- `logging.level`: Format of log messages in the console. Valid values are "default" and "json"
+- `discord.authorizedRoles`: Comma separated string of IDs by roles that will be able to add and remove Squad servers to the bot. You can copy the IDs in `Server Settings > Roles` by clicking the three dots next to a role and pressing `Copy ID`
+- `logging.level`: Log level of log messages in the console. Valid values are `debug`, `verbose`, `info`, `warn` and `error`
+- `logging.format`: Format of log messages in the console. Valid values are `default` and `json`
