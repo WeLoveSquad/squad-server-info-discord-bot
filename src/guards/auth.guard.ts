@@ -26,7 +26,7 @@ export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<Comman
       if (member.roles.cache.hasAny(...authorizedRoles.split(","))) {
         await next();
       } else {
-        interaction.reply({
+        await interaction.reply({
           content: "You do not have the required permissions to perform this action!",
           ephemeral: true,
         });
