@@ -30,7 +30,7 @@ export class ManageServersSlashCommands {
     try {
       serverAddress = new ServerAddress(serverQueryAddress);
     } catch (error: any) {
-      interaction.reply({
+      await interaction.reply({
         content: `${serverQueryAddress} is not a valid Squad Server Query Address. Valid example: "12.13.145.167:12345"`,
         ephemeral: true,
       });
@@ -38,7 +38,7 @@ export class ManageServersSlashCommands {
     }
 
     if (this.storageService.contains(serverAddress)) {
-      interaction.reply({
+      await interaction.reply({
         content: `${serverQueryAddress} is already stored in the server-info-bot`,
         ephemeral: true,
       });
@@ -69,13 +69,94 @@ export class ManageServersSlashCommands {
     interaction: CommandInteraction
   ): Promise<void> {
     if (await this.storageService.removeServerAtPosition(position - 1)) {
-      interaction.reply({
-        content: `Server #${position} has been removed from the server-info-bot by`,
+      await interaction.reply({
+        content: `Server #${position} has been removed from the server-info-bot`,
         ephemeral: true,
       });
     } else {
-      interaction.reply({
+      await interaction.reply({
         content: `Server #${position} was not found in the server-info-bot and could not be removed`,
+        ephemeral: true,
+      });
+    }
+  }
+
+  @Slash({
+    description: "Initialize the server-info-bot to send the server information in this channel",
+    name: "init",
+  })
+  @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
+  async init(interaction: CommandInteraction) {
+    if (!interaction.guildId) {
+      await interaction.reply({
+        content: "The bot can only be initialized in a Discord Server!",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    await this.storageService.initGuildAndChannel(interaction.guildId, interaction.channelId);
+
+    await interaction.reply({
+      content: "Succesfully initialized the bot in this channel",
+      ephemeral: true,
+    });
+  }
+
+  @Slash({
+    description: "Set the interval",
+    name: "set-interval",
+  })
+  @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
+  async setUpdateInterval(
+    @SlashOption({
+      description:
+        "Interval in seconds in which the bot will query infos from the Squad-Servers and update the message",
+      name: "interval",
+      required: true,
+      type: ApplicationCommandOptionType.Number,
+    })
+    interval: number,
+    interaction: CommandInteraction
+  ) {
+    try {
+      await this.storageService.setUpdateIntervalSec(interval);
+      await interaction.reply({
+        content: `Update interval has been succesfully changed to ${interval} seconds`,
+        ephemeral: true,
+      });
+    } catch (error: any) {
+      await interaction.reply({
+        content: `${interval} seconds is not a valid interval. The smallest allowed interval is 5 seconds`,
+        ephemeral: true,
+      });
+    }
+  }
+
+  @Slash({
+    description: "Set the time zone that will be used in dates inside the embed",
+    name: "set-time-zone",
+  })
+  @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
+  async setTimeZone(
+    @SlashOption({
+      description: "IANA time zone name. e.g. Europe/Berlin",
+      name: "time-zone",
+      required: true,
+      type: ApplicationCommandOptionType.String,
+    })
+    timeZone: string,
+    interaction: CommandInteraction
+  ) {
+    try {
+      await this.storageService.setTimeZone(timeZone);
+      await interaction.reply({
+        content: `Time zone has been successfully changed to ${timeZone}`,
+        ephemeral: true,
+      });
+    } catch (error: any) {
+      await interaction.reply({
+        content: `${timeZone} is not a valid IANA time zone!`,
         ephemeral: true,
       });
     }
