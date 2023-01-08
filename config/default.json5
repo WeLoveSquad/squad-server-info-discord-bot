@@ -1,11 +1,7 @@
 {
   discord: {
     botToken: "XXXXXXXXXXXXXXXXXXXXXXXXXX",
-    guild: "000000000000000000",
-    serverInfoChannel: "000000000000000000",
-    messageUpdateIntervalSec: 15,
     authorizedRoles: "000000000000000001,000000000000000002",
-    timeZone: "Europe/Berlin",
   },
   logging: {
     level: "debug",
