@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "test": "ts-mocha -n loader=ts-node/esm/transpile-only -p tsconfig.json 'test/*.test.ts'",
-    "format": "prettier --write \"src/**/*.ts\"",
+    "format": "prettier --write \"(src|test)/**/*.ts\"",
     "serve": "node build/main.js",
     "start": "node --loader ts-node/esm/transpile-only src/main.ts",
     "dev": "nodemon --exec node --loader ts-node/esm/transpile-only src/main.ts"
@@ -37,15 +37,17 @@
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
+    "@types/chai-as-promised": "^7.1.5",
     "@types/config": "^3.3.0",
     "@types/expect": "^24.3.0",
     "@types/luxon": "^3.2.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.18",
     "chai": "^4.3.7",
+    "chai-as-promised": "^7.1.1",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.20",
-    "prettier": "^2.8.1",
+    "prettier": "^2.8.2",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.4"

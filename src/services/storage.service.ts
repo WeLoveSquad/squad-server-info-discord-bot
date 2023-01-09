@@ -1,5 +1,6 @@
 import EventEmitter from "events";
 import fs from "fs";
+import { DateTime } from "luxon";
 import { singleton } from "tsyringe";
 import { ServerAddress } from "../model/server-address.model.js";
 import { Logger } from "./logger.service.js";
@@ -9,23 +10,51 @@ export class StorageService extends EventEmitter {
   private static readonly STORAGE_DIR_PATH = "./storage";
   private static readonly STORAGE_FILE_PATH = "./storage/storage.json";
 
-  public static readonly STORAGE_UPDATED_EVENT = "storageUpdated";
+  public static readonly SERVERS_UPDATED_EVENT = "serversUpdated";
+  public static readonly INTERVAL_UPDATED_EVENT = "intervalUpdated";
+  public static readonly CHANNEL_UPDATED_EVENT = "channelUpdated";
+  public static readonly TIME_ZONE_UPDATED_EVENT = "timeZoneUpdated";
 
+  private guildId: string | undefined;
+  private channelId: string | undefined;
   private servers: ServerAddress[] = [];
+  private updateIntervalSec: number = 15;
+  private timeZone: string = "Europe/Berlin";
 
   constructor(private logger: Logger) {
     super();
 
-    this.logger.debug("Will store servers in file: [%s]", StorageService.STORAGE_FILE_PATH);
+    this.logger.debug("Will store storage in file: [%s]", StorageService.STORAGE_FILE_PATH);
 
     if (fs.existsSync(StorageService.STORAGE_FILE_PATH)) {
       this.logger.info("Found storage file: [%s]", StorageService.STORAGE_FILE_PATH);
       const storage = JSON.parse(fs.readFileSync(StorageService.STORAGE_FILE_PATH, "utf-8"));
 
-      for (const server of storage.servers) {
+      if (!storage) {
+        this.logger.error(
+          "An error occured while loading the storage. Will use the default values and override the storage on the next save"
+        );
+        return;
+      }
+
+      for (const server of storage.servers ?? []) {
         this.logger.verbose("Loaded [%s] from storage", server);
         this.servers.push(new ServerAddress(server));
       }
+
+      this.guildId = storage.guildId;
+      this.channelId = storage.channelId;
+      this.updateIntervalSec = storage.updateIntervalSec ?? 15;
+      this.timeZone = storage.timeZone ?? "Europe/Berlin";
+
+      this.logger.verbose(
+        "Loaded storage. guildId: [%s], channelId: [%s], servers: [%s], interval: [%s], timeZone: [%s]",
+        this.guildId,
+        this.channelId,
+        this.servers.map((server) => server.toString()),
+        this.updateIntervalSec,
+        this.timeZone
+      );
     } else {
       this.logger.info(
         "Storage file at [%s] does not exist yet and no servers were loaded",
@@ -43,7 +72,7 @@ export class StorageService extends EventEmitter {
     this.logger.info("Added [%s] to storage", serverAddress.toString());
 
     await this.updateStorage();
-    this.emit(StorageService.STORAGE_UPDATED_EVENT);
+    this.emit(StorageService.SERVERS_UPDATED_EVENT);
   }
 
   async removeServerAtPosition(position: number): Promise<boolean> {
@@ -63,7 +92,7 @@ export class StorageService extends EventEmitter {
     );
 
     await this.updateStorage();
-    this.emit(StorageService.STORAGE_UPDATED_EVENT);
+    this.emit(StorageService.SERVERS_UPDATED_EVENT);
     return true;
   }
 
@@ -75,6 +104,54 @@ export class StorageService extends EventEmitter {
     }
 
     return false;
+  }
+
+  async initGuildAndChannel(guildId: string, channelId: string): Promise<void> {
+    this.guildId = guildId;
+    this.channelId = channelId;
+    await this.updateStorage();
+    this.emit(StorageService.CHANNEL_UPDATED_EVENT);
+  }
+
+  isChannelInitialized(): boolean {
+    return this.guildId !== undefined && this.channelId !== undefined;
+  }
+
+  getGuildId(): string | undefined {
+    return this.guildId;
+  }
+
+  getChannelId(): string | undefined {
+    return this.channelId;
+  }
+
+  async setUpdateIntervalSec(interval: number) {
+    if (interval < 5) {
+      throw new Error("Interval cannot be smaller than 5 seconds");
+    }
+
+    this.updateIntervalSec = interval;
+    await this.updateStorage();
+    this.emit(StorageService.INTERVAL_UPDATED_EVENT);
+  }
+
+  getUpdateIntervalSec(): number {
+    return this.updateIntervalSec;
+  }
+
+  async setTimeZone(timeZone: string) {
+    const date = DateTime.local().setZone(timeZone);
+    if (!date.isValid) {
+      throw new Error(`${timeZone} is not a valid IANA time zone`);
+    }
+
+    this.timeZone = timeZone;
+    await this.updateStorage();
+    this.emit(StorageService.TIME_ZONE_UPDATED_EVENT);
+  }
+
+  getTimeZone(): string {
+    return this.timeZone;
   }
 
   private async updateStorage(): Promise<void> {
@@ -96,15 +173,22 @@ export class StorageService extends EventEmitter {
 
     const serverAddresses = [];
 
-    this.logger.info("Updating storage");
     for (const server of this.servers) {
-      this.logger.verbose("Saving [%s] to storage", server.toString());
       serverAddresses.push(server.toString());
     }
 
+    const storage = {
+      guildId: this.guildId,
+      channelId: this.channelId,
+      servers: serverAddresses,
+      updateIntervalSec: this.updateIntervalSec,
+      timeZone: this.timeZone,
+    };
+
+    this.logger.verbose("Saving storage: [%s]", JSON.stringify(storage));
     await fs.promises.writeFile(
       `${StorageService.STORAGE_FILE_PATH}`,
-      JSON.stringify({ servers: serverAddresses }),
+      JSON.stringify(storage),
       "utf-8"
     );
   }

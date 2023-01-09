@@ -1,4 +1,3 @@
-import config from "config";
 import {
   Channel,
   Client,
@@ -22,6 +21,7 @@ export class ServerInfoChannelHandler {
   private guild?: Guild;
   private serverInfoChannel?: TextChannel;
   private serverInfoMessage?: Message;
+  private interval?: NodeJS.Timer;
 
   private serverQueryService: ServerQueryService;
   private storageService: StorageService;
@@ -37,14 +37,57 @@ export class ServerInfoChannelHandler {
   async onceReady(_: unknown, client: Client): Promise<void> {
     await this.initServerInfoChannel(client);
 
-    this.storageService.addListener(StorageService.STORAGE_UPDATED_EVENT, async () => {
-      await this.syncServerInfos();
+    this.storageService.addListener(StorageService.CHANNEL_UPDATED_EVENT, async () => {
+      clearInterval(this.interval);
+
+      if (this.serverInfoMessage) {
+        try {
+          await this.serverInfoMessage.delete();
+          this.serverInfoMessage = undefined;
+          this.logger.info("Server info channel has been updated. Deleted old server info message");
+        } catch (error: any) {
+          this.logger.warn(
+            "Server info channel has been updated. Could not delete old server info message"
+          );
+        }
+      }
+
+      await this.initServerInfoChannel(client);
+      await this.startUpdateInterval();
     });
 
+    this.storageService.addListener(StorageService.SERVERS_UPDATED_EVENT, async () => {
+      this.logger.debug("Servers have been updated. Will restart the update interval");
+      await this.startUpdateInterval();
+    });
+
+    this.storageService.addListener(StorageService.TIME_ZONE_UPDATED_EVENT, async () => {
+      this.logger.debug("Time zone has been updated. Will restart the update interval");
+      await this.startUpdateInterval();
+    });
+
+    this.storageService.addListener(StorageService.INTERVAL_UPDATED_EVENT, async () => {
+      this.logger.debug("Interval has been updated. Will restart the update interval");
+      await this.startUpdateInterval();
+    });
+
+    await this.startUpdateInterval();
+  }
+
+  private async startUpdateInterval(): Promise<void> {
+    clearInterval(this.interval);
+
+    if (!this.guild || !this.serverInfoChannel) {
+      this.logger.info(
+        "Will not start the update interval because the server info channel has not been initialized yet"
+      );
+      return;
+    }
+
     await this.syncServerInfos();
-    setInterval(async () => {
+    this.interval = setInterval(async () => {
       await this.syncServerInfos();
-    }, config.get<number>("discord.messageUpdateIntervalSec") * 1000);
+    }, this.storageService.getUpdateIntervalSec() * 1000);
   }
 
   private async syncServerInfos(): Promise<void> {
@@ -115,8 +158,18 @@ export class ServerInfoChannelHandler {
   }
 
   private async initServerInfoChannel(client: Client): Promise<void> {
-    this.guild = await this.getGuild(client);
-    this.serverInfoChannel = await this.getServerInfoChannel(client);
+    const guildId = this.storageService.getGuildId();
+    const channelId = this.storageService.getChannelId();
+
+    if (!guildId || !channelId) {
+      this.logger.info(
+        "Cannot init server info channel yet because the bot has not been initialized in a channel"
+      );
+      return;
+    }
+
+    this.guild = await this.getGuild(client, guildId);
+    this.serverInfoChannel = await this.getServerInfoChannel(client, channelId);
 
     await this.serverInfoChannel.messages.fetch();
     const messages = [...this.serverInfoChannel.messages.cache];
@@ -138,35 +191,29 @@ export class ServerInfoChannelHandler {
     }
   }
 
-  private async getGuild(client: Client): Promise<Guild> {
+  private async getGuild(client: Client, guildId: string): Promise<Guild> {
     try {
-      return await client.guilds.fetch(config.get<string>("discord.guild"));
+      return await client.guilds.fetch(guildId);
     } catch (error: any) {
       throw new Error(
-        `Could not find guild with id: [${config.get<string>("discord.guild")}]. Reason: [${
-          error?.rawError?.message
-        }]`
+        `Could not find guild with id: [${guildId}]. Reason: [${error?.rawError?.message}]`
       );
     }
   }
 
-  private async getServerInfoChannel(client: Client): Promise<TextChannel> {
-    const cachedServerInfoChannel: Channel | undefined = client.channels.cache.get(
-      config.get<string>("discord.serverInfoChannel")
-    );
+  private async getServerInfoChannel(client: Client, channelId: string): Promise<TextChannel> {
+    const cachedServerInfoChannel: Channel | undefined = client.channels.cache.get(channelId);
     if (cachedServerInfoChannel) {
       return cachedServerInfoChannel as TextChannel;
     }
 
     if (!this.guild) {
-      throw Error("Could not find guild from config");
+      throw Error("Guild is undefined");
     }
 
-    const channel: GuildBasedChannel | undefined = this.guild.channels.cache.get(
-      config.get<string>("discord.serverInfoChannel")
-    );
+    const channel: GuildBasedChannel | undefined = this.guild.channels.cache.get(channelId);
     if (!channel) {
-      throw Error("Could not find server info channel from config");
+      throw Error(`Could not find server info channel with id: [${channelId}]`);
     }
 
     if (channel.isTextBased()) {
@@ -207,7 +254,7 @@ export class ServerInfoChannelHandler {
   private buildServerInfoErrorEmbed(serverAddress: ServerAddress, position: number): EmbedBuilder {
     return new EmbedBuilder()
       .setTitle(`${serverAddress.ip}:${serverAddress.port}`)
-      .setDescription("Server query endpoint is unreachable")
+      .setDescription("Server query endpoint is not responding")
       .setFooter({
         text: `#${position} | Last update: ${this.getTimestamp()}`,
       });
@@ -215,7 +262,7 @@ export class ServerInfoChannelHandler {
 
   private getTimestamp(): string {
     return DateTime.now()
-      .setZone(config.get<string>("discord.timeZone"))
+      .setZone(this.storageService.getTimeZone())
       .toFormat("dd.LL.yyyy HH:mm:ss");
   }
 }
