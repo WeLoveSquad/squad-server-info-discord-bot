@@ -7,7 +7,7 @@ import { ServerAddress } from "../model/server-address.model.js";
 import { StorageService } from "../services/storage.service.js";
 
 @Discord()
-export class ManageServersSlashCommands {
+export class ManageBotSlashCommands {
   private storageService: StorageService;
 
   constructor() {
@@ -82,7 +82,7 @@ export class ManageServersSlashCommands {
   }
 
   @Slash({
-    description: "Initialize the server-info-bot to send the server information in this channel",
+    description: "Initialize the server-info-bot to send server information in this channel",
     name: "init",
   })
   @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
@@ -104,14 +104,14 @@ export class ManageServersSlashCommands {
   }
 
   @Slash({
-    description: "Set the interval",
+    description: "Set the interval how often the server information will be updated",
     name: "set-interval",
   })
   @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
   async setUpdateInterval(
     @SlashOption({
       description:
-        "Interval in seconds in which the bot will query infos from the Squad-Servers and update the message",
+        "Interval in seconds in which the bot will query information from the Squad-Servers",
       name: "interval",
       required: true,
       type: ApplicationCommandOptionType.Number,
@@ -134,7 +134,7 @@ export class ManageServersSlashCommands {
   }
 
   @Slash({
-    description: "Set the time zone that will be used in dates inside the embed",
+    description: "Set the time zone that will be used for dates inside the embed",
     name: "set-time-zone",
   })
   @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
