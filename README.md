@@ -24,7 +24,7 @@ A Discord bot to show [Squad](https://joinsquad.com/) server information in an e
   - The smalles allowed interval is `5 seconds`
   - Example: `/set-interval 5`
 - `/set-time-zone <time-zone>`
-  - The bot shows date and time in the bottom left corner in each embed to show when that embed was updated for the last time. This command allows you to modify the time-zone for that date
+  - The bot shows date and time in the bottom left corner in each embed to show when that embed was updated for the last time. This command allows you to modify the time zone for that date
   - `<time-zone>` must be a valid IANA time zone database value. You can find available time zone names [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
   - The default time zone is `Europe/Berlin`
   - Example: `/set-time-zone America/New_York`
