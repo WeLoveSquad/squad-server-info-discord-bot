@@ -254,7 +254,7 @@ export class ServerInfoChannelHandler {
   private buildServerInfoErrorEmbed(serverAddress: ServerAddress, position: number): EmbedBuilder {
     return new EmbedBuilder()
       .setTitle(`${serverAddress.ip}:${serverAddress.port}`)
-      .setDescription("Server query endpoint is unreachable")
+      .setDescription("Server query endpoint is not responding")
       .setFooter({
         text: `#${position} | Last update: ${this.getTimestamp()}`,
       });
