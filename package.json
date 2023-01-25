@@ -34,6 +34,7 @@
     "discord.js": "^14.7.1",
     "discordx": "^11.5.2",
     "luxon": "^3.2.1",
+    "rcon": "^1.1.0",
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.7.0",
     "winston": "^3.8.2"

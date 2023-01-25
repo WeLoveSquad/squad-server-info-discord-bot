@@ -1,17 +1,22 @@
 import {
+  APIEmbedField,
   Channel,
   Client,
   EmbedBuilder,
   Guild,
   GuildBasedChannel,
   Message,
+  RestOrArray,
   TextChannel,
 } from "discord.js";
 import { Discord, Once } from "discordx";
 import { DateTime, Duration } from "luxon";
 import { container } from "tsyringe";
-import { ServerAddress } from "../model/server-address.model.js";
+import { Player } from "../model/player.model.js";
 import { ServerInfo } from "../model/server-info.model.js";
+import { SquadServer } from "../model/squad-server.model.js";
+import { Squad } from "../model/squad.model.js";
+import { Teams } from "../model/teams.model.js";
 import { Logger } from "../services/logger.service.js";
 import { ServerQueryService } from "../services/server-query.service.js";
 import { StorageService } from "../services/storage.service.js";
@@ -93,32 +98,44 @@ export class ServerInfoChannelHandler {
   private async syncServerInfos(): Promise<void> {
     const servers = this.storageService.getServers();
     const embeds: EmbedBuilder[] = [];
+    const playerEmbeds: EmbedBuilder[] = [];
 
-    for (const [index, serverAddress] of servers.entries()) {
-      this.logger.verbose("Syncing server infos for server: [%s]", serverAddress.toString());
-      let embed;
+    for (const [index, server] of servers.entries()) {
+      this.logger.verbose("Syncing server infos for server: [%s]", server.toString());
+      let infoEmbed;
 
+      const nextLayer = server.getNextLayer();
+
+      let serverInfo;
       try {
-        const serverInfo = await this.serverQueryService.getServerInfo(serverAddress);
-        embed = this.buildServerInfoEmbed(serverInfo, index + 1);
+        serverInfo = await this.serverQueryService.getServerInfo(server);
+        infoEmbed = this.buildServerInfoEmbed(serverInfo, index + 1, nextLayer);
       } catch (error: any) {
         this.logger.error(
           "Could not get server info for server: [%s]. Reason: [%s]",
-          serverAddress.toString(),
+          server.toString(),
           error
         );
 
-        embed = this.buildServerInfoErrorEmbed(serverAddress, index + 1);
+        infoEmbed = this.buildServerInfoErrorEmbed(server, index + 1);
       }
 
-      embeds.push(embed);
+      embeds.push(infoEmbed);
+
+      const teams = server.getTeams();
+      if (server.showPlayers && serverInfo && teams) {
+        playerEmbeds.push(this.buildPlayerEmbed(serverInfo, teams, index + 1));
+      }
     }
 
-    this.updateServerInfoMessage(embeds);
+    this.updateServerInfoMessage(embeds, playerEmbeds);
   }
 
-  private async updateServerInfoMessage(embeds: EmbedBuilder[]): Promise<void> {
-    if (embeds.length == 0) {
+  private async updateServerInfoMessage(
+    infoEmbeds: EmbedBuilder[],
+    playerEmbeds: EmbedBuilder[]
+  ): Promise<void> {
+    if (infoEmbeds.length == 0) {
       if (this.serverInfoMessage) {
         try {
           await this.serverInfoMessage.delete();
@@ -139,6 +156,8 @@ export class ServerInfoChannelHandler {
       );
       return;
     }
+
+    const embeds = [...infoEmbeds, ...playerEmbeds];
 
     if (!this.serverInfoMessage) {
       this.serverInfoMessage = await this.serverInfoChannel.send({ embeds: embeds });
@@ -174,7 +193,7 @@ export class ServerInfoChannelHandler {
     await this.serverInfoChannel.messages.fetch();
     const messages = [...this.serverInfoChannel.messages.cache];
 
-    for (const [key, message] of messages) {
+    for (const [_, message] of messages) {
       if (!this.serverInfoMessage && message.author.id === client.user?.id) {
         this.serverInfoMessage = message;
       } else {
@@ -223,10 +242,14 @@ export class ServerInfoChannelHandler {
     }
   }
 
-  private buildServerInfoEmbed(serverInfo: ServerInfo, position: number): EmbedBuilder {
+  private buildServerInfoEmbed(
+    serverInfo: ServerInfo,
+    position: number,
+    nextLayer: string | undefined
+  ): EmbedBuilder {
     const duration = Duration.fromObject({ seconds: serverInfo.playtimeSeconds });
 
-    return new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setTitle(serverInfo.serverName)
       .setThumbnail(`https://squadmaps.com/img/maps/full_size/${serverInfo.layer}.jpg`)
       .addFields(
@@ -244,16 +267,119 @@ export class ServerInfoChannelHandler {
         },
         { name: "Public Queue", value: serverInfo.publicQueue.toString(), inline: true },
         { name: "Whitelist Queue", value: serverInfo.whitelistQueue.toString(), inline: true },
-        { name: "Round Time", value: duration.toFormat("hh:mm:ss") }
+        { name: "Round Time", value: duration.toFormat("hh:mm:ss"), inline: true }
       )
       .setFooter({
         text: `#${position} | Last update: ${this.getTimestamp()}`,
       });
+
+    if (nextLayer) {
+      embed.addFields(
+        { name: "Next Layer", value: nextLayer, inline: true },
+        { name: "\u200B", value: "\u200B", inline: true }
+      );
+    }
+
+    return embed;
   }
 
-  private buildServerInfoErrorEmbed(serverAddress: ServerAddress, position: number): EmbedBuilder {
+  private buildPlayerEmbed(serverInfo: ServerInfo, teams: Teams, position: number): EmbedBuilder {
+    const embed = new EmbedBuilder().setTitle(`${serverInfo.serverName} - Players`);
+
+    const teamOneEmbedFields = this.buildSquadsEmbedFields(teams.teamOneSquads);
+    const teamOneUnassignedFields = this.buildUnassignedEmbedField(teams.teamOneUnassigned);
+    const teamTwoEmbedFields = this.buildSquadsEmbedFields(teams.teamTwoSquads);
+    const teamTwoUnassignedFields = this.buildUnassignedEmbedField(teams.teamTwoUnassigned);
+
+    embed.addFields({
+      name: `Team 1 - ${serverInfo.teamOne}`,
+      value: `${teams.teamOnePlayerCount} Players`,
+    });
+
+    embed.addFields(...teamOneEmbedFields);
+    if (teamOneUnassignedFields) {
+      embed.addFields(...teamOneUnassignedFields);
+    }
+
+    embed.addFields({
+      name: `Team 2 - ${serverInfo.teamTwo}`,
+      value: `${teams.teamTwoPlayerCount} Players`,
+    });
+
+    embed.addFields(...teamTwoEmbedFields);
+    if (teamTwoUnassignedFields) {
+      embed.addFields(...teamTwoUnassignedFields);
+    }
+
+    embed.setFooter({
+      text: `#${position} | Last update: ${this.getTimestamp()}`,
+    });
+
+    return embed;
+  }
+
+  private buildSquadsEmbedFields(squads: Map<number, Squad>): RestOrArray<APIEmbedField> {
+    const fields: APIEmbedField[] = [];
+
+    for (const [id, squad] of squads.entries()) {
+      let squadMembers = "";
+      for (const player of squad.players) {
+        squadMembers += `> ${player.name}\n`;
+      }
+
+      const lock = squad.locked ? ":lock:" : ":unlock:";
+
+      fields.push({
+        name: `${id} | ${squad.name} (${squad.size}) ${lock}`,
+        value: squadMembers,
+        inline: true,
+      });
+    }
+
+    if (fields.length % 3 == 2) {
+      fields.push({ name: "\u200B", value: "\u200B", inline: true });
+    } else if (fields.length % 3 == 1) {
+      fields[fields.length - 1].inline = false;
+    }
+
+    return fields;
+  }
+
+  private buildUnassignedEmbedField(
+    unassignedPlayers: Player[]
+  ): RestOrArray<APIEmbedField> | undefined {
+    if (unassignedPlayers.length == 0) {
+      return undefined;
+    }
+
+    const unassignedFields = [
+      {
+        name: `Unassigned`,
+        value: "",
+        inline: true,
+      },
+      {
+        name: `\u200B`,
+        value: "",
+        inline: true,
+      },
+      {
+        name: `\u200B`,
+        value: "",
+        inline: true,
+      },
+    ];
+
+    for (const [index, player] of unassignedPlayers.entries()) {
+      unassignedFields[index % 3].value += `> ${player.name}\n`;
+    }
+
+    return unassignedFields.filter((field) => field.value !== "");
+  }
+
+  private buildServerInfoErrorEmbed(squadServer: SquadServer, position: number): EmbedBuilder {
     return new EmbedBuilder()
-      .setTitle(`${serverAddress.ip}:${serverAddress.port}`)
+      .setTitle(`${squadServer.ip}:${squadServer.queryPort}`)
       .setDescription("Server query endpoint is not responding")
       .setFooter({
         text: `#${position} | Last update: ${this.getTimestamp()}`,

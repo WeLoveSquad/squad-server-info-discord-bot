@@ -2,7 +2,7 @@ import EventEmitter from "events";
 import fs from "fs";
 import { DateTime } from "luxon";
 import { singleton } from "tsyringe";
-import { ServerAddress } from "../model/server-address.model.js";
+import { SquadServer } from "../model/squad-server.model.js";
 import { Logger } from "./logger.service.js";
 
 @singleton()
@@ -17,7 +17,7 @@ export class StorageService extends EventEmitter {
 
   private guildId: string | undefined;
   private channelId: string | undefined;
-  private servers: ServerAddress[] = [];
+  private servers: SquadServer[] = [];
   private updateIntervalSec: number = 15;
   private timeZone: string = "Europe/Berlin";
 
@@ -39,7 +39,21 @@ export class StorageService extends EventEmitter {
 
       for (const server of storage.servers ?? []) {
         this.logger.verbose("Loaded [%s] from storage", server);
-        this.servers.push(new ServerAddress(server));
+
+        const ip = server.ip;
+        const queryPort = server.queryPort;
+
+        if (ip && queryPort) {
+          this.servers.push(
+            new SquadServer({
+              ip: ip,
+              queryPort: queryPort,
+              rconPort: server.rconPort,
+              rconPassword: server.rconPassword,
+              showPlayers: server.showPlayers ?? false,
+            })
+          );
+        }
       }
 
       this.guildId = storage.guildId;
@@ -63,13 +77,13 @@ export class StorageService extends EventEmitter {
     }
   }
 
-  getServers(): ServerAddress[] {
+  getServers(): SquadServer[] {
     return [...this.servers];
   }
 
-  async addServer(serverAddress: ServerAddress): Promise<void> {
-    this.servers.push(serverAddress);
-    this.logger.info("Added [%s] to storage", serverAddress.toString());
+  async addServer(server: SquadServer): Promise<void> {
+    this.servers.push(server);
+    this.logger.info("Added [%s] to storage", server.toString());
 
     await this.updateStorage();
     this.emit(StorageService.SERVERS_UPDATED_EVENT);
@@ -84,9 +98,10 @@ export class StorageService extends EventEmitter {
       return false;
     }
 
-    const removedAddress = this.servers.splice(position, 1);
+    const removedAddress = this.servers.splice(position, 1)[0];
+    removedAddress.dispose();
     this.logger.info(
-      "Removed [%s] at position: [%d] from storage",
+      "Removed [%s] at position: [%d] from storage and disposed the Rcon connection",
       removedAddress.toString(),
       position
     );
@@ -96,9 +111,31 @@ export class StorageService extends EventEmitter {
     return true;
   }
 
-  contains(serverAddress: ServerAddress): boolean {
+  async setShowPlayers(position: number, show: boolean): Promise<boolean> {
+    if (position < 0 || position >= this.servers.length) {
+      this.logger.info(
+        "Address at position: [%d] is not a valid position in the storage",
+        position
+      );
+      return false;
+    }
+
+    this.servers[position].setShowPlayers(show);
+    this.logger.info(
+      "Set showPlayers to: [%s] for server: [%s] at position: [%d] from storage and disposed the Rcon connection",
+      show,
+      this.servers[position].toString(),
+      position
+    );
+
+    await this.updateStorage();
+    this.emit(StorageService.SERVERS_UPDATED_EVENT);
+    return true;
+  }
+
+  contains(squadServer: SquadServer): boolean {
     for (const server of this.servers) {
-      if (server.equals(serverAddress)) {
+      if (server.equals(squadServer)) {
         return true;
       }
     }
@@ -171,16 +208,22 @@ export class StorageService extends EventEmitter {
       }
     }
 
-    const serverAddresses = [];
+    const servers = [];
 
     for (const server of this.servers) {
-      serverAddresses.push(server.toString());
+      servers.push({
+        ip: server.ip,
+        queryPort: server.queryPort,
+        rconPort: server.rconPort,
+        rconPassword: server.rconPassword,
+        showPlayers: server.showPlayers,
+      });
     }
 
     const storage = {
       guildId: this.guildId,
       channelId: this.channelId,
-      servers: serverAddresses,
+      servers: servers,
       updateIntervalSec: this.updateIntervalSec,
       timeZone: this.timeZone,
     };

@@ -1,7 +1,7 @@
 import ServerQuery from "@fabricio-191/valve-server-query";
 import { injectable } from "tsyringe";
-import { ServerAddress } from "../model/server-address.model.js";
 import { ServerInfo } from "../model/server-info.model.js";
+import { SquadServer } from "../model/squad-server.model.js";
 import { Logger } from "./logger.service.js";
 
 @injectable()
@@ -10,22 +10,22 @@ export class ServerQueryService {
 
   constructor(private logger: Logger) {}
 
-  public async getServerInfo(serverAddress: ServerAddress): Promise<ServerInfo> {
+  public async getServerInfo(squadServer: SquadServer): Promise<ServerInfo> {
     const server = await ServerQuery.Server({
-      ip: serverAddress.ip,
-      port: serverAddress.port,
+      ip: squadServer.ip,
+      port: squadServer.queryPort,
       timeout: 3000,
     });
-    this.logger.debug("Connected to server: [%s]", serverAddress.toString());
+    this.logger.debug("Connected to server: [%s]", squadServer.toQueryPortString());
 
     const info = await server.getInfo();
     if (!info) {
-      throw new Error(`Could not get info from server: [${serverAddress}]`);
+      throw new Error(`Could not get info from server: [${squadServer.toQueryPortString()}]`);
     }
 
     const rules = await server.getRules();
     if (!rules) {
-      throw new Error(`Could not get rules from server: [${serverAddress}]`);
+      throw new Error(`Could not get rules from server: [${squadServer.toQueryPortString()}]`);
     }
 
     const playerCount = this.getRuleNumber(rules, "PlayerCount_i");
@@ -48,7 +48,7 @@ export class ServerQueryService {
     );
 
     server.disconnect();
-    this.logger.debug("Disconnected from server [%s]", serverAddress.toString());
+    this.logger.debug("Disconnected from server [%s]", squadServer.toQueryPortString());
     return serverInfo;
   }
 
