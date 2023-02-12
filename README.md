@@ -49,7 +49,7 @@ The image below shows how an embed of a Team will look like. The bot will send t
 - `show-squad-names <True | False>`
   - If an RCON-Port and correct RCON-Password are provided the bot will also be able to request information about players and squads in each team and display them in an embed. With this command you can configure if the names of the squads should be shown or not. If `False` is used the squad names will be replaced with `Squad 1`, `Squad 2` and so on.
   -  The default value is `True`
-  - Example: `show-squad-names True`
+  - Example: `/show-squad-names True`
 
 ## Creating a bot and adding it to your server
 
