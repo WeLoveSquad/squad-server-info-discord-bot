@@ -48,6 +48,7 @@ describe("Settings", () => {
       const timeZone = "America/New_York";
       const showNextLayer = false;
       const showSquadNames = false;
+      const sortSquadsBySize = true;
 
       const json = {
         guildId: guildId,
@@ -57,6 +58,7 @@ describe("Settings", () => {
         timeZone: timeZone,
         showNextLayer: showNextLayer,
         showSquadNames: showSquadNames,
+        sortSquadsBySize: sortSquadsBySize,
       };
 
       const jsonString = JSON.stringify(json);
@@ -70,6 +72,7 @@ describe("Settings", () => {
       expect(settings.timeZone).to.equal(timeZone);
       expect(settings.showNextLayer).to.be.false;
       expect(settings.showSquadNames).to.be.false;
+      expect(settings.sortSquadsBySize).to.be.true;
     });
 
     it("partial settings are parsed correctly", () => {
@@ -94,6 +97,7 @@ describe("Settings", () => {
       expect(settings.timeZone).to.equal("Europe/Berlin");
       expect(settings.showNextLayer).to.be.true;
       expect(settings.showSquadNames).to.be.true;
+      expect(settings.sortSquadsBySize).to.be.false;
     });
   });
 
@@ -107,7 +111,7 @@ describe("Settings", () => {
       const jsonString = settings.toJsonString();
 
       expect(jsonString).to.equal(
-        '{"guildId":"123","serverChannelId":"456","playerChannelId":"789","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"guildId":"123","serverChannelId":"456","playerChannelId":"789","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
 
@@ -117,7 +121,7 @@ describe("Settings", () => {
       const jsonString = settings.toJsonString();
 
       expect(jsonString).to.equal(
-        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
   });

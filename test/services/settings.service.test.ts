@@ -57,7 +57,7 @@ describe("SettingsService", () => {
       await settingsService.initGuildAndServerChannel("123", "321");
 
       expect(getSettingsFileContent()).to.equal(
-        '{"guildId":"123","serverChannelId":"321","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"guildId":"123","serverChannelId":"321","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
 
@@ -67,13 +67,13 @@ describe("SettingsService", () => {
       await settingsService.initGuildAndServerChannel("123", "321");
 
       expect(getSettingsFileContent()).to.equal(
-        '{"guildId":"123","serverChannelId":"321","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"guildId":"123","serverChannelId":"321","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
 
       await settingsService.initGuildAndServerChannel("567", "765");
 
       expect(getSettingsFileContent()).to.equal(
-        '{"guildId":"567","serverChannelId":"765","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"guildId":"567","serverChannelId":"765","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
   });
@@ -86,7 +86,7 @@ describe("SettingsService", () => {
       await settingsService.initPlayerChannel("456");
 
       expect(getSettingsFileContent()).to.equal(
-        '{"guildId":"123","serverChannelId":"321","playerChannelId":"456","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"guildId":"123","serverChannelId":"321","playerChannelId":"456","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
 
@@ -97,13 +97,13 @@ describe("SettingsService", () => {
       await settingsService.initPlayerChannel("456");
 
       expect(getSettingsFileContent()).to.equal(
-        '{"guildId":"123","serverChannelId":"321","playerChannelId":"456","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"guildId":"123","serverChannelId":"321","playerChannelId":"456","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
 
       await settingsService.initPlayerChannel("789");
 
       expect(getSettingsFileContent()).to.equal(
-        '{"guildId":"123","serverChannelId":"321","playerChannelId":"789","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"guildId":"123","serverChannelId":"321","playerChannelId":"789","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
 
@@ -215,13 +215,13 @@ describe("SettingsService", () => {
       await settingsService.initPlayerChannel("456");
 
       expect(getSettingsFileContent()).to.equal(
-        '{"guildId":"123","serverChannelId":"321","playerChannelId":"456","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"guildId":"123","serverChannelId":"321","playerChannelId":"456","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
 
       await settingsService.removePlayerChannel();
 
       expect(getSettingsFileContent()).to.equal(
-        '{"guildId":"123","serverChannelId":"321","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"guildId":"123","serverChannelId":"321","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
 
@@ -241,7 +241,7 @@ describe("SettingsService", () => {
       await settingsService.setUpdateIntervalSec(15);
 
       expect(getSettingsFileContent()).to.equal(
-        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
 
@@ -271,7 +271,7 @@ describe("SettingsService", () => {
       await settingsService.setTimeZone("America/New_York");
 
       expect(getSettingsFileContent()).to.equal(
-        '{"updateIntervalSec":15,"timeZone":"America/New_York","showNextLayer":true,"showSquadNames":true}'
+        '{"updateIntervalSec":15,"timeZone":"America/New_York","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
 
@@ -301,7 +301,7 @@ describe("SettingsService", () => {
       await settingsService.setShowNextLayer(true);
 
       expect(getSettingsFileContent()).to.equal(
-        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
 
@@ -311,7 +311,7 @@ describe("SettingsService", () => {
       await settingsService.setShowNextLayer(false);
 
       expect(getSettingsFileContent()).to.equal(
-        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":false,"showSquadNames":true}'
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":false,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
   });
@@ -341,7 +341,7 @@ describe("SettingsService", () => {
       await settingsService.setShowSquadNames(true);
 
       expect(getSettingsFileContent()).to.equal(
-        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
 
@@ -351,12 +351,12 @@ describe("SettingsService", () => {
       await settingsService.setShowSquadNames(false);
 
       expect(getSettingsFileContent()).to.equal(
-        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":false}'
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":false,"sortSquadsBySize":false}'
       );
     });
   });
 
-  describe("setShowSquadNames", () => {
+  describe("showSquadNames", () => {
     it("returns showSquadNames true", async () => {
       const settingsService = container.resolve(SettingsService);
 
@@ -374,6 +374,46 @@ describe("SettingsService", () => {
     });
   });
 
+  describe("setSortSquadsBySize", () => {
+    it("sets sortSquadsBySize true", async () => {
+      const settingsService = container.resolve(SettingsService);
+
+      await settingsService.setSortSquadsBySize(true);
+
+      expect(getSettingsFileContent()).to.equal(
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":true}'
+      );
+    });
+
+    it("sets sortSquadsBySize false", async () => {
+      const settingsService = container.resolve(SettingsService);
+
+      await settingsService.setShowSquadNames(false);
+
+      expect(getSettingsFileContent()).to.equal(
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":false,"sortSquadsBySize":false}'
+      );
+    });
+  });
+
+  describe("showSquadNames", () => {
+    it("returns sortSquadsBySize true", async () => {
+      const settingsService = container.resolve(SettingsService);
+
+      await settingsService.setSortSquadsBySize(true);
+
+      expect(settingsService.sortSquadsBySize()).to.be.true;
+    });
+
+    it("returns sortSquadsBySize false", async () => {
+      const settingsService = container.resolve(SettingsService);
+
+      await settingsService.setSortSquadsBySize(false);
+
+      expect(settingsService.sortSquadsBySize()).to.be.false;
+    });
+  });
+
   describe("reset", () => {
     it("resets all settings to default", async () => {
       const settingsService = container.resolve(SettingsService);
@@ -386,7 +426,7 @@ describe("SettingsService", () => {
       await settingsService.setShowSquadNames(false);
 
       expect(getSettingsFileContent()).to.equal(
-        '{"guildId":"123","serverChannelId":"321","playerChannelId":"456","updateIntervalSec":30,"timeZone":"America/New_York","showNextLayer":false,"showSquadNames":false}'
+        '{"guildId":"123","serverChannelId":"321","playerChannelId":"456","updateIntervalSec":30,"timeZone":"America/New_York","showNextLayer":false,"showSquadNames":false,"sortSquadsBySize":false}'
       );
 
       await settingsService.resetSettings();
@@ -397,9 +437,10 @@ describe("SettingsService", () => {
       expect(settingsService.getTimeZone()).to.equal("Europe/Berlin");
       expect(settingsService.showNextLayer()).to.be.true;
       expect(settingsService.showSquadNames()).to.be.true;
+      expect(settingsService.sortSquadsBySize()).to.be.false;
 
       expect(getSettingsFileContent()).to.equal(
-        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
       );
     });
   });

@@ -140,6 +140,16 @@ export class SettingsService extends EventEmitter {
     return this.settings.showSquadNames;
   }
 
+  public async setSortSquadsBySize(sort: boolean): Promise<void> {
+    this.settings.sortSquadsBySize = sort;
+    await this.updateSettings();
+    this.emit(SettingsService.SETTINGS_UPDATED_EVENT);
+  }
+
+  public sortSquadsBySize(): boolean {
+    return this.settings.sortSquadsBySize;
+  }
+
   public async resetSettings(): Promise<void> {
     this.settings = new Settings();
     await this.updateSettings();

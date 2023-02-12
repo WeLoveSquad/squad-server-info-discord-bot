@@ -6,6 +6,7 @@ export class Settings {
   timeZone: string = "Europe/Berlin";
   showNextLayer: boolean = true;
   showSquadNames: boolean = true;
+  sortSquadsBySize: boolean = false;
 
   constructor(jsonString?: string) {
     if (!jsonString) {
@@ -24,6 +25,7 @@ export class Settings {
     this.timeZone = settings.timeZone ?? "Europe/Berlin";
     this.showNextLayer = settings.showNextLayer ?? true;
     this.showSquadNames = settings.showSquadNames ?? true;
+    this.sortSquadsBySize = settings.sortSquadsBySize ?? false;
   }
 
   public toJsonString(): string {
