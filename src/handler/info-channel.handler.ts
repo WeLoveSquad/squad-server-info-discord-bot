@@ -176,13 +176,13 @@ export class InfoChannelHandler {
 
     if (this.settingsService.isPlayerChannelInitialized()) {
       try {
-        await this.updatePlayerInfoMessage(playerEmbeds);
+        await this.updatePlayerInfoMessages(playerEmbeds);
       } catch (error: any) {
         this.logger.warn(
           "An error occured while updating the player info messages. Will resend all messages"
         );
 
-        await this.updatePlayerInfoMessage(playerEmbeds, true);
+        await this.updatePlayerInfoMessages(playerEmbeds, true);
         await this.clearPlayerInfoChannel();
       }
     }
@@ -232,7 +232,7 @@ export class InfoChannelHandler {
     }
   }
 
-  private async updatePlayerInfoMessage(playerEmbeds: EmbedBuilder[], resendAll: boolean = false) {
+  private async updatePlayerInfoMessages(playerEmbeds: EmbedBuilder[], resendAll: boolean = false) {
     if (!this.playerInfoChannel) {
       this.logger.error(
         "Cannot update the player info messages because playerInfoChannel is undefined"
