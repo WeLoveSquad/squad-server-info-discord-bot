@@ -30,6 +30,7 @@
   "dependencies": {
     "@discordx/importer": "^1.1.10",
     "@fabricio-191/valve-server-query": "^4.1.9",
+    "@sapphire/shapeshift": "^3.8.1",
     "config": "^3.3.9",
     "discord.js": "^14.7.1",
     "discordx": "^11.7.0",

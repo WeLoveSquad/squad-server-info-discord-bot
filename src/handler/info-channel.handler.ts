@@ -1,3 +1,4 @@
+import { CombinedPropertyError } from "@sapphire/shapeshift";
 import {
   Channel,
   Client,
@@ -165,7 +166,17 @@ export class InfoChannelHandler {
       }
     }
 
-    await this.updateInfoMessages(serverEmbeds, playerEmbeds);
+    try {
+      await this.updateInfoMessages(serverEmbeds, playerEmbeds);
+    } catch (error: any) {
+      this.logger.error(
+        "Unexpected error occurred while updating the info messages. Error: [%s]",
+        error
+      );
+      if (error instanceof CombinedPropertyError) {
+        this.logger.error("Error is a CombinedPropertyError. Errors: [%s]", error.errors);
+      }
+    }
   }
 
   private async updateInfoMessages(
