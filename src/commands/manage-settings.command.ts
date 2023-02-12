@@ -64,6 +64,31 @@ export class ManageSettingsSlashCommands {
   }
 
   @Slash({
+    description: "Enable that squads in the player-info-embed are sorted by size from small to big",
+    name: "sort-squads",
+  })
+  @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
+  async setSortSquadsBySize(
+    @SlashOption({
+      description: "True if squads should be sorted by size (small to big), otherwise false",
+      name: "sort",
+      required: true,
+      type: ApplicationCommandOptionType.Boolean,
+    })
+    sort: boolean,
+    interaction: CommandInteraction
+  ) {
+    await this.settingsService.setSortSquadsBySize(sort);
+
+    await interaction.reply({
+      content: `Succesfully ${
+        sort ? "enabled" : "disabled"
+      } that squads will be sorted in the player-info-embed`,
+      ephemeral: true,
+    });
+  }
+
+  @Slash({
     description: "Initialize the server-info-bot to send server information in this channel",
     name: "init",
   })

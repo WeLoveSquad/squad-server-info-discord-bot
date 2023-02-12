@@ -11,6 +11,7 @@ import { Team } from "../enums/team.enum.js";
 import { Player } from "../model/player.model.js";
 import { ServerInfo } from "../model/server-info.model.js";
 import { SquadServer } from "../model/squad-server.model.js";
+import { Squad } from "../model/squad.model.js";
 import { Teams } from "../model/teams.model.js";
 import { SettingsService } from "./settings.service.js";
 
@@ -146,7 +147,10 @@ export class ComponentService {
   private buildSquadEmbedFields(teams: Teams, team: Team): APIEmbedField[] {
     const fields: APIEmbedField[] = [];
 
-    const squads = teams.getSquads(team);
+    let squads = teams.getSquads(team);
+    if (this.settingsService.sortSquadsBySize()) {
+      squads = this.sortSquads(squads);
+    }
 
     for (const [index, squad] of squads.entries()) {
       let playerValue = "";
@@ -184,6 +188,10 @@ export class ComponentService {
     }
 
     return fields;
+  }
+
+  private sortSquads(squads: Squad[]): Squad[] {
+    return squads.sort((a, b) => a.size - b.size);
   }
 
   private buildUnassignedEmbedField(unassignedPlayers: Player[]): APIEmbedField[] | undefined {

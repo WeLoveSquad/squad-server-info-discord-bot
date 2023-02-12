@@ -50,6 +50,11 @@ The image below shows how an embed of a Team will look like. The bot will send a
   - If an RCON-Port and correct RCON-Password are provided the bot will also be able to request information about players and squads in each team and display them in an embed. With this command you can configure if the names of the squads should be shown or not. If `False` is used the squad names will be replaced with `Squad 1`, `Squad 2` and so on.
   -  The default value is `True`
   - Example: `/show-squad-names True`
+- `sort-squads <True | False>`
+  - Sorts the squads in the player-info-embed by their size from small to big
+  - Normally squads are sorted by their ID. This can lead to the problem that small squads are shown next to big squads and thus the embed contains big empty spaces. Sorting the squads by their size will reduce the size of empty space and the embed but the squads will not be in the same order as ingame
+  - The default value is `False`
+  - Example: `/sort-squads True`
 
 ## Creating a bot and adding it to your server
 
