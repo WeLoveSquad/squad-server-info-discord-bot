@@ -183,7 +183,6 @@ export class InfoChannelHandler {
         );
 
         await this.updatePlayerInfoMessages(playerEmbeds, true);
-        await this.clearPlayerInfoChannel();
       }
     }
   }
@@ -216,6 +215,7 @@ export class InfoChannelHandler {
       });
     } else {
       try {
+        this.logger.debug("Editing server info message [%s]", this.serverInfoMessage.id);
         await this.serverInfoMessage.edit({ embeds: infoEmbeds, components: components });
       } catch (error: any) {
         this.logger.warn(
@@ -244,22 +244,39 @@ export class InfoChannelHandler {
       this.playerInfoMessages = [];
     }
 
-    for (const [index, embed] of playerEmbeds.entries()) {
-      const components = [];
+    const components = [];
+    if (this.serverInfoMessage) {
+      components.push(this.componentService.buildServerInfoLinkButton(this.serverInfoMessage.id));
+    }
 
-      if (index % 2 == 1 && this.serverInfoMessage) {
-        components.push(this.componentService.buildServerInfoLinkButton(this.serverInfoMessage.id));
+    let embedIndex = 0;
+    let messageIndex = 0;
+    while (embedIndex < playerEmbeds.length) {
+      const embeds = [playerEmbeds[embedIndex]];
+      if (embedIndex + 1 < playerEmbeds.length) {
+        embeds.push(playerEmbeds[embedIndex + 1]);
       }
 
-      if (index < this.playerInfoMessages.length) {
-        await this.playerInfoMessages[index].edit({ embeds: [embed], components: components });
+      if (messageIndex < this.playerInfoMessages.length) {
+        this.logger.debug(
+          "Editing player info message [%s]",
+          this.playerInfoMessages[messageIndex].id
+        );
+        await this.playerInfoMessages[messageIndex].edit({
+          embeds: embeds,
+          components: components,
+        });
       } else {
+        this.logger.debug("Sending new player info message");
         const message = await this.playerInfoChannel.send({
-          embeds: [embed],
+          embeds: embeds,
           components: components,
         });
         this.playerInfoMessages.push(message);
       }
+
+      embedIndex += 2;
+      messageIndex += 1;
     }
   }
 
@@ -306,12 +323,19 @@ export class InfoChannelHandler {
 
     this.playerInfoChannel = await this.getDiscordChannel(client, playerChannelId);
 
+    const rconServerCount = this.serverService.getRconServerCount();
     const messages = await this.playerInfoChannel.messages.fetch();
+
     for (const [_, message] of messages) {
       if (message.author.id !== client.user?.id) {
         await this.deleteMessage(message);
-      } else if (message.id !== this.serverInfoMessage?.id) {
+      } else if (
+        message.id !== this.serverInfoMessage?.id &&
+        this.playerInfoMessages.length < rconServerCount
+      ) {
         this.playerInfoMessages.splice(0, 0, message);
+      } else {
+        await this.deleteMessage(message);
       }
     }
   }
