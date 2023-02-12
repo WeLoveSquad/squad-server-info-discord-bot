@@ -26,7 +26,7 @@ export class Squad {
     this.locked = this.parseLocked(match[4]);
   }
 
-  public static isValidSquadString(rconSquadString: string) {
+  public static isValidSquadString(rconSquadString: string): boolean {
     return SQUAD_REGEX.test(rconSquadString);
   }
 

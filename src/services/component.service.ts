@@ -156,15 +156,9 @@ export class ComponentService {
         : `Squad ${squad.id}`;
 
       for (const [index, player] of squad.players.entries()) {
-        let leader = "";
-        if (player.leader && squad.name === "CMD Squad") {
-          leader = " :star2:";
-        } else if (player.leader) {
-          leader = " :star:";
-        }
-
         const playerName = this.sanitizePlayerName(player.name);
-        playerValue += `**${index + 1}.** ${playerName}${leader}\n`;
+        const leaderEmoji = this.getLeaderEmoji(player.leader, squad.name);
+        playerValue += `**${index + 1}.** ${playerName}${leaderEmoji}\n`;
       }
 
       const lock = squad.locked ? ":lock:" : ":unlock:";
@@ -174,7 +168,7 @@ export class ComponentService {
         inline: true,
       });
 
-      if (index % 2 == 0) {
+      if (index % 2 == 0 && index != squads.length - 1) {
         fields.push({
           name: "\u200B",
           value: "\u200B",
@@ -232,13 +226,25 @@ export class ComponentService {
     return unassignedFields;
   }
 
-  private sanitizePlayerName(name: string) {
+  private sanitizePlayerName(name: string): string {
     return name
       .replace("_", "\\_")
       .replace("*", "\\*")
       .replace("~", "\\~")
       .replace(">", "\\>")
       .replace("`", "\\`");
+  }
+
+  private getLeaderEmoji(isLeader: boolean, squadName: string): string {
+    if (!isLeader) {
+      return "";
+    }
+
+    if (squadName === "CMD Squad") {
+      return " :star2:";
+    } else {
+      return " :star:";
+    }
   }
 
   private buildFooter(position: number): string {

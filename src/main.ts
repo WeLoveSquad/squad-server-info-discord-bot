@@ -49,7 +49,7 @@ class Main {
 const main = container.resolve(Main);
 main.start();
 
-function handleExit(signal: string) {
+function handleExit(signal: string): void {
   main.shutdown(signal);
   process.exit(0);
 }

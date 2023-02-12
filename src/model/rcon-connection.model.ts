@@ -123,7 +123,7 @@ export class RconConnection {
     }
   }
 
-  private handleMessage(message: string) {
+  private handleMessage(message: string): void {
     if (message.startsWith("----- Active Players -----")) {
       this.logger.debug(
         "[RCON, %s] Received response to [%s]",
@@ -150,7 +150,7 @@ export class RconConnection {
     }
   }
 
-  private handleNextLayerMessage(message: string) {
+  private handleNextLayerMessage(message: string): void {
     const splitMessage = message.split(", ");
     if (splitMessage.length < 2) {
       this.logger.warn("[RCON, %s] Could not parse next layer: [%s]", this.serverAddres, message);
@@ -171,12 +171,12 @@ export class RconConnection {
     this.nextLayer = layer.replaceAll(" ", "_");
   }
 
-  private handlePlayersMessage(message: string) {
+  private handlePlayersMessage(message: string): void {
     this.receivedPlayerData = true;
     this.players = this.parsePlayers(message);
   }
 
-  private handlePartialPlayersMessage(message: string) {
+  private handlePartialPlayersMessage(message: string): void {
     const players = this.parsePlayers(message);
 
     this.players = this.players.concat(players);
@@ -199,7 +199,7 @@ export class RconConnection {
     return players;
   }
 
-  private isPartialPlayersMessage(message: string) {
+  private isPartialPlayersMessage(message: string): boolean {
     const splitMessage = message.split("\n");
 
     if (Player.isValidPlayerString(splitMessage[0])) {
@@ -209,7 +209,7 @@ export class RconConnection {
     return false;
   }
 
-  private handleSquadsMessage(message: string) {
+  private handleSquadsMessage(message: string): void {
     const splitMessage = message.split("\n");
     this.squads = [];
 

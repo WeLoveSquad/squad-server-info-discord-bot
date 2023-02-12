@@ -26,7 +26,7 @@ export class Settings {
     this.showSquadNames = settings.showSquadNames ?? true;
   }
 
-  public toJsonString() {
+  public toJsonString(): string {
     return JSON.stringify(this);
   }
 }
