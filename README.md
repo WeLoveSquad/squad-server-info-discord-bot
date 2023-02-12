@@ -1,33 +1,55 @@
 # Squad server info Discord bot
 
-A Discord bot to show [Squad](https://joinsquad.com/) server information in an embed in a Discord text channel
+A Discord bot to show [Squad](https://joinsquad.com/) server and player information in embeds in Discord text channels
+
+## Server Information
+
+The server information is retrieved from the public query endpoint of a Squad Server and only requires the Server `IP` and `Query-Port` in the config. Only the `Next Layer` in the image below cannot be retrieved from that public endpoint and requires an optional RCON-Connection. If an RCON-Port and RCON-Password are not provided then the information about the `Next Layer` will not be shown.
 
 ![embed-showcase](https://user-images.githubusercontent.com/24782633/210274236-7f269927-467d-463c-a1cc-3305ace65045.png)
 
+## Player Information
+
+The player information can only be retrieved from an RCON-Connection if the RCON-Port and RCON-Password are provided in the [config](#config-values).\
+If RCON is used the bot will **ONLY** use the commands `ListSquads`, `ListPlayers` and `ShowNextMap`. \
+The image below shows how an embed of a Team will look like. The bot will send two message for each Server with an RCON-Connection. Each message contains it's own player information embed for one team.
+
+![grafik](https://user-images.githubusercontent.com/24782633/218317356-894acdc2-51c3-4141-932d-1e1cebf42e94.png)
 
 ## Available Commands
 
 - `/init`
-  - Initialize the bot in a channel. The bot will send the server information in the channel where the `/init` command was used.
-  - If the bot has already been initialized in a channel it is possible to use `/init` in another channel. The bot will then delete it's current message and send all future server information in the other channel that was newly initialized.
+  - Initialize the bot to send server information in the channel where the `/init` command was used
+  - If the server information has already been initialized in a channel it is possible to use `/init` in another channel. The bot will then delete it's current message and send all future server information in the other channel that was newly initialized
   - Example: `/init`
-- `/add-server <server-address>`
-  - Adds a server to the bot. The bot will query server information from that server and show that information in an embed in a configured text channel
-  - `<server-address>` has to contain the IP and Query-Port of the Squad server in the form of `IP:Port`. IP and Query-Port of a server can be found on [BattleMetrics](https://www.battlemetrics.com)
-  - Example: `/add-server 45.91.103.14:27165`
-- `/remove-server <server-position>`
-  - Removes a server from the bot. The server information of that server will not be shown anymore. The position corresponds to the order of the servers in the message by the bot and can also be seen at the bottom left of the embed.
-  - Example: `/remove-server 1`
+- `/init-player-info`
+  - Will only have an effect for servers that include an `RCON-Port` and `RCON-Password` in the config
+  - Initialize the bot to send player information in the channel where the `/init-player-info` command was used
+  - Requires that the server information has been initialized with `/init`
+  - If the player information has already been initialized in a channel it is possible to use `/init-player-info` in another channel. The bot will then delete it's current player information messages and send all future player information in the other channel that was newly initialized
+  - It is also possible to use `/init-player-info` in the same channel where `/init` was used
+  - Example: `/init-player-info`
+- `/remove-player-info`
+  - Deletes all previously sent player information embeds and stops querying new player information from the RCON-Connection
+  - Example: `/remove-player-info`
 - `/set-interval <interval>`
-  - Sets the interval in seconds in which the bot will query the Squad Servers and update the server info message
+  - Sets the interval in seconds in which the bot will query the Squad Servers and update the server information and player information embeds
   - The default interval is `15 seconds`
-  - The smalles allowed interval is `5 seconds`
+  - The smalles allowed interval is also `15 seconds`
   - Example: `/set-interval 5`
 - `/set-time-zone <time-zone>`
   - The bot shows date and time in the bottom left corner in each embed to show when that embed was updated for the last time. This command allows you to modify the time zone for that date
   - `<time-zone>` must be a valid IANA time zone database value. You can find available time zone names [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
   - The default time zone is `Europe/Berlin`
   - Example: `/set-time-zone America/New_York`
+- `show-next-layer <True | False>`
+  - If an RCON-Port and correct RCON-Password are provided the bot will also be able to request the next layer from the Squad Server and display it in the server information embed. With this command you can configure if the next layer should be shown or not
+  - The default value is `True`
+  - `/show-next-layer True`
+- `show-squad-names <True | False>`
+  - If an RCON-Port and correct RCON-Password are provided the bot will also be able to request information about players and squads in each team and display them in an embed. With this command you can configure if the names of the squads should be shown or not. If `False` is used the squad names will be replaced with `Squad 1`, `Squad 2` and so on.
+  -  The default value is `True`
+  - Example: `show-squad-names True`
 
 ## Creating a bot and adding it to your server
 
@@ -77,5 +99,13 @@ npm run dev
 ## Config values
 - `discord.botToken`: Secret Token of your Discord bot
 - `discord.authorizedRoles`: Comma separated string of IDs by roles that will be able to add and remove Squad servers to the bot. You can copy the IDs in `Server Settings > Roles` by clicking the three dots next to a role and pressing `Copy ID`
+- `squad.servers`: Comma separated string of Squad-Servers from which the bot will query information
+  - Format:
+    - Without RCON: `<IP>:<Query-Port>`
+      - Example: `11.22.33.44:27165`
+    - With RCON: `<IP>:<Query-Port>:<RCON-Port>:<RCON-Password>`
+      - Example: `55.66.77.88:27165:12345:password`
+    - To use multiple servers in the config use a comma to separate the servers:
+      - `11.22.33.44:27165,55.66.77.88:27165:12345:password`
 - `logging.level`: Log level of log messages in the console. Valid values are `debug`, `verbose`, `info`, `warn` and `error`
 - `logging.format`: Format of log messages in the console. Valid values are `default` and `json`

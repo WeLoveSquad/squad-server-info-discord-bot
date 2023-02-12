@@ -7,16 +7,16 @@ export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<Comman
   authorizedRoles: string
 ) => {
   return async (interaction, client, next) => {
+    const logger = container.resolve(Logger);
+
     const messageGuild = interaction.guild;
     if (!messageGuild) {
-      container
-        .resolve(Logger)
-        .warn(
-          "interaction message guild not found for interaction: [%s] by user: [%s] with id: [%s]",
-          interaction.type,
-          interaction.user.username,
-          interaction.user.id
-        );
+      logger.warn(
+        "interaction message guild not found for interaction: [%s] by user: [%s] with id: [%s]",
+        interaction.type,
+        interaction.user.username,
+        interaction.user.id
+      );
       return;
     }
 
@@ -32,15 +32,13 @@ export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<Comman
         });
       }
     } catch (error: any) {
-      container
-        .resolve(Logger)
-        .warn(
-          "An error occurred while trying to check authentication of interaction: [%s] by user: [%s] with id: [%s]. Error: [%s]",
-          interaction.type,
-          interaction.user.username,
-          interaction.user.id,
-          error
-        );
+      logger.warn(
+        "An error occurred while trying to check authentication of interaction: [%s] by user: [%s] with id: [%s]. Error: [%s]",
+        interaction.type,
+        interaction.user.username,
+        interaction.user.id,
+        error
+      );
     }
   };
 };

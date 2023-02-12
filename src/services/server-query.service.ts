@@ -1,31 +1,31 @@
 import ServerQuery from "@fabricio-191/valve-server-query";
 import { injectable } from "tsyringe";
-import { ServerAddress } from "../model/server-address.model.js";
 import { ServerInfo } from "../model/server-info.model.js";
+import { SquadServer } from "../model/squad-server.model.js";
 import { Logger } from "./logger.service.js";
+
+const FACTIONS = ["AUS", "CAF", "GB", "INS", "MEA", "MIL", "RUS", "USA", "USMC", "PLA"];
 
 @injectable()
 export class ServerQueryService {
-  private factions = ["AUS", "CAF", "GB", "INS", "MEA", "MIL", "RUS", "USA", "USMC", "PLA"];
-
   constructor(private logger: Logger) {}
 
-  public async getServerInfo(serverAddress: ServerAddress): Promise<ServerInfo> {
+  public async getServerInfo(squadServer: SquadServer): Promise<ServerInfo> {
     const server = await ServerQuery.Server({
-      ip: serverAddress.ip,
-      port: serverAddress.port,
+      ip: squadServer.ip,
+      port: squadServer.queryPort,
       timeout: 3000,
     });
-    this.logger.debug("Connected to server: [%s]", serverAddress.toString());
+    this.logger.debug("Connected to Server-Query-Endpoint: [%s]", squadServer.toQueryPortString());
 
     const info = await server.getInfo();
     if (!info) {
-      throw new Error(`Could not get info from server: [${serverAddress}]`);
+      throw new Error(`Could not get info from server: [${squadServer.toQueryPortString()}]`);
     }
 
     const rules = await server.getRules();
     if (!rules) {
-      throw new Error(`Could not get rules from server: [${serverAddress}]`);
+      throw new Error(`Could not get rules from server: [${squadServer.toQueryPortString()}]`);
     }
 
     const playerCount = this.getRuleNumber(rules, "PlayerCount_i");
@@ -35,20 +35,23 @@ export class ServerQueryService {
     const teamOne = this.parseFaction(this.getRuleString(rules, "TeamOne_s"));
     const teamTwo = this.parseFaction(this.getRuleString(rules, "TeamTwo_s"));
 
-    const serverInfo = new ServerInfo(
-      info.name,
-      info.map,
-      playerCount,
-      info.players.max,
-      teamOne,
-      teamTwo,
-      publicQueue,
-      whitelistQueue,
-      playtimeSeconds
-    );
+    const serverInfo = new ServerInfo({
+      serverName: info.name,
+      layer: info.map,
+      playerCount: playerCount,
+      maxPlayerCount: info.players.max,
+      teamOne: teamOne,
+      teamTwo: teamTwo,
+      publicQueue: publicQueue,
+      whitelistQueue: whitelistQueue,
+      playtimeSeconds: playtimeSeconds,
+    });
 
     server.disconnect();
-    this.logger.debug("Disconnected from server [%s]", serverAddress.toString());
+    this.logger.debug(
+      "Disconnected from Server-Query-Endpoint: [%s]",
+      squadServer.toQueryPortString()
+    );
     return serverInfo;
   }
 
@@ -61,7 +64,7 @@ export class ServerQueryService {
         key,
         value
       );
-      return -1;
+      return 0;
     }
 
     return value;
@@ -82,8 +85,8 @@ export class ServerQueryService {
     return value;
   }
 
-  parseFaction(team: string): string {
-    for (const faction of this.factions) {
+  public parseFaction(team: string): string {
+    for (const faction of FACTIONS) {
       if (team.includes(faction)) {
         return faction;
       }

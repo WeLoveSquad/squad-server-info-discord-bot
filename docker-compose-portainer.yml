@@ -7,10 +7,11 @@ services:
     environment:
       - "DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}"
       - "DISCORD_AUTHORIZED_ROLES=${DISCORD_AUTHORIZED_ROLES}"
+      - "SQUAD_SERVERS=${SQUAD_SERVERS}"
       - "LOGGING_LEVEL=${LOGGING_LEVEL}"
       - "LOGGING_FORMAT=${LOGGING_FORMAT}"
     volumes:
-      - squad-server-info-dc-bot-vol:/home/node/app/storage
+      - squad-server-info-dc-bot-vol:/home/node/app/settings
     networks:
       - proxy
     logging:

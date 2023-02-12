@@ -1,6 +1,6 @@
 dist/
 build/
-storage/
+settings/
 config/*
 !config/default*
 !config/custom-environment-variables*

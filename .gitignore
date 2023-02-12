@@ -3,6 +3,6 @@ build/
 config/*
 !config/default*
 !config/custom-environment-variables*
-storage/*
+settings/*
 .vscode/
 docker-compose-local.yml
