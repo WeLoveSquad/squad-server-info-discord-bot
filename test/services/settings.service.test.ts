@@ -4,7 +4,6 @@ import { SettingsService } from "../../src/services/settings.service.js";
 
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
-import { Settings } from "../../src/model/settings.model.js";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -13,7 +12,7 @@ const SETTINGS_DIR_PATH = "./settings";
 const SETTINGS_FILE_PATH = "./settings/settings.json";
 
 describe("SettingsService", () => {
-  before(async () => {
+  beforeEach(async () => {
     await removeSettings();
   });
 
@@ -23,21 +22,6 @@ describe("SettingsService", () => {
   });
 
   describe("constructor", () => {
-    // it("loads settings correctly", async () => {
-    //   await createMockSettings();
-    //   await createMockSettings();
-
-    //   const settingsService = container.resolve(SettingsService);
-
-    //   expect(settingsService.getGuildId()).to.equal("123456789");
-    //   expect(settingsService.getServerChannelId()).to.equal("987654321");
-    //   expect(settingsService.getPlayerChannelId()).to.equal("123454321");
-    //   expect(settingsService.getUpdateIntervalSec()).to.equal(30);
-    //   expect(settingsService.getTimeZone()).to.equal("Europe/Brussels");
-    //   expect(settingsService.showNextLayer()).to.be.false;
-    //   expect(settingsService.showSquadNames()).to.be.false;
-    // });
-
     it("empty storage uses default values", () => {
       const settingsService = container.resolve(SettingsService);
 
@@ -389,29 +373,42 @@ describe("SettingsService", () => {
       expect(settingsService.showSquadNames()).to.be.false;
     });
   });
+
+  describe("reset", () => {
+    it("resets all settings to default", async () => {
+      const settingsService = container.resolve(SettingsService);
+
+      await settingsService.initGuildAndServerChannel("123", "321");
+      await settingsService.initPlayerChannel("456");
+      await settingsService.setUpdateIntervalSec(30);
+      await settingsService.setTimeZone("America/New_York");
+      await settingsService.setShowNextLayer(false);
+      await settingsService.setShowSquadNames(false);
+
+      expect(getSettingsFileContent()).to.equal(
+        '{"guildId":"123","serverChannelId":"321","playerChannelId":"456","updateIntervalSec":30,"timeZone":"America/New_York","showNextLayer":false,"showSquadNames":false}'
+      );
+
+      await settingsService.resetSettings();
+
+      expect(settingsService.isServerChannelInitialized()).to.be.false;
+      expect(settingsService.isPlayerChannelInitialized()).to.be.false;
+      expect(settingsService.getUpdateIntervalSec()).to.equal(15);
+      expect(settingsService.getTimeZone()).to.equal("Europe/Berlin");
+      expect(settingsService.showNextLayer()).to.be.true;
+      expect(settingsService.showSquadNames()).to.be.true;
+
+      expect(getSettingsFileContent()).to.equal(
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+      );
+    });
+  });
 });
 
 const removeSettings = async (): Promise<void> => {
   await fs.promises.rm(SETTINGS_DIR_PATH, { recursive: true, force: true });
 };
 
-const createMockSettings = async (): Promise<void> => {
-  await fs.promises.mkdir(SETTINGS_DIR_PATH, { recursive: true });
-
-  const settings = new Settings();
-  settings.guildId = "123456789";
-  settings.serverChannelId = "987654321";
-  settings.playerChannelId = "123454321";
-  settings.updateIntervalSec = 30;
-  settings.timeZone = "Europe/Brussels";
-  settings.showNextLayer = false;
-  settings.showSquadNames = false;
-
-  await fs.promises.writeFile(SETTINGS_FILE_PATH, JSON.stringify(settings), "utf-8");
-};
-
 const getSettingsFileContent = (): string => {
   return fs.readFileSync(SETTINGS_FILE_PATH, "utf-8");
 };
-
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));

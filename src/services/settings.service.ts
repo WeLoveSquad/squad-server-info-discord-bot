@@ -140,7 +140,7 @@ export class SettingsService extends EventEmitter {
     return this.settings.showSquadNames;
   }
 
-  public async reset(): Promise<void> {
+  public async resetSettings(): Promise<void> {
     this.settings = new Settings();
     await this.updateSettings();
     this.emit(SettingsService.SETTINGS_RESET_EVENT);

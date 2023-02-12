@@ -203,7 +203,7 @@ export class ManageSettingsSlashCommands {
   })
   @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
   async resetSettings(interaction: CommandInteraction) {
-    await this.settingsService.reset();
+    await this.settingsService.resetSettings();
     await interaction.reply({
       content: `Successfully reset all settings to the default values`,
       ephemeral: true,
