@@ -1,50 +1,48 @@
+import { Team } from "../enums/team.enum.js";
 import { Player } from "./player.model";
+
+const SQUAD_REGEX =
+  /ID: (\d+) \| Name: (.*) \| Size: (\d+) \| Locked: (True|False) \| Creator Name: (.*) \| Creator Steam ID: (\d+)/;
 
 export class Squad {
   id: number;
-  teamId: number;
+  team: Team;
   name: string;
   size: number;
   locked: boolean;
   players: Player[] = [];
 
-  constructor(rconSquadString: string, teamId: number) {
-    const attributes = rconSquadString.split(" | ");
+  constructor(rconSquadString: string, team: Team) {
+    const match = rconSquadString.match(SQUAD_REGEX);
 
-    if (attributes.length != 6) {
-      throw new Error(`rcon squad info: [${rconSquadString}] is invalid`);
+    if (!match || match.length != 7) {
+      throw new Error(`RCON squad string: [${rconSquadString}] is invalid`);
     }
 
-    this.teamId = teamId;
-    this.id = this.parseId(attributes[0]);
-    this.name = this.parseName(attributes[1]);
-    this.size = this.parseSize(attributes[2]);
-    this.locked = this.parseLocked(attributes[3]);
+    this.team = team;
+    this.id = Number.parseInt(match[1]);
+    this.name = match[2];
+    this.size = Number.parseInt(match[3]);
+    this.locked = this.parseLocked(match[4]);
+  }
+
+  public static isValidSquadString(rconSquadString: string) {
+    return SQUAD_REGEX.test(rconSquadString);
   }
 
   public addPlayer(player: Player): void {
-    this.players.push(player);
+    if (player.leader) {
+      this.players.splice(0, 0, player);
+    } else {
+      this.players.push(player);
+    }
   }
 
-  private parseId(idString: string): number {
-    const id: string = idString.split("ID: ")[1];
-
-    return Number(id);
+  public clearPlayers(): void {
+    this.players = [];
   }
 
-  private parseName(nameString: string): string {
-    return nameString.split("Name: ")[1];
-  }
-
-  private parseSize(sizeString: string): number {
-    const size: string = sizeString.split("Size: ")[1];
-
-    return Number(size);
-  }
-
-  private parseLocked(lockedString: string): boolean {
-    const locked: string = lockedString.split("Locked: ")[1];
-
-    return locked.toLowerCase() === "true";
+  private parseLocked(isLocked: string): boolean {
+    return isLocked.toLowerCase() === "true";
   }
 }

@@ -4,10 +4,10 @@ import { ServerInfo } from "../model/server-info.model.js";
 import { SquadServer } from "../model/squad-server.model.js";
 import { Logger } from "./logger.service.js";
 
+const FACTIONS = ["AUS", "CAF", "GB", "INS", "MEA", "MIL", "RUS", "USA", "USMC", "PLA"];
+
 @injectable()
 export class ServerQueryService {
-  private factions = ["AUS", "CAF", "GB", "INS", "MEA", "MIL", "RUS", "USA", "USMC", "PLA"];
-
   constructor(private logger: Logger) {}
 
   public async getServerInfo(squadServer: SquadServer): Promise<ServerInfo> {
@@ -16,7 +16,7 @@ export class ServerQueryService {
       port: squadServer.queryPort,
       timeout: 3000,
     });
-    this.logger.debug("Connected to server: [%s]", squadServer.toQueryPortString());
+    this.logger.debug("Connected to Server-Query-Endpoint: [%s]", squadServer.toQueryPortString());
 
     const info = await server.getInfo();
     if (!info) {
@@ -35,20 +35,23 @@ export class ServerQueryService {
     const teamOne = this.parseFaction(this.getRuleString(rules, "TeamOne_s"));
     const teamTwo = this.parseFaction(this.getRuleString(rules, "TeamTwo_s"));
 
-    const serverInfo = new ServerInfo(
-      info.name,
-      info.map,
-      playerCount,
-      info.players.max,
-      teamOne,
-      teamTwo,
-      publicQueue,
-      whitelistQueue,
-      playtimeSeconds
-    );
+    const serverInfo = new ServerInfo({
+      serverName: info.name,
+      layer: info.map,
+      playerCount: playerCount,
+      maxPlayerCount: info.players.max,
+      teamOne: teamOne,
+      teamTwo: teamTwo,
+      publicQueue: publicQueue,
+      whitelistQueue: whitelistQueue,
+      playtimeSeconds: playtimeSeconds,
+    });
 
     server.disconnect();
-    this.logger.debug("Disconnected from server [%s]", squadServer.toQueryPortString());
+    this.logger.debug(
+      "Disconnected from Server-Query-Endpoint: [%s]",
+      squadServer.toQueryPortString()
+    );
     return serverInfo;
   }
 
@@ -61,7 +64,7 @@ export class ServerQueryService {
         key,
         value
       );
-      return -1;
+      return 0;
     }
 
     return value;
@@ -82,8 +85,8 @@ export class ServerQueryService {
     return value;
   }
 
-  parseFaction(team: string): string {
-    for (const faction of this.factions) {
+  public parseFaction(team: string): string {
+    for (const faction of FACTIONS) {
       if (team.includes(faction)) {
         return faction;
       }

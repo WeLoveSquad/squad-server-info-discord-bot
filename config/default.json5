@@ -3,6 +3,11 @@
     botToken: "XXXXXXXXXXXXXXXXXXXXXXXXXX",
     authorizedRoles: "000000000000000001,000000000000000002",
   },
+  squad: {
+    // Comma separated string of servers in the format:
+    // <IP>:<Quer-Port> OR <IP>:<Quer-Port>:<RCON-Port>:<RCON-Password>
+    servers: "11.22.33.44:27165,55.66.77.88:27165:12345:password",
+  },
   logging: {
     level: "debug",
     format: "default",

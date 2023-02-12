@@ -1,75 +1,68 @@
-import { RconService } from "../services/rcon.service.js";
+import { RconConnection } from "./rcon-connection.model.js";
 import { Teams } from "./teams.model.js";
-
-export interface ServerOptions {
-  ip: string;
-  queryPort: number;
-  rconPort?: number;
-  rconPassword?: string;
-  showPlayers?: boolean;
-}
 
 const IP_REGEX = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
 
 export class SquadServer {
   public readonly ip: string;
   public readonly queryPort: number;
-  public showPlayers: boolean;
+
+  public readonly rconEnabled: boolean = false;
   public readonly rconPort?: number;
   public readonly rconPassword?: string;
-  private readonly rconService?: RconService;
 
-  constructor(options: ServerOptions) {
-    if (!IP_REGEX.test(options.ip)) {
-      throw new Error(`IP: [${options.ip}] ist not a valid IP-Address`);
-    }
-    if (!this.isValidPort(options.queryPort)) {
-      throw new Error(`Query-Port: [${options.queryPort}] ist not a valid Port`);
-    }
-    if (options.rconPort && !this.isValidPort(options.rconPort)) {
-      throw new Error(`Rcon-Port: [${options.rconPort}] ist not a valid Port`);
-    }
-    if (options.rconPort && !options.rconPassword) {
-      throw new Error(`Cannot set Rcon-Port without providing a Rcon-Password`);
+  private readonly rconConnection?: RconConnection;
+
+  constructor(serverString: string) {
+    const serverParams = serverString.split(":");
+
+    if (serverParams.length != 2 && serverParams.length != 4) {
+      throw new Error(
+        `'${serverString}' is not valid. The string has to follow the format: <IP>:<Query-Port> or <IP>:<Query-Port>:<RCON-Port>:<RCON-Password>`
+      );
     }
 
-    this.ip = options.ip;
-    this.queryPort = options.queryPort;
-    this.rconPort = options.rconPort;
-    this.rconPassword = options.rconPassword ?? undefined;
-    this.showPlayers = options.showPlayers ?? false;
+    this.ip = this.validateIp(serverParams[0]);
+    this.queryPort = this.parsePort(serverParams[1]);
 
-    if (this.rconPort && this.rconPassword) {
-      this.rconService = new RconService(this.ip, this.rconPort, this.rconPassword);
+    if (serverParams.length == 4) {
+      this.rconPort = this.parsePort(serverParams[2]);
+      this.rconPassword = serverParams[3];
+      this.rconEnabled = true;
+      this.rconConnection = new RconConnection(this.ip, this.rconPort, this.rconPassword);
     }
   }
 
   public getTeams(): Teams | undefined {
-    return this.rconService?.getTeams();
+    if (!this.rconConnection?.isConnected()) {
+      return undefined;
+    }
+
+    return this.rconConnection.getTeams();
   }
 
   public getNextLayer(): string | undefined {
-    return this.rconService?.getNextLayer();
-  }
-
-  public setShowPlayers(show: boolean): void {
-    this.showPlayers = show;
-  }
-
-  public dispose(): void {
-    this.rconService?.disconect();
-  }
-
-  public equals(other: SquadServer): boolean {
-    return this.ip == other.ip && this.queryPort == other.queryPort;
-  }
-
-  public toString(): string {
-    if (this.rconPort) {
-      return `IP: ${this.ip}, Query-Port: ${this.queryPort}, Rcon-Port: ${this.rconPort}`;
-    } else {
-      return `IP: ${this.ip}, Query-Port: ${this.queryPort}, Rcon disabled`;
+    if (!this.rconConnection?.isConnected()) {
+      return undefined;
     }
+
+    return this.rconConnection.getNextLayer();
+  }
+
+  public isRconConnected(): boolean {
+    if (!this.rconConnection) {
+      return false;
+    }
+
+    return this.rconConnection.isConnected();
+  }
+
+  public hasReceivedPlayerData(): boolean {
+    if (!this.rconConnection) {
+      return false;
+    }
+
+    return this.rconConnection.hasReceivedPlayerData();
   }
 
   public toQueryPortString(): string {
@@ -80,7 +73,21 @@ export class SquadServer {
     return `${this.ip}:${this.rconPort}`;
   }
 
-  private isValidPort(port: number) {
-    return port >= 1 || port <= 65535;
+  private validateIp(ip: string): string {
+    if (!IP_REGEX.test(ip)) {
+      throw new Error(`IP: '${ip}' is not a valid IP-Address`);
+    }
+
+    return ip;
+  }
+
+  private parsePort(portStr: string): number {
+    const port = Number.parseInt(portStr);
+
+    if (isNaN(port) || port < 0 || port > 65535) {
+      throw new Error(`Port: '${portStr}' is not a valid Port`);
+    }
+
+    return port;
   }
 }

@@ -4,10 +4,11 @@ services:
     image: squad-server-info-dc-bot
     build: .
     volumes:
-      - "squad-server-info-dc-bot-vol:/home/node/app/storage"
+      - "squad-server-info-dc-bot-vol:/home/node/app/settings"
     environment:
       - "DISCORD_BOT_TOKEN=CHANGE_ME"
       - "DISCORD_AUTHORIZED_ROLES=000000000000000001,000000000000000002"
+      - "SQUAD_SERVERS=11.22.33.44:27165,55.66.77.88:27165:12345:password"
       - "LOGGING_LEVEL=debug"
       - "LOGGING_FORMAT=default"
 

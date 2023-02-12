@@ -1,59 +1,46 @@
+import { Team } from "../enums/team.enum.js";
+
+const PLAYER_REGEX =
+  /ID: (\d+) \| SteamID: (\d+) \| Name: (.+) \| Team ID: ([12]) \| Squad ID: (\d+|N\/A) \| Is Leader: (True|False) \| Role: (\w+)/;
+
 export class Player {
   id: number;
   steamdid: string;
   name: string;
   teamId: number;
+  team: Team;
   squadId: number | undefined;
   leader: boolean;
 
   constructor(rconPlayerString: string) {
-    const attributes = rconPlayerString.split(" | ");
+    const match = rconPlayerString.match(PLAYER_REGEX);
 
-    if (attributes.length != 7) {
-      throw new Error(`rcon player info: [${rconPlayerString}] is invalid`);
+    if (!match || match.length != 8) {
+      throw new Error(`RCON player string: '${rconPlayerString}' is invalid`);
     }
 
-    this.id = this.parseId(attributes[0]);
-    this.steamdid = this.parseSteamId(attributes[1]);
-    this.name = this.parseName(attributes[2]);
-    this.teamId = this.parseTeamid(attributes[3]);
-    this.squadId = this.parseSquadId(attributes[4]);
-    this.leader = this.parseIsLeader(attributes[5]);
+    this.id = Number.parseInt(match[1]);
+    this.steamdid = match[2];
+    this.name = match[3].trim();
+    this.teamId = Number.parseInt(match[4]);
+    this.team = Team.fromNumber(this.teamId);
+    this.squadId = this.parseSquadId(match[5]);
+    this.leader = this.parseIsLeader(match[6]);
   }
 
-  private parseId(idString: string): number {
-    const id: string = idString.split("ID: ")[1];
-
-    return Number(id);
+  public static isValidPlayerString(rconPlayerString: string) {
+    return PLAYER_REGEX.test(rconPlayerString);
   }
 
-  private parseSteamId(steamIdString: string): string {
-    return steamIdString.split("SteamID: ")[1];
+  private parseIsLeader(isLeader: string): boolean {
+    return isLeader.toLowerCase() === "true";
   }
 
-  private parseName(nameString: string): string {
-    return nameString.split("Name: ")[1];
-  }
-
-  private parseTeamid(teamIdString: string): number {
-    const teamId: string = teamIdString.split("Team ID: ")[1];
-
-    return Number(teamId);
-  }
-
-  private parseSquadId(squadIdString: string): number | undefined {
-    const squadId: string = squadIdString.split("Squad ID: ")[1];
-
-    if (squadId == "N/A") {
+  private parseSquadId(squadId: string): number | undefined {
+    if (squadId === "N/A") {
       return undefined;
     }
 
-    return Number(squadId);
-  }
-
-  private parseIsLeader(isLeaderString: string): boolean {
-    const isLeader: string = isLeaderString.split("Is Leader: ")[1];
-
-    return isLeader.toLowerCase() === "true";
+    return Number.parseInt(squadId);
   }
 }

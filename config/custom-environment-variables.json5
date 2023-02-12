@@ -3,6 +3,9 @@
     botToken: "DISCORD_BOT_TOKEN",
     authorizedRoles: "DISCORD_AUTHORIZED_ROLES",
   },
+  squad: {
+    servers: "SQUAD_SERVERS",
+  },
   logging: {
     level: "LOGGING_LEVEL",
     format: "LOGGING_FORMAT",

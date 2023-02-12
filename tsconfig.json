@@ -4,6 +4,7 @@
     "module": "ESNext",
     "outDir": "build",
     "rootDir": "src",
+    "sourceMap": true,
     "strict": true,
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,

@@ -5,7 +5,6 @@ WORKDIR /home/node/app
 USER node
 
 COPY --chown=node:node package*.json .
-RUN npm config set unsafe-perm true
 RUN npm install
 
 COPY --chown=node:node . .
@@ -25,6 +24,6 @@ COPY --chown=node:node package*.json .
 RUN npm clean-install && npm cache clean --force
 COPY --from=builder /home/node/app/build ./build
 COPY --chown=node:node ./config ./config
-RUN mkdir ./storage
+RUN mkdir ./settings
 
 CMD [ "node", "build/main.js" ]

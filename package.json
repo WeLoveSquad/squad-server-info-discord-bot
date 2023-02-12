@@ -10,7 +10,7 @@
   "main": "build/main.js",
   "scripts": {
     "build": "tsc",
-    "test": "ts-mocha -n loader=ts-node/esm/transpile-only -p tsconfig.json 'test/*.test.ts'",
+    "test": "ts-mocha -n loader=ts-node/esm/transpile-only -p tsconfig.json 'test/**/*.test.ts' --exit",
     "format": "prettier --write \"(src|test)/**/*.ts\"",
     "serve": "node build/main.js",
     "start": "node --loader ts-node/esm/transpile-only src/main.ts",
@@ -18,7 +18,7 @@
   },
   "nodemonConfig": {
     "ignore": [
-      "storage/*"
+      "settings/*"
     ]
   },
   "keywords": [
@@ -29,10 +29,10 @@
   ],
   "dependencies": {
     "@discordx/importer": "^1.1.10",
-    "@fabricio-191/valve-server-query": "^4.1.8",
-    "config": "^3.3.8",
+    "@fabricio-191/valve-server-query": "^4.1.9",
+    "config": "^3.3.9",
     "discord.js": "^14.7.1",
-    "discordx": "^11.5.2",
+    "discordx": "^11.7.0",
     "luxon": "^3.2.1",
     "rcon": "^1.1.0",
     "reflect-metadata": "^0.1.13",
@@ -46,14 +46,15 @@
     "@types/expect": "^24.3.0",
     "@types/luxon": "^3.2.0",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.18",
+    "@types/node": "^18.13.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.20",
-    "prettier": "^2.8.2",
+    "prettier": "^2.8.4",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
+    "tsconfig-paths": "^4.1.2",
+    "typescript": "^4.9.5"
   }
 }
