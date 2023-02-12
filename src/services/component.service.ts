@@ -163,7 +163,8 @@ export class ComponentService {
           leader = " :star:";
         }
 
-        playerValue += `${index + 1}. ${player.name}${leader}\n`;
+        const playerName = this.sanitizePlayerName(player.name);
+        playerValue += `**${index + 1}.** ${playerName}${leader}\n`;
       }
 
       const lock = squad.locked ? ":lock:" : ":unlock:";
@@ -218,7 +219,8 @@ export class ComponentService {
 
     for (const [index, player] of unassignedPlayers.entries()) {
       const fieldIndex = index + 1 <= half ? 0 : 2;
-      unassignedFields[fieldIndex].value += `${index + 1}. ${player.name}\n`;
+      const playerName = this.sanitizePlayerName(player.name);
+      unassignedFields[fieldIndex].value += `**${index + 1}.** ${playerName}\n`;
     }
 
     unassignedFields.forEach((field) => {
@@ -228,6 +230,15 @@ export class ComponentService {
     });
 
     return unassignedFields;
+  }
+
+  private sanitizePlayerName(name: string) {
+    return name
+      .replace("_", "\\_")
+      .replace("*", "\\*")
+      .replace("~", "\\~")
+      .replace(">", "\\>")
+      .replace("`", "\\`");
   }
 
   private buildFooter(position: number): string {
