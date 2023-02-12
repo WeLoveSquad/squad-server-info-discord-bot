@@ -14,6 +14,8 @@ The player information can only be retrieved from an RCON-Connection if the RCON
 If RCON is used the bot will **ONLY** use the commands `ListSquads`, `ListPlayers` and `ShowNextMap`. \
 The image below shows how an embed of a Team will look like. The bot will send two message for each Server with an RCON-Connection. Each message contains it's own player information embed for one team.
 
+![grafik](https://user-images.githubusercontent.com/24782633/218317356-894acdc2-51c3-4141-932d-1e1cebf42e94.png)
+
 ## Available Commands
 
 - `/init`
