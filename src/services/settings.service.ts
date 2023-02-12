@@ -92,8 +92,8 @@ export class SettingsService extends EventEmitter {
   }
 
   public async setUpdateIntervalSec(interval: number): Promise<void> {
-    if (interval < 5) {
-      throw new SettingsServiceError("Interval cannot be smaller than 5 seconds");
+    if (interval < 10) {
+      throw new SettingsServiceError("Interval cannot be smaller than 10 seconds");
     }
 
     this.settings.updateIntervalSec = interval;
