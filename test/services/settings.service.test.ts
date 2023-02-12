@@ -22,7 +22,7 @@ describe("SettingsService", () => {
   });
 
   describe("constructor", () => {
-    it("empty storage uses default values", () => {
+    it("empty settings uses default values", () => {
       const settingsService = container.resolve(SettingsService);
 
       expect(settingsService.getGuildId()).to.be.undefined;
@@ -34,9 +34,9 @@ describe("SettingsService", () => {
       expect(settingsService.showSquadNames()).to.be.true;
     });
 
-    it("invalid storage uses default values", () => {
+    it("invalid settings uses default values", () => {
       fs.mkdirSync(SETTINGS_DIR_PATH, { recursive: true });
-      fs.writeFileSync(SETTINGS_FILE_PATH, JSON.stringify({ invalid: "storage" }), "utf-8");
+      fs.writeFileSync(SETTINGS_FILE_PATH, JSON.stringify({ invalid: "settings" }), "utf-8");
 
       const settingsService = container.resolve(SettingsService);
 
