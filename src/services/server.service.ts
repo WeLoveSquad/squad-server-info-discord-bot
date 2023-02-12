@@ -9,6 +9,7 @@ export class ServerQueryError extends Error {}
 @singleton()
 export class ServerService {
   private squadServers: SquadServer[] = [];
+  private rconServerCount: number = 0;
 
   constructor(private serverQueryService: ServerQueryService) {
     const serversStr = config.get<string>("squad.servers");
@@ -16,12 +17,21 @@ export class ServerService {
     const servers = serversStr.split(",");
 
     for (const server of servers) {
-      this.squadServers.push(new SquadServer(server));
+      const squadServer = new SquadServer(server);
+      this.squadServers.push(squadServer);
+
+      if (squadServer.rconEnabled) {
+        this.rconServerCount++;
+      }
     }
   }
 
   public getServers(): SquadServer[] {
     return [...this.squadServers];
+  }
+
+  public getRconServerCount(): number {
+    return this.rconServerCount;
   }
 
   public async getServerInfo(server: SquadServer): Promise<ServerInfo> {
