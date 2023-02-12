@@ -238,18 +238,18 @@ describe("SettingsService", () => {
     it("sets interval correctly", async () => {
       const settingsService = container.resolve(SettingsService);
 
-      await settingsService.setUpdateIntervalSec(10);
+      await settingsService.setUpdateIntervalSec(15);
 
       expect(getSettingsFileContent()).to.equal(
-        '{"updateIntervalSec":10,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true}'
       );
     });
 
     it("too small interval throws error", async () => {
       const settingsService = container.resolve(SettingsService);
 
-      return expect(settingsService.setUpdateIntervalSec(9)).to.be.rejectedWith(
-        "Interval cannot be smaller than 10 seconds"
+      return expect(settingsService.setUpdateIntervalSec(14)).to.be.rejectedWith(
+        "Interval cannot be smaller than 15 seconds"
       );
     });
   });
