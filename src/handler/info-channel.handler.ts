@@ -50,6 +50,10 @@ export class InfoChannelHandler {
       await this.handlePlayerChannelUpdated(client);
     });
 
+    this.settingsService.addListener(SettingsService.SETTINGS_RESET_EVENT, async () => {
+      await this.handleSettingsReset();
+    });
+
     this.settingsService.addListener(SettingsService.SETTINGS_UPDATED_EVENT, async () => {
       this.logger.debug("Settings have been updated. Will restart the update interval");
       await this.startUpdateInterval();
@@ -81,15 +85,33 @@ export class InfoChannelHandler {
   private async handlePlayerChannelUpdated(client: Client): Promise<void> {
     clearInterval(this.interval);
 
-    const messages = [...this.playerInfoMessages];
     this.playerInfoMessages = [];
-
-    for (const message of messages) {
-      await this.deleteMessage(message);
-    }
+    await this.clearPlayerInfoChannel();
+    this.playerInfoChannel = undefined;
 
     await this.initPlayerInfoChannel(client);
     await this.startUpdateInterval();
+  }
+
+  private async handleSettingsReset(): Promise<void> {
+    clearInterval(this.interval);
+
+    this.playerInfoChannel = undefined;
+    this.serverInfoChannel = undefined;
+
+    if (this.serverInfoMessage) {
+      await this.deleteMessage(this.serverInfoMessage);
+    }
+    this.serverInfoMessage = undefined;
+
+    for (const message of this.playerInfoMessages) {
+      await this.deleteMessage(message);
+    }
+    this.playerInfoMessages = [];
+
+    this.logger.info(
+      "Settings have been reset. Deleted all messages and stopped requesting server information"
+    );
   }
 
   private async startUpdateInterval(): Promise<void> {

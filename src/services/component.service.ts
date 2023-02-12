@@ -151,14 +151,13 @@ export class ComponentService {
     for (const [index, squad] of squads.entries()) {
       let playerValue = "";
 
-      const lock = squad.locked ? ":lock:" : ":unlock:";
       const squadName = this.settingsService.showSquadNames()
         ? `${squad.id} | ${squad.name}`
         : `Squad ${squad.id}`;
 
       for (const [index, player] of squad.players.entries()) {
         let leader = "";
-        if (player.leader && squad.name == "CMD Squad") {
+        if (player.leader && squad.name === "CMD Squad") {
           leader = " :star2:";
         } else if (player.leader) {
           leader = " :star:";
@@ -167,6 +166,7 @@ export class ComponentService {
         playerValue += `${index + 1}. ${player.name}${leader}\n`;
       }
 
+      const lock = squad.locked ? ":lock:" : ":unlock:";
       fields.push({
         name: `__${squadName}__ (${squad.size}) ${lock}`,
         value: playerValue,

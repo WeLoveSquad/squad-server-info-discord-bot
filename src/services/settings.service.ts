@@ -15,6 +15,7 @@ export class SettingsService extends EventEmitter {
   public static readonly SERVER_CHANNEL_UPDATED_EVENT = "serverChannelUpdated";
   public static readonly PLAYER_CHANNEL_UPDATED_EVENT = "playerChannelUpdated";
   public static readonly SETTINGS_UPDATED_EVENT = "settingsUpdated";
+  public static readonly SETTINGS_RESET_EVENT = "settingsReset";
 
   private settings: Settings;
 
@@ -142,7 +143,7 @@ export class SettingsService extends EventEmitter {
   public async reset(): Promise<void> {
     this.settings = new Settings();
     await this.updateSettings();
-    this.emit(SettingsService.SETTINGS_UPDATED_EVENT);
+    this.emit(SettingsService.SETTINGS_RESET_EVENT);
   }
 
   private async updateSettings(): Promise<void> {
