@@ -44,15 +44,17 @@ export class ServerService {
 
     if (!server.rconEnabled) {
       return serverInfo;
-    }
-
-    if (server.isRconConnected() && server.hasReceivedPlayerData()) {
-      serverInfo.nextLayer = server.getNextLayer();
-      serverInfo.teams = server.getTeams();
-    } else if (server.isRconConnected() && !server.hasReceivedPlayerData()) {
-      serverInfo.rconMessage = "Loading player data...";
     } else if (!server.isRconConnected()) {
       serverInfo.rconMessage = "Error: Could not establish RCON connection";
+      return serverInfo;
+    }
+
+    serverInfo.nextLayer = server.getNextLayer();
+
+    if (server.hasReceivedPlayerData()) {
+      serverInfo.teams = server.getTeams();
+    } else {
+      serverInfo.rconMessage = "Loading player data...";
     }
 
     return serverInfo;
