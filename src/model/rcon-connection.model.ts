@@ -92,6 +92,7 @@ export class RconConnection {
   private initInterval(): void {
     clearInterval(this.rconInterval);
 
+    this.requestData();
     this.rconInterval = setInterval(() => {
       this.requestData();
     }, this.settingsService.getUpdateIntervalSec() * 1000);
