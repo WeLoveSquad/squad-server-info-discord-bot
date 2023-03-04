@@ -125,11 +125,26 @@ export class InfoChannelHandler {
       return;
     }
 
-    await this.syncServerInfos();
-    this.interval = setInterval(async () => {
-      await this.clearServerInfoChannel();
-      await this.clearPlayerInfoChannel();
+    try {
       await this.syncServerInfos();
+    } catch (error: any) {
+      this.logger.error(
+        "An unexpected error occurred while syncing the server infos for the first time. Error: [%s]",
+        error
+      );
+    }
+
+    this.interval = setInterval(async () => {
+      try {
+        await this.clearServerInfoChannel();
+        await this.clearPlayerInfoChannel();
+        await this.syncServerInfos();
+      } catch (error: any) {
+        this.logger.error(
+          "An unexpected error occurred while syncing the server infos. Error: [%s]",
+          error
+        );
+      }
     }, this.settingsService.getUpdateIntervalSec() * 1000);
   }
 

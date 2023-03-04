@@ -5,6 +5,7 @@ services:
     build: .
     volumes:
       - "squad-server-info-dc-bot-vol:/home/node/app/settings"
+    restart: unless-stopped
     environment:
       - "DISCORD_BOT_TOKEN=CHANGE_ME"
       - "DISCORD_AUTHORIZED_ROLES=000000000000000001,000000000000000002"
