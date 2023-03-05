@@ -13,11 +13,12 @@ import { ServerInfo } from "../model/server-info.model.js";
 import { SquadServer } from "../model/squad-server.model.js";
 import { Squad } from "../model/squad.model.js";
 import { Teams } from "../model/teams.model.js";
+import { Logger } from "./logger.service.js";
 import { SettingsService } from "./settings.service.js";
 
 @injectable()
 export class ComponentService {
-  constructor(private settingsService: SettingsService) {}
+  constructor(private logger: Logger, private settingsService: SettingsService) {}
 
   public buildServerInfoEmbed(serverInfo: ServerInfo, position: number): EmbedBuilder {
     const duration = Duration.fromObject({ seconds: serverInfo.playtimeSeconds });
@@ -153,6 +154,15 @@ export class ComponentService {
     }
 
     for (const [index, squad] of squads.entries()) {
+      if (squad.players.length == 0) {
+        this.logger.warn(
+          "Squad [%s] has 0 players (reported size: [%s]) and will not be added to the player info embed",
+          squad.size,
+          squad.name
+        );
+        continue;
+      }
+
       let playerValue = "";
 
       const squadName = this.settingsService.showSquadNames()
