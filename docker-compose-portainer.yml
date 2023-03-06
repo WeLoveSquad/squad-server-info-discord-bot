@@ -24,9 +24,8 @@ services:
         gelf-address: "${GELF_ADDRESS}"
 
 networks:
-  networks:
-    traefik-static-wan-ip87:
-      external: true
+  traefik-static-wan-ip87:
+    external: true
   proxy:
     external: true
 
