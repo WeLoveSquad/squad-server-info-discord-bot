@@ -157,8 +157,8 @@ export class ComponentService {
       if (squad.players.length == 0) {
         this.logger.warn(
           "Squad [%s] has 0 players (reported size: [%s]) and will not be added to the player info embed",
-          squad.size,
-          squad.name
+          squad.name,
+          squad.size
         );
         continue;
       }
