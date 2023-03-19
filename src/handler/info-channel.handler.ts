@@ -6,7 +6,7 @@ import {
   Guild,
   GuildBasedChannel,
   Message,
-  TextChannel
+  TextChannel,
 } from "discord.js";
 import { Discord, Once } from "discordx";
 import { container } from "tsyringe";
