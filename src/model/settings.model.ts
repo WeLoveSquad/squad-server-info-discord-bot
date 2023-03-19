@@ -7,6 +7,7 @@ export class Settings {
   showNextLayer: boolean = true;
   showSquadNames: boolean = true;
   sortSquadsBySize: boolean = false;
+  showCommander: boolean = true;
 
   constructor(jsonString?: string) {
     if (!jsonString) {
@@ -26,6 +27,7 @@ export class Settings {
     this.showNextLayer = settings.showNextLayer ?? true;
     this.showSquadNames = settings.showSquadNames ?? true;
     this.sortSquadsBySize = settings.sortSquadsBySize ?? false;
+    this.showCommander = settings.showCommander ?? true;
   }
 
   public toJsonString(): string {
