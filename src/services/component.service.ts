@@ -258,7 +258,7 @@ export class ComponentService {
       return "";
     }
 
-    if (squadName === "CMD Squad") {
+    if (this.settingsService.showCommander() && squadName === "CMD Squad") {
       return " :star2:";
     } else {
       return " :star:";

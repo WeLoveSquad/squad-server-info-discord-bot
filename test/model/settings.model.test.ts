@@ -111,7 +111,7 @@ describe("Settings", () => {
       const jsonString = settings.toJsonString();
 
       expect(jsonString).to.equal(
-        '{"guildId":"123","serverChannelId":"456","playerChannelId":"789","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
+        '{"guildId":"123","serverChannelId":"456","playerChannelId":"789","updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false,"showCommander":true}'
       );
     });
 
@@ -121,7 +121,7 @@ describe("Settings", () => {
       const jsonString = settings.toJsonString();
 
       expect(jsonString).to.equal(
-        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false}'
+        '{"updateIntervalSec":15,"timeZone":"Europe/Berlin","showNextLayer":true,"showSquadNames":true,"sortSquadsBySize":false,"showCommander":true}'
       );
     });
   });

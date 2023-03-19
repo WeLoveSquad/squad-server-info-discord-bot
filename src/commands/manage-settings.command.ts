@@ -64,6 +64,32 @@ export class ManageSettingsSlashCommands {
   }
 
   @Slash({
+    description:
+      "Enable or disable that the commander is shown with a separate icon in the player-info-embed",
+    name: "show-commander",
+  })
+  @Guard(UserIsAuthorized(config.get<string>("discord.authorizedRoles")))
+  async setShowCommander(
+    @SlashOption({
+      description: "True if the commander should have a separate icon, otherwise false",
+      name: "show",
+      required: true,
+      type: ApplicationCommandOptionType.Boolean,
+    })
+    show: boolean,
+    interaction: CommandInteraction
+  ) {
+    await this.settingsService.setShowCommander(show);
+
+    await interaction.reply({
+      content: `Succesfully ${
+        show ? "enabled" : "disabled"
+      } that the commander will be shown with a separate icon in player-embeds`,
+      ephemeral: true,
+    });
+  }
+
+  @Slash({
     description: "Enable that squads in the player-info-embed are sorted by size from small to big",
     name: "sort-squads",
   })
