@@ -1,5 +1,5 @@
 import { container } from "tsyringe";
-import { Logger } from "./logger.service.js";
+import { Logger } from "../services/logger.service.js";
 
 const FACTIONS = ["AUS", "CAF", "GB", "INS", "MEA", "MIL", "RUS", "USA", "USMC", "PLA"];
 
@@ -13,9 +13,9 @@ export class FactionParser {
       }
     }
 
-    if (teamString.includes("RU") || teamString == "Logar_Seed_v1") {
+    if (teamString.includes("RU") || teamString === "Logar_Seed_v1") {
       return "RUS";
-    } else if (teamString == "Tallil_RAAS_v8") {
+    } else if (teamString === "Tallil_RAAS_v8") {
       return "GB";
     }
 

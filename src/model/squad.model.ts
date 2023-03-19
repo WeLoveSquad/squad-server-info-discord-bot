@@ -15,14 +15,14 @@ export class Squad {
   constructor(rconSquadString: string, team: Team) {
     const match = rconSquadString.match(SQUAD_REGEX);
 
-    if (!match || match.length != 7) {
+    if (!match || match.length !== 7) {
       throw new Error(`RCON squad string: [${rconSquadString}] is invalid`);
     }
 
     this.team = team;
-    this.id = Number.parseInt(match[1]);
+    this.id = Number.parseInt(match[1], 10);
     this.name = match[2];
-    this.size = Number.parseInt(match[3]);
+    this.size = Number.parseInt(match[3], 10);
     this.locked = this.parseLocked(match[4]);
   }
 

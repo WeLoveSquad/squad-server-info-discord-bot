@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import "reflect-metadata";
-import { FactionParser } from "../../src/services/faction-parser.service.js";
+import { FactionParser } from "../../src/utils/faction-parser.utils.js";
 
 describe("FactionParser", () => {
   describe("parseFaction", () => {

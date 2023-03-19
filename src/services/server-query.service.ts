@@ -2,7 +2,7 @@ import ServerQuery from "@fabricio-191/valve-server-query";
 import { injectable } from "tsyringe";
 import { ServerInfo } from "../model/server-info.model.js";
 import { SquadServer } from "../model/squad-server.model.js";
-import { FactionParser } from "./faction-parser.service.js";
+import { FactionParser } from "../utils/faction-parser.utils.js";
 import { Logger } from "./logger.service.js";
 
 @injectable()
@@ -37,13 +37,13 @@ export class ServerQueryService {
     const serverInfo = new ServerInfo({
       serverName: info.name,
       layer: info.map,
-      playerCount: playerCount,
       maxPlayerCount: info.players.max,
-      teamOne: teamOne,
-      teamTwo: teamTwo,
-      publicQueue: publicQueue,
-      whitelistQueue: whitelistQueue,
-      playtimeSeconds: playtimeSeconds,
+      playerCount,
+      teamOne,
+      teamTwo,
+      publicQueue,
+      whitelistQueue,
+      playtimeSeconds,
     });
 
     server.disconnect();

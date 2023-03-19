@@ -103,7 +103,7 @@ export class ComponentService {
     }
 
     const teams = serverInfo.teams;
-    const teamStr = team == Team.ONE ? serverInfo.teamOne : serverInfo.teamTwo;
+    const teamStr = team === Team.ONE ? serverInfo.teamOne : serverInfo.teamTwo;
     const playerEmbed = new EmbedBuilder()
       .setTitle(`${serverInfo.serverName} - Team ${team}`)
       .setDescription(
@@ -153,8 +153,8 @@ export class ComponentService {
       squads = this.sortSquads(squads);
     }
 
-    for (const [index, squad] of squads.entries()) {
-      if (squad.players.length == 0) {
+    for (const [squadIndex, squad] of squads.entries()) {
+      if (squad.players.length === 0) {
         this.logger.warn(
           "Squad [%s] has 0 players (reported size: [%s]) and will not be added to the player info embed",
           squad.name,
@@ -169,10 +169,10 @@ export class ComponentService {
         ? `${squad.id} | ${squad.name}`
         : `Squad ${squad.id}`;
 
-      for (const [index, player] of squad.players.entries()) {
+      for (const [playerIndex, player] of squad.players.entries()) {
         const playerName = this.sanitizePlayerName(player.name);
         const leaderEmoji = this.getLeaderEmoji(player.leader, squad.name);
-        playerValue += `**${index + 1}.** ${playerName}${leaderEmoji}\n`;
+        playerValue += `**${playerIndex + 1}.** ${playerName}${leaderEmoji}\n`;
       }
 
       const lock = squad.locked ? ":lock:" : ":unlock:";
@@ -182,7 +182,7 @@ export class ComponentService {
         inline: true,
       });
 
-      if (index % 2 == 0 && index != squads.length - 1) {
+      if (squadIndex % 2 === 0 && squadIndex !== squads.length - 1) {
         fields.push({
           name: "\u200B",
           value: "\u200B",
@@ -191,9 +191,9 @@ export class ComponentService {
       }
     }
 
-    if (fields.length % 3 == 2) {
+    if (fields.length % 3 === 2) {
       fields.push({ name: "\u200B", value: "\u200B", inline: true });
-    } else if (fields.length % 3 == 1) {
+    } else if (fields.length % 3 === 1) {
       fields[fields.length - 1].inline = false;
     }
 
@@ -205,7 +205,7 @@ export class ComponentService {
   }
 
   private buildUnassignedEmbedField(unassignedPlayers: Player[]): APIEmbedField[] | undefined {
-    if (unassignedPlayers.length == 0) {
+    if (unassignedPlayers.length === 0) {
       return undefined;
     }
 

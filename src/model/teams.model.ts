@@ -23,7 +23,7 @@ export class Teams {
     }
 
     for (const player of players) {
-      if (player.team == Team.ONE) {
+      if (player.team === Team.ONE) {
         this.teamOnePlayerCount++;
       } else {
         this.teamTwoPlayerCount++;
@@ -41,7 +41,7 @@ export class Teams {
   }
 
   public getSquads(team: Team): Squad[] {
-    if (team == Team.ONE) {
+    if (team === Team.ONE) {
       return this.teamOneSquads;
     } else {
       return this.teamTwoSquads;
@@ -49,7 +49,7 @@ export class Teams {
   }
 
   public getUnassigned(team: Team): Player[] {
-    if (team == Team.ONE) {
+    if (team === Team.ONE) {
       return this.teamOneUnassigned;
     } else {
       return this.teamTwoUnassigned;
@@ -57,7 +57,7 @@ export class Teams {
   }
 
   public getPlayerCount(team: Team): number {
-    if (team == Team.ONE) {
+    if (team === Team.ONE) {
       return this.teamOnePlayerCount;
     } else {
       return this.teamTwoPlayerCount;
@@ -65,7 +65,7 @@ export class Teams {
   }
 
   private insertPlayerToSquad(player: Player): void {
-    const squads = player.team == Team.ONE ? this.teamOneSquads : this.teamTwoSquads;
+    const squads = player.team === Team.ONE ? this.teamOneSquads : this.teamTwoSquads;
 
     for (const squad of squads) {
       if (squad.id === player.squadId) {
@@ -76,7 +76,7 @@ export class Teams {
   }
 
   private insertUnassigned(player: Player): void {
-    if (player.team == Team.ONE) {
+    if (player.team === Team.ONE) {
       this.teamOneUnassigned.push(player);
     } else {
       this.teamTwoUnassigned.push(player);

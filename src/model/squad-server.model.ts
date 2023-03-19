@@ -16,7 +16,7 @@ export class SquadServer {
   constructor(serverString: string) {
     const serverParams = serverString.split(":");
 
-    if (serverParams.length != 2 && serverParams.length != 4) {
+    if (serverParams.length !== 2 && serverParams.length !== 4) {
       throw new Error(
         `'${serverString}' is not valid. The string has to follow the format: <IP>:<Query-Port> or <IP>:<Query-Port>:<RCON-Port>:<RCON-Password>`
       );
@@ -25,7 +25,7 @@ export class SquadServer {
     this.ip = this.validateIp(serverParams[0]);
     this.queryPort = this.parsePort(serverParams[1]);
 
-    if (serverParams.length == 4) {
+    if (serverParams.length === 4) {
       this.rconPort = this.parsePort(serverParams[2]);
       this.rconPassword = serverParams[3];
       this.rconEnabled = true;
@@ -82,7 +82,7 @@ export class SquadServer {
   }
 
   private parsePort(portStr: string): number {
-    const port = Number.parseInt(portStr);
+    const port = Number.parseInt(portStr, 10);
 
     if (isNaN(port) || port < 0 || port > 65535) {
       throw new Error(`Port: '${portStr}' is not a valid Port`);

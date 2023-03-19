@@ -12,6 +12,10 @@
     "build": "tsc",
     "test": "ts-mocha -n loader=ts-node/esm/transpile-only -p tsconfig.json 'test/**/*.test.ts' --exit",
     "format": "prettier --write \"(src|test)/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json",
+    "preversion": "npm run lint && npm run test",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags",
     "serve": "node build/main.js",
     "start": "node --loader ts-node/esm/transpile-only src/main.ts",
     "dev": "nodemon --exec node --loader ts-node/esm/transpile-only src/main.ts"
@@ -56,6 +60,8 @@
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.2",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.9.5"
   }
 }
