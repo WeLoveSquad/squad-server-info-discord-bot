@@ -36,7 +36,7 @@ The image below shows how an embed of a Team will look like. The bot will send a
   - Sets the interval in seconds in which the bot will query the Squad Servers and update the server information and player information embeds
   - The default interval is `15 seconds`
   - The smalles allowed interval is also `15 seconds`
-  - Example: `/set-interval 5`
+  - Example: `/set-interval 15`
 - `/set-time-zone <time-zone>`
   - The bot shows date and time in the bottom left corner in each embed to show when that embed was updated for the last time. This command allows you to modify the time zone for that date
   - `<time-zone>` must be a valid IANA time zone database value. You can find available time zone names [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
