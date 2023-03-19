@@ -14,6 +14,7 @@ describe("Settings", () => {
       expect(settings.timeZone).to.equal("Europe/Berlin");
       expect(settings.showNextLayer).to.be.true;
       expect(settings.showSquadNames).to.be.true;
+      expect(settings.showCommander).to.be.true;
     });
 
     it("empty string uses default values", () => {
@@ -26,6 +27,7 @@ describe("Settings", () => {
       expect(settings.timeZone).to.equal("Europe/Berlin");
       expect(settings.showNextLayer).to.be.true;
       expect(settings.showSquadNames).to.be.true;
+      expect(settings.showCommander).to.be.true;
     });
 
     it("invalid string uses default values", () => {
@@ -38,6 +40,7 @@ describe("Settings", () => {
       expect(settings.timeZone).to.equal("Europe/Berlin");
       expect(settings.showNextLayer).to.be.true;
       expect(settings.showSquadNames).to.be.true;
+      expect(settings.showCommander).to.be.true;
     });
 
     it("json settings are parsed correctly", () => {
@@ -49,6 +52,7 @@ describe("Settings", () => {
       const showNextLayer = false;
       const showSquadNames = false;
       const sortSquadsBySize = true;
+      const showCommander = false;
 
       const json = {
         guildId: guildId,
@@ -59,6 +63,7 @@ describe("Settings", () => {
         showNextLayer: showNextLayer,
         showSquadNames: showSquadNames,
         sortSquadsBySize: sortSquadsBySize,
+        showCommander: showCommander,
       };
 
       const jsonString = JSON.stringify(json);
@@ -73,6 +78,7 @@ describe("Settings", () => {
       expect(settings.showNextLayer).to.be.false;
       expect(settings.showSquadNames).to.be.false;
       expect(settings.sortSquadsBySize).to.be.true;
+      expect(settings.showCommander).to.be.false;
     });
 
     it("partial settings are parsed correctly", () => {
@@ -98,6 +104,7 @@ describe("Settings", () => {
       expect(settings.showNextLayer).to.be.true;
       expect(settings.showSquadNames).to.be.true;
       expect(settings.sortSquadsBySize).to.be.false;
+      expect(settings.showCommander).to.be.true;
     });
   });
 
