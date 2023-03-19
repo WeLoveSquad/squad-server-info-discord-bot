@@ -237,12 +237,12 @@ export class InfoChannelHandler {
     if (!this.serverInfoMessage) {
       this.serverInfoMessage = await this.serverInfoChannel.send({
         embeds: infoEmbeds,
-        components: components,
+        components,
       });
     } else {
       try {
         this.logger.debug("Editing server info message [%s]", this.serverInfoMessage.id);
-        await this.serverInfoMessage.edit({ embeds: infoEmbeds, components: components });
+        await this.serverInfoMessage.edit({ embeds: infoEmbeds, components });
       } catch (error: any) {
         this.logger.warn(
           "Could not edit server info message with id: [%s] and will send a new message. Error: [%s]",
@@ -252,7 +252,7 @@ export class InfoChannelHandler {
 
         this.serverInfoMessage = await this.serverInfoChannel.send({
           embeds: infoEmbeds,
-          components: components,
+          components,
         });
       }
     }
@@ -289,14 +289,14 @@ export class InfoChannelHandler {
           this.playerInfoMessages[messageIndex].id
         );
         await this.playerInfoMessages[messageIndex].edit({
-          embeds: embeds,
-          components: components,
+          embeds,
+          components,
         });
       } else {
         this.logger.debug("Sending new player info message");
         const message = await this.playerInfoChannel.send({
-          embeds: embeds,
-          components: components,
+          embeds,
+          components,
         });
         this.playerInfoMessages.push(message);
       }

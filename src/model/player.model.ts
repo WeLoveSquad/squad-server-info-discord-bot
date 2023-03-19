@@ -1,4 +1,5 @@
 import { Team } from "../enums/team.enum.js";
+import { TeamUtils } from "../utils/team.utils.js";
 
 const PLAYER_REGEX =
   /ID: (\d+) \| SteamID: (\d+) \| Name: (.+) \| Team ID: ([12]) \| Squad ID: (\d+|N\/A) \| Is Leader: (True|False) \| Role: (\w+)/;
@@ -15,15 +16,15 @@ export class Player {
   constructor(rconPlayerString: string) {
     const match = rconPlayerString.match(PLAYER_REGEX);
 
-    if (!match || match.length != 8) {
+    if (!match || match.length !== 8) {
       throw new Error(`RCON player string: '${rconPlayerString}' is invalid`);
     }
 
-    this.id = Number.parseInt(match[1]);
+    this.id = Number.parseInt(match[1], 10);
     this.steamdid = match[2];
     this.name = match[3].trim();
-    this.teamId = Number.parseInt(match[4]);
-    this.team = Team.fromNumber(this.teamId);
+    this.teamId = Number.parseInt(match[4], 10);
+    this.team = TeamUtils.fromNumber(this.teamId);
     this.squadId = this.parseSquadId(match[5]);
     this.leader = this.parseIsLeader(match[6]);
   }
@@ -41,6 +42,6 @@ export class Player {
       return undefined;
     }
 
-    return Number.parseInt(squadId);
+    return Number.parseInt(squadId, 10);
   }
 }

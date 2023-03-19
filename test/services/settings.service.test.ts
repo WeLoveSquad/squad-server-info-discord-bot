@@ -13,12 +13,13 @@ const SETTINGS_FILE_PATH = "./settings/settings.json";
 
 describe("SettingsService", () => {
   beforeEach(async () => {
+    container.reset();
     await removeSettings();
   });
 
   afterEach(async () => {
-    await removeSettings();
     container.reset();
+    await removeSettings();
   });
 
   describe("constructor", () => {
