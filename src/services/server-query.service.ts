@@ -2,9 +2,8 @@ import ServerQuery from "@fabricio-191/valve-server-query";
 import { injectable } from "tsyringe";
 import { ServerInfo } from "../model/server-info.model.js";
 import { SquadServer } from "../model/squad-server.model.js";
+import { FactionParser } from "./faction-parser.service.js";
 import { Logger } from "./logger.service.js";
-
-const FACTIONS = ["AUS", "CAF", "GB", "INS", "MEA", "MIL", "RUS", "USA", "USMC", "PLA"];
 
 @injectable()
 export class ServerQueryService {
@@ -32,8 +31,8 @@ export class ServerQueryService {
     const publicQueue = this.getRuleNumber(rules, "PublicQueue_i");
     const whitelistQueue = this.getRuleNumber(rules, "ReservedQueue_i");
     const playtimeSeconds = this.getRuleNumber(rules, "PLAYTIME_i");
-    const teamOne = this.parseFaction(this.getRuleString(rules, "TeamOne_s"));
-    const teamTwo = this.parseFaction(this.getRuleString(rules, "TeamTwo_s"));
+    const teamOne = FactionParser.parseFaction(this.getRuleString(rules, "TeamOne_s"));
+    const teamTwo = FactionParser.parseFaction(this.getRuleString(rules, "TeamTwo_s"));
 
     const serverInfo = new ServerInfo({
       serverName: info.name,
@@ -83,22 +82,5 @@ export class ServerQueryService {
     }
 
     return value;
-  }
-
-  public parseFaction(team: string): string {
-    for (const faction of FACTIONS) {
-      if (team.includes(faction)) {
-        return faction;
-      }
-    }
-
-    if (team.includes("RU") || team == "Logar_Seed_v1") {
-      return "RUS";
-    } else if (team == "Tallil_RAAS_v8") {
-      return "GB";
-    }
-
-    this.logger.warn("Could not parse faction from team: [%s]", team);
-    return "Unknown";
   }
 }
