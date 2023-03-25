@@ -35,9 +35,10 @@ export class ServerService {
   }
 
   public async getServerInfo(server: SquadServer): Promise<ServerInfo> {
-    let serverInfo;
+    let serverInfo: ServerInfo;
     try {
       serverInfo = await this.serverQueryService.getServerInfo(server);
+      this.setServerName(server, serverInfo.serverName);
     } catch (error: any) {
       throw new ServerQueryError("Server Query Endpoint is not responding");
     }
@@ -58,5 +59,13 @@ export class ServerService {
     }
 
     return serverInfo;
+  }
+
+  private setServerName(server: SquadServer, name: string) {
+    for (const squadServer of this.squadServers) {
+      if (squadServer.equals(server)) {
+        squadServer.name = name;
+      }
+    }
   }
 }
