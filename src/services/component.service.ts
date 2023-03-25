@@ -87,14 +87,24 @@ export class ComponentService {
     position: number,
     message?: string
   ): EmbedBuilder {
-    return new EmbedBuilder()
-      .setTitle(`${squadServer.ip}:${squadServer.queryPort}`)
-      .setDescription(
-        message ? message : "Unexpected error occured. Could not retrieve server information."
-      )
-      .setFooter({
-        text: this.buildFooter(position),
-      });
+    const embed = new EmbedBuilder();
+    const errorMessage = message
+      ? message
+      : "Unexpected error occured. Could not retrieve server information.";
+
+    if (squadServer.name) {
+      embed
+        .setTitle(squadServer.name)
+        .setDescription(`${squadServer.ip}:${squadServer.queryPort}\n${errorMessage}`);
+    } else {
+      embed.setTitle(`${squadServer.ip}:${squadServer.queryPort}`).setDescription(errorMessage);
+    }
+
+    embed.setFooter({
+      text: this.buildFooter(position),
+    });
+
+    return embed;
   }
 
   public buildPlayerInfoEmbed(serverInfo: ServerInfo, team: Team, position: number): EmbedBuilder {

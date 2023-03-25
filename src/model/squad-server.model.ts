@@ -6,6 +6,7 @@ const IP_REGEX = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
 export class SquadServer {
   public readonly ip: string;
   public readonly queryPort: number;
+  public name?: string;
 
   public readonly rconEnabled: boolean = false;
   public readonly rconPort?: number;
@@ -71,6 +72,10 @@ export class SquadServer {
 
   public toRconPortString(): string {
     return `${this.ip}:${this.rconPort}`;
+  }
+
+  public equals(other: SquadServer): boolean {
+    return this.ip === other.ip && this.queryPort === other.queryPort;
   }
 
   private validateIp(ip: string): string {

@@ -11,6 +11,7 @@ import {
 import { Discord, Once } from "discordx";
 import { container } from "tsyringe";
 import { Team } from "../enums/team.enum.js";
+import { ServerInfo } from "../model/server-info.model.js";
 import { ComponentService } from "../services/component.service.js";
 import { Logger } from "../services/logger.service.js";
 import { ServerQueryError, ServerService } from "../services/server.service.js";
@@ -156,7 +157,7 @@ export class InfoChannelHandler {
     for (const [index, server] of servers.entries()) {
       const position = index + 1;
 
-      let serverInfo;
+      let serverInfo: ServerInfo;
       try {
         serverInfo = await this.serverService.getServerInfo(server);
         serverEmbeds.push(this.componentService.buildServerInfoEmbed(serverInfo, position));
