@@ -1,10 +1,8 @@
 import Rcon from "rcon";
 import { container } from "tsyringe";
-import { Team } from "../enums/team.enum.js";
 import { Logger } from "../services/logger.service.js";
 import { SettingsService } from "../services/settings.service.js";
 import { Player } from "./player.model.js";
-import { Squad } from "./squad.model.js";
 import { Teams } from "./teams.model.js";
 
 const LIST_SQUADS_REQUEST = "ListSquads";
@@ -20,8 +18,9 @@ export class RconConnection {
   private receivedPlayerData: boolean = false;
   private rconInterval?: NodeJS.Timer;
 
-  private squads: Squad[] = [];
-  private players: Player[] = [];
+  private latestSquadsResponse?: string;
+  private latestPlayersResponse?: string;
+  private latestTeams?: Teams;
   private nextLayer: string = "Unknown";
 
   private serverAddres: string;
@@ -81,8 +80,8 @@ export class RconConnection {
     return this.receivedPlayerData;
   }
 
-  public getTeams(): Teams {
-    return new Teams(this.squads, this.players);
+  public getTeams(): Teams | undefined {
+    return this.latestTeams;
   }
 
   public getNextLayer(): string {
@@ -131,16 +130,16 @@ export class RconConnection {
         this.serverAddres,
         LIST_PLAYERS_REQUEST
       );
-      this.handlePlayersMessage(message);
+      this.handlePlayersMessage(message, false);
     } else if (this.isPartialPlayersMessage(message)) {
-      this.handlePartialPlayersMessage(message);
+      this.handlePlayersMessage(message, true);
     } else if (message.startsWith("----- Active Squads -----")) {
       this.logger.debug(
         "[RCON, %s] Received response to [%s]",
         this.serverAddres,
         LIST_SQUADS_REQUEST
       );
-      this.handleSquadsMessage(message);
+      this.latestSquadsResponse = message;
     } else if (message.startsWith("Next level is")) {
       this.logger.debug(
         "[RCON, %s] Received response to [%s]",
@@ -148,6 +147,19 @@ export class RconConnection {
         NEXT_LAYER_REQUEST
       );
       this.handleNextLayerMessage(message);
+    }
+  }
+
+  private handlePlayersMessage(message: string, partial: boolean) {
+    if (this.latestPlayersResponse && partial) {
+      this.latestPlayersResponse += `\n${message}`;
+    } else {
+      this.latestPlayersResponse = message;
+    }
+
+    if (message.includes("----- Recently Disconnected Players [Max of 15] -----")) {
+      this.latestTeams = new Teams(this.latestSquadsResponse, this.latestPlayersResponse);
+      this.receivedPlayerData = true;
     }
   }
 
@@ -172,34 +184,6 @@ export class RconConnection {
     this.nextLayer = layer.replaceAll(" ", "_");
   }
 
-  private handlePlayersMessage(message: string): void {
-    this.receivedPlayerData = true;
-    this.players = this.parsePlayers(message);
-  }
-
-  private handlePartialPlayersMessage(message: string): void {
-    const players = this.parsePlayers(message);
-
-    this.players = this.players.concat(players);
-  }
-
-  private parsePlayers(message: string): Player[] {
-    const splitMessage = message.split("\n");
-    const players: Player[] = [];
-
-    for (const line of splitMessage) {
-      if (line.startsWith("----- Recently Disconnected Players")) {
-        break;
-      }
-
-      if (Player.isValidPlayerString(line)) {
-        players.push(new Player(line));
-      }
-    }
-
-    return players;
-  }
-
   private isPartialPlayersMessage(message: string): boolean {
     const splitMessage = message.split("\n");
 
@@ -208,24 +192,6 @@ export class RconConnection {
     }
 
     return false;
-  }
-
-  private handleSquadsMessage(message: string): void {
-    const splitMessage = message.split("\n");
-    this.squads = [];
-
-    let team = Team.ONE;
-
-    for (const line of splitMessage) {
-      if (line.startsWith("Team ID: 2")) {
-        team = Team.TWO;
-        continue;
-      }
-
-      if (Squad.isValidSquadString(line)) {
-        this.squads.push(new Squad(line, team));
-      }
-    }
   }
 
   private handleReconnect(): void {
