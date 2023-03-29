@@ -2,12 +2,12 @@ export class Settings {
   guildId: string | undefined;
   serverChannelId: string | undefined;
   playerChannelId: string | undefined;
-  updateIntervalSec: number = 15;
-  timeZone: string = "Europe/Berlin";
-  showNextLayer: boolean = true;
-  showSquadNames: boolean = true;
-  sortSquadsBySize: boolean = false;
-  showCommander: boolean = true;
+  updateIntervalSec = 15;
+  timeZone = "Europe/Berlin";
+  showNextLayer = true;
+  showSquadNames = true;
+  sortSquadsBySize = false;
+  showCommander = true;
 
   constructor(jsonString?: string) {
     if (!jsonString) {

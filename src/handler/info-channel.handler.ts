@@ -72,7 +72,7 @@ export class InfoChannelHandler {
         await this.serverInfoMessage.delete();
         this.serverInfoMessage = undefined;
         this.logger.info("Server info channel has been updated. Deleted old server info message");
-      } catch (error: any) {
+      } catch (error: unknown) {
         this.logger.warn(
           "Server info channel has been updated. Could not delete old server info message"
         );
@@ -128,7 +128,7 @@ export class InfoChannelHandler {
 
     try {
       await this.syncServerInfos();
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.error(
         "An unexpected error occurred while syncing the server infos for the first time. Error: [%s]",
         error
@@ -140,7 +140,7 @@ export class InfoChannelHandler {
         await this.clearServerInfoChannel();
         await this.clearPlayerInfoChannel();
         await this.syncServerInfos();
-      } catch (error: any) {
+      } catch (error: unknown) {
         this.logger.error(
           "An unexpected error occurred while syncing the server infos. Error: [%s]",
           error
@@ -161,7 +161,7 @@ export class InfoChannelHandler {
       try {
         serverInfo = await this.serverService.getServerInfo(server);
         serverEmbeds.push(this.componentService.buildServerInfoEmbed(serverInfo, position));
-      } catch (error: any) {
+      } catch (error: unknown) {
         if (error instanceof ServerQueryError) {
           serverEmbeds.push(
             this.componentService.buildServerInfoErrorEmbed(server, position, error.message)
@@ -184,7 +184,7 @@ export class InfoChannelHandler {
 
     try {
       await this.updateInfoMessages(serverEmbeds, playerEmbeds);
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.error(
         "Unexpected error occurred while updating the info messages. Error: [%s]",
         error
@@ -204,7 +204,8 @@ export class InfoChannelHandler {
     if (this.settingsService.isPlayerChannelInitialized()) {
       try {
         await this.updatePlayerInfoMessages(playerEmbeds);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        console.log(error);
         this.logger.warn(
           "An error occured while updating the player info messages. Will resend all messages"
         );
@@ -244,7 +245,7 @@ export class InfoChannelHandler {
       try {
         this.logger.debug("Editing server info message [%s]", this.serverInfoMessage.id);
         await this.serverInfoMessage.edit({ embeds: infoEmbeds, components });
-      } catch (error: any) {
+      } catch (error: unknown) {
         this.logger.warn(
           "Could not edit server info message with id: [%s] and will send a new message. Error: [%s]",
           this.serverInfoMessage.id,
@@ -259,7 +260,7 @@ export class InfoChannelHandler {
     }
   }
 
-  private async updatePlayerInfoMessages(playerEmbeds: EmbedBuilder[], resendAll: boolean = false) {
+  private async updatePlayerInfoMessages(playerEmbeds: EmbedBuilder[], resendAll = false) {
     if (!this.playerInfoChannel) {
       this.logger.error(
         "Cannot update the player info messages because playerInfoChannel is undefined"
@@ -323,7 +324,7 @@ export class InfoChannelHandler {
 
     const messages = await this.serverInfoChannel.messages.fetch();
 
-    for (const [_, message] of messages) {
+    for (const message of messages.values()) {
       if (!this.serverInfoMessage && message.author.id === client.user?.id) {
         this.serverInfoMessage = message;
       } else {
@@ -353,7 +354,7 @@ export class InfoChannelHandler {
     const rconServerCount = this.serverService.getRconServerCount();
     const messages = await this.playerInfoChannel.messages.fetch();
 
-    for (const [_, message] of messages) {
+    for (const message of messages.values()) {
       if (message.author.id !== client.user?.id) {
         await this.deleteMessage(message);
       } else if (
@@ -370,7 +371,7 @@ export class InfoChannelHandler {
   private async deleteMessage(message: Message): Promise<void> {
     try {
       await message.delete();
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.warn("Could not delete message: [%s]. Error: [%s]", message.id, error);
     }
   }
@@ -378,7 +379,7 @@ export class InfoChannelHandler {
   private async getGuild(client: Client, guildId: string): Promise<Guild> {
     try {
       return await client.guilds.fetch(guildId);
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw new Error(`Could not find guild with id: '${guildId}'. Reason: '${error}'`);
     }
   }
@@ -412,7 +413,7 @@ export class InfoChannelHandler {
 
     const messages = await this.serverInfoChannel.messages.fetch();
 
-    for (const [_, message] of messages) {
+    for (const message of messages.values()) {
       if (!this.isBotMessage(message)) {
         this.deleteMessage(message);
       }
@@ -426,7 +427,7 @@ export class InfoChannelHandler {
 
     const messages = await this.playerInfoChannel.messages.fetch();
 
-    for (const [_, message] of messages) {
+    for (const message of messages.values()) {
       if (!this.isBotMessage(message)) {
         this.deleteMessage(message);
       }

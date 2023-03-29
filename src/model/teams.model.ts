@@ -5,11 +5,11 @@ import { Squad } from "./squad.model.js";
 export class Teams {
   private teamOneSquads: Squad[] = [];
   private teamOneUnassigned: Player[] = [];
-  private teamOnePlayerCount: number = 0;
+  private teamOnePlayerCount = 0;
 
   private teamTwoSquads: Squad[] = [];
   private teamTwoUnassigned: Player[] = [];
-  private teamTwoPlayerCount: number = 0;
+  private teamTwoPlayerCount = 0;
 
   constructor(squadsResponse?: string, playerResponse?: string) {
     if (!squadsResponse || !playerResponse) {

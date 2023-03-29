@@ -9,7 +9,7 @@ export class ServerQueryError extends Error {}
 @singleton()
 export class ServerService {
   private squadServers: SquadServer[] = [];
-  private rconServerCount: number = 0;
+  private rconServerCount = 0;
 
   constructor(private serverQueryService: ServerQueryService) {
     const serversStr = config.get<string>("squad.servers");
@@ -45,7 +45,7 @@ export class ServerService {
     try {
       serverInfo = await this.serverQueryService.getServerInfo(server);
       this.setServerName(server, serverInfo.serverName);
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw new ServerQueryError("Server Query Endpoint is not responding");
     }
 

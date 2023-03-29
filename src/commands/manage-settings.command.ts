@@ -147,7 +147,7 @@ export class ManageSettingsSlashCommands {
   async initPlayerChannel(interaction: CommandInteraction) {
     try {
       await this.settingsService.initPlayerChannel(interaction.channelId);
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof SettingsServiceError ? error.message : "An unexpected error occured";
 
@@ -172,7 +172,7 @@ export class ManageSettingsSlashCommands {
   async removePlayerChannel(interaction: CommandInteraction) {
     try {
       await this.settingsService.removePlayerChannel();
-    } catch (error: any) {
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof SettingsServiceError ? error.message : "An unexpected error occured";
 
@@ -211,9 +211,9 @@ export class ManageSettingsSlashCommands {
         content: `Update interval has been succesfully changed to ${interval} seconds`,
         ephemeral: true,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       await interaction.reply({
-        content: `${interval} seconds is not a valid interval. The smallest allowed interval is 5 seconds`,
+        content: `${interval} seconds is not a valid interval. The smallest allowed interval is 15 seconds`,
         ephemeral: true,
       });
     }
@@ -240,7 +240,7 @@ export class ManageSettingsSlashCommands {
         content: `Time zone has been successfully changed to ${timeZone}`,
         ephemeral: true,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       await interaction.reply({
         content: `${timeZone} is not a valid IANA time zone!`,
         ephemeral: true,

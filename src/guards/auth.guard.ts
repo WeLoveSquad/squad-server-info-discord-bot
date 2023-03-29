@@ -6,7 +6,7 @@ import { Logger } from "../services/logger.service.js";
 export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<CommandInteraction> = (
   authorizedRoles: string
 ) => {
-  return async (interaction, client, next) => {
+  return async (interaction, _, next) => {
     const logger = container.resolve(Logger);
 
     const messageGuild = interaction.guild;
@@ -31,7 +31,7 @@ export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<Comman
           ephemeral: true,
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.warn(
         "An error occurred while trying to check authentication of interaction: [%s] by user: [%s] with id: [%s]. Error: [%s]",
         interaction.type,

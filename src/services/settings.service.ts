@@ -178,7 +178,7 @@ export class SettingsService extends EventEmitter {
           "Successfully created settings directory at [%s]",
           SettingsService.SETTINGS_DIR_PATH
         );
-      } catch (error: any) {
+      } catch (error: unknown) {
         throw new Error(`Could not create settings file at [${SettingsService.SETTINGS_DIR_PATH}]`);
       }
     }

@@ -14,14 +14,14 @@ export class RconConnection {
   private settingsService: SettingsService;
 
   private rcon: Rcon;
-  private connected: boolean = false;
-  private receivedPlayerData: boolean = false;
+  private connected = false;
+  private receivedPlayerData = false;
   private rconInterval?: NodeJS.Timer;
 
   private latestSquadsResponse?: string;
   private latestPlayersResponse?: string;
   private latestTeams?: Teams;
-  private nextLayer: string = "Unknown";
+  private nextLayer = "Unknown";
 
   private serverAddres: string;
 
