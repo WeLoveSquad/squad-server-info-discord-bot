@@ -1,6 +1,6 @@
 import { Team } from "../enums/team.enum.js";
-import { Player } from "./player.model.js";
-import { Squad } from "./squad.model.js";
+import { Player } from "./player.entity.js";
+import { Squad } from "./squad.entity.js";
 
 export class Teams {
   private teamOneSquads: Squad[] = [];
@@ -18,6 +18,9 @@ export class Teams {
 
     this.parseSquads(squadsResponse);
     this.parsePlayers(playerResponse);
+
+    this.teamOneSquads = this.teamOneSquads.filter((squad) => squad.players.length >= 1);
+    this.teamTwoSquads = this.teamTwoSquads.filter((squad) => squad.players.length >= 1);
 
     this.teamOneSquads.sort((a, b) => a.id - b.id);
     this.teamTwoSquads.sort((a, b) => a.id - b.id);

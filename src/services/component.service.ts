@@ -7,18 +7,19 @@ import {
 } from "discord.js";
 import { DateTime, Duration } from "luxon";
 import { injectable } from "tsyringe";
+import { Player } from "../entities/player.entity.js";
+import { ServerInfo, SquadServer } from "../entities/squad-server.entity.js";
+import { Squad } from "../entities/squad.entity.js";
+import { Teams } from "../entities/teams.entity.js";
 import { Team } from "../enums/team.enum.js";
-import { Player } from "../model/player.model.js";
-import { ServerInfo } from "../model/server-info.model.js";
-import { SquadServer } from "../model/squad-server.model.js";
-import { Squad } from "../model/squad.model.js";
-import { Teams } from "../model/teams.model.js";
-import { Logger } from "./logger.service.js";
+import { Logger } from "../logger/logger.js";
 import { SettingsService } from "./settings.service.js";
 
 @injectable()
 export class ComponentService {
-  constructor(private logger: Logger, private settingsService: SettingsService) {}
+  private logger = new Logger(ComponentService.name);
+
+  constructor(private settingsService: SettingsService) {}
 
   public buildServerInfoEmbed(serverInfo: ServerInfo, position: number): EmbedBuilder {
     const duration = Duration.fromObject({ seconds: serverInfo.playtimeSeconds });

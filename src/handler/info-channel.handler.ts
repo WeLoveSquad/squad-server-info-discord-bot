@@ -1,24 +1,18 @@
-import { CombinedPropertyError } from "@sapphire/shapeshift";
-import {
-  Channel,
-  Client,
-  EmbedBuilder,
-  Guild,
-  GuildBasedChannel,
-  Message,
-  TextChannel,
-} from "discord.js";
+import { Client, EmbedBuilder, Guild, Message, TextChannel } from "discord.js";
 import { Discord, Once } from "discordx";
-import { container } from "tsyringe";
+import { injectable } from "tsyringe";
+import { ServerInfo, ServerInfoError } from "../entities/squad-server.entity.js";
 import { Team } from "../enums/team.enum.js";
-import { ServerInfo } from "../model/server-info.model.js";
+import { Logger } from "../logger/logger.js";
 import { ComponentService } from "../services/component.service.js";
-import { Logger } from "../services/logger.service.js";
-import { ServerQueryError, ServerService } from "../services/server.service.js";
+import { ServerService } from "../services/server.service.js";
 import { SettingsService } from "../services/settings.service.js";
 
 @Discord()
+@injectable()
 export class InfoChannelHandler {
+  private logger = new Logger(InfoChannelHandler.name);
+
   private guild?: Guild;
   private serverInfoChannel?: TextChannel;
   private serverInfoMessage?: Message;
@@ -27,17 +21,11 @@ export class InfoChannelHandler {
   private playerInfoChannel?: TextChannel;
   private playerInfoMessages: Message[] = [];
 
-  private settingsService: SettingsService;
-  private logger: Logger;
-  private serverService: ServerService;
-  private componentService: ComponentService;
-
-  constructor() {
-    this.serverService = container.resolve(ServerService);
-    this.settingsService = container.resolve(SettingsService);
-    this.componentService = container.resolve(ComponentService);
-    this.logger = container.resolve(Logger);
-  }
+  constructor(
+    private serverService: ServerService,
+    private settingsService: SettingsService,
+    private componentService: ComponentService
+  ) {}
 
   @Once({ event: "ready" })
   async onceReady(_: unknown, client: Client): Promise<void> {
@@ -159,10 +147,10 @@ export class InfoChannelHandler {
 
       let serverInfo: ServerInfo;
       try {
-        serverInfo = await this.serverService.getServerInfo(server);
+        serverInfo = await server.getServerInfo();
         serverEmbeds.push(this.componentService.buildServerInfoEmbed(serverInfo, position));
       } catch (error: unknown) {
-        if (error instanceof ServerQueryError) {
+        if (error instanceof ServerInfoError) {
           serverEmbeds.push(
             this.componentService.buildServerInfoErrorEmbed(server, position, error.message)
           );
@@ -189,9 +177,6 @@ export class InfoChannelHandler {
         "Unexpected error occurred while updating the info messages. Error: [%s]",
         error
       );
-      if (error instanceof CombinedPropertyError) {
-        this.logger.error("Error is a CombinedPropertyError. Errors: [%s]", error.errors);
-      }
     }
   }
 
@@ -260,7 +245,10 @@ export class InfoChannelHandler {
     }
   }
 
-  private async updatePlayerInfoMessages(playerEmbeds: EmbedBuilder[], resendAll = false) {
+  private async updatePlayerInfoMessages(
+    playerEmbeds: EmbedBuilder[],
+    resendAll = false
+  ): Promise<void> {
     if (!this.playerInfoChannel) {
       this.logger.error(
         "Cannot update the player info messages because playerInfoChannel is undefined"
@@ -385,25 +373,12 @@ export class InfoChannelHandler {
   }
 
   private async getDiscordChannel(client: Client, channelId: string): Promise<TextChannel> {
-    const cachedChannel: Channel | undefined = client.channels.cache.get(channelId);
-    if (cachedChannel) {
-      return cachedChannel as TextChannel;
+    const channel = await client.channels.fetch(channelId);
+    if (!channel || !(channel instanceof TextChannel)) {
+      throw new Error(`Could not find text channel with id '${channelId}'`);
     }
 
-    if (!this.guild) {
-      throw Error(`Could not get channel with id: '${channelId}' because guild is undefined`);
-    }
-
-    const channel: GuildBasedChannel | undefined = this.guild.channels.cache.get(channelId);
-    if (!channel) {
-      throw Error(`Could not find server channel with id: '${channelId}'`);
-    }
-
-    if (channel.isTextBased()) {
-      return channel as TextChannel;
-    } else {
-      throw Error(`The channel with id: '${channelId}' is not a text channel`);
-    }
+    return channel;
   }
 
   private async clearServerInfoChannel(): Promise<void> {

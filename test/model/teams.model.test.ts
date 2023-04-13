@@ -1,6 +1,6 @@
 import { expect } from "chai";
+import { Teams } from "../../src/entities/teams.entity.js";
 import { Team } from "../../src/enums/team.enum.js";
-import { Teams } from "../../src/model/teams.model.js";
 
 describe("Teams", () => {
   const squadsResponse = `

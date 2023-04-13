@@ -1,8 +1,8 @@
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
+import { Player } from "../../src/entities/player.entity.js";
+import { Squad } from "../../src/entities/squad.entity.js";
 import { Team } from "../../src/enums/team.enum.js";
-import { Player } from "../../src/model/player.model.js";
-import { Squad } from "../../src/model/squad.model.js";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;

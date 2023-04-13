@@ -2,13 +2,15 @@ import EventEmitter from "events";
 import fs from "fs";
 import { DateTime } from "luxon";
 import { singleton } from "tsyringe";
-import { Settings } from "../model/settings.model.js";
-import { Logger } from "./logger.service.js";
+import { Settings } from "../entities/settings.entity.js";
+import { Logger } from "../logger/logger.js";
 
 export class SettingsServiceError extends Error {}
 
 @singleton()
 export class SettingsService extends EventEmitter {
+  private logger = new Logger(SettingsService.name);
+
   private static readonly SETTINGS_DIR_PATH = "./settings";
   private static readonly SETTINGS_FILE_PATH = "./settings/settings.json";
 
@@ -19,7 +21,7 @@ export class SettingsService extends EventEmitter {
 
   private settings: Settings;
 
-  constructor(private logger: Logger) {
+  constructor() {
     super();
 
     this.logger.debug("Will store settings in file: [%s]", SettingsService.SETTINGS_FILE_PATH);

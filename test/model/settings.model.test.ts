@@ -1,4 +1,4 @@
-import { Settings } from "../../src/model/settings.model.js";
+import { Settings } from "../../src/entities/settings.entity.js";
 
 import { expect } from "chai";
 
