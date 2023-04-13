@@ -1,20 +1,15 @@
 import config from "config";
 import { singleton } from "tsyringe";
-import { ServerInfo } from "../model/server-info.model.js";
-import { SquadServer } from "../model/squad-server.model.js";
-import { ServerQueryService } from "./server-query.service.js";
-
-export class ServerQueryError extends Error {}
+import { SquadServer } from "../entities/squad-server.entity.js";
 
 @singleton()
 export class ServerService {
   private squadServers: SquadServer[] = [];
   private rconServerCount = 0;
 
-  constructor(private serverQueryService: ServerQueryService) {
-    const serversStr = config.get<string>("squad.servers");
-
-    const servers = serversStr.split(",");
+  constructor() {
+    const serverConfig = config.get<string>("squad.servers");
+    const servers = serverConfig.split(",");
 
     for (const server of servers) {
       const squadServer = new SquadServer(server);
@@ -33,38 +28,11 @@ export class ServerService {
   }
 
   public getServers(): SquadServer[] {
-    return [...this.squadServers];
+    return this.squadServers;
   }
 
   public getRconServerCount(): number {
     return this.rconServerCount;
-  }
-
-  public async getServerInfo(server: SquadServer): Promise<ServerInfo> {
-    let serverInfo: ServerInfo;
-    try {
-      serverInfo = await this.serverQueryService.getServerInfo(server);
-      this.setServerName(server, serverInfo.serverName);
-    } catch (error: unknown) {
-      throw new ServerQueryError("Server Query Endpoint is not responding");
-    }
-
-    if (!server.rconEnabled) {
-      return serverInfo;
-    } else if (!server.isRconConnected()) {
-      serverInfo.rconMessage = "Error: Could not establish RCON connection";
-      return serverInfo;
-    }
-
-    serverInfo.nextLayer = server.getNextLayer();
-
-    if (server.hasReceivedPlayerData()) {
-      serverInfo.teams = server.getTeams();
-    } else {
-      serverInfo.rconMessage = "Loading player data...";
-    }
-
-    return serverInfo;
   }
 
   private contains(server: SquadServer): boolean {
@@ -75,13 +43,5 @@ export class ServerService {
     }
 
     return false;
-  }
-
-  private setServerName(server: SquadServer, name: string): void {
-    for (const squadServer of this.squadServers) {
-      if (squadServer.equals(server)) {
-        squadServer.name = name;
-      }
-    }
   }
 }

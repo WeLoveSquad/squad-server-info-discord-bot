@@ -1,13 +1,13 @@
+import config from "config";
 import { CommandInteraction } from "discord.js";
 import { GuardFunction } from "discordx";
-import { container } from "tsyringe";
-import { Logger } from "../services/logger.service.js";
+import { Logger } from "../logger/logger.js";
 
-export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<CommandInteraction> = (
-  authorizedRoles: string
-) => {
+const AUTHORIZED_ROLE_IDS = config.get<string>("discord.authorizedRoles");
+
+export const UserIsAuthorized: () => GuardFunction<CommandInteraction> = () => {
   return async (interaction, _, next) => {
-    const logger = container.resolve(Logger);
+    const logger = new Logger(UserIsAuthorized.name);
 
     const messageGuild = interaction.guild;
     if (!messageGuild) {
@@ -23,7 +23,7 @@ export const UserIsAuthorized: (authorizedRoles: string) => GuardFunction<Comman
     try {
       const member = await messageGuild.members.fetch({ user: interaction.user.id });
 
-      if (member.roles.cache.hasAny(...authorizedRoles.split(","))) {
+      if (member.roles.cache.hasAny(...AUTHORIZED_ROLE_IDS.split(","))) {
         await next();
       } else {
         await interaction.reply({

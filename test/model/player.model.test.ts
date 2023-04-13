@@ -1,4 +1,4 @@
-import { Player } from "../../src/model/player.model.js";
+import { Player } from "../../src/entities/player.entity.js";
 
 import chai from "chai";
 import chaiAsPromised from "chai-as-promised";

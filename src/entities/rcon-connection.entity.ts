@@ -1,9 +1,9 @@
 import Rcon from "rcon";
 import { container } from "tsyringe";
-import { Logger } from "../services/logger.service.js";
+import { Logger } from "../logger/logger.js";
 import { SettingsService } from "../services/settings.service.js";
-import { Player } from "./player.model.js";
-import { Teams } from "./teams.model.js";
+import { Player } from "./player.entity.js";
+import { Teams } from "./teams.entity.js";
 
 const LIST_SQUADS_REQUEST = "ListSquads";
 const LIST_PLAYERS_REQUEST = "ListPlayers";
@@ -26,7 +26,7 @@ export class RconConnection {
   private serverAddres: string;
 
   constructor(ip: string, port: number, password: string) {
-    this.logger = container.resolve(Logger);
+    this.logger = new Logger(`${Rcon.name}, ${ip}:${port}`);
     this.settingsService = container.resolve(SettingsService);
 
     this.serverAddres = `${ip}:${port}`;
@@ -35,12 +35,12 @@ export class RconConnection {
       challenge: true,
     });
 
-    this.logger.info("[RCON, %s] Connecting to RCON-Server...", this.serverAddres);
+    this.logger.info("Connecting to RCON-Server...", this.serverAddres);
 
     this.rcon.addListener("response", (message: string) => this.handleMessage(message.trim()));
 
     this.rcon.addListener("end", () => {
-      this.logger.info("[RCON, %s] Connection closed", this.serverAddres);
+      this.logger.info("Connection closed", this.serverAddres);
       this.receivedPlayerData = false;
       this.connected = false;
 
@@ -48,7 +48,7 @@ export class RconConnection {
     });
 
     this.rcon.addListener("error", (error) => {
-      this.logger.error("[RCON, %s] Rcon error: [%s]", this.serverAddres, error);
+      this.logger.error("Rcon error: [%s]", this.serverAddres, error);
       this.receivedPlayerData = false;
       this.connected = false;
 
@@ -56,7 +56,7 @@ export class RconConnection {
     });
 
     this.rcon.addListener("auth", () => {
-      this.logger.info("[RCON, %s] Successfully connected", this.serverAddres);
+      this.logger.info("Successfully connected", this.serverAddres);
       this.receivedPlayerData = false;
       this.connected = true;
 
@@ -99,21 +99,18 @@ export class RconConnection {
 
   private requestData(): void {
     if (!this.connected) {
-      this.logger.verbose(
-        "[RCON, %s] Rcon not connected! Will not request any data",
-        this.serverAddres
-      );
+      this.logger.verbose("Rcon not connected! Will not request any data", this.serverAddres);
       return;
     }
 
     if (this.settingsService.isServerChannelInitialized() && this.settingsService.showNextLayer()) {
-      this.logger.debug("[RCON, %s] Sending [%s] request", this.serverAddres, NEXT_LAYER_REQUEST);
+      this.logger.debug("Sending [%s] request", this.serverAddres, NEXT_LAYER_REQUEST);
       this.rcon.send(NEXT_LAYER_REQUEST);
     }
 
     if (this.settingsService.isPlayerChannelInitialized()) {
       this.logger.debug(
-        "[RCON, %s] Sending [%s] and [%s] requests",
+        "Sending [%s] and [%s] requests",
         this.serverAddres,
         LIST_SQUADS_REQUEST,
         LIST_PLAYERS_REQUEST
@@ -125,32 +122,20 @@ export class RconConnection {
 
   private handleMessage(message: string): void {
     if (message.startsWith("----- Active Players -----")) {
-      this.logger.debug(
-        "[RCON, %s] Received response to [%s]",
-        this.serverAddres,
-        LIST_PLAYERS_REQUEST
-      );
+      this.logger.debug("Received response to [%s]", this.serverAddres, LIST_PLAYERS_REQUEST);
       this.handlePlayersMessage(message, false);
     } else if (this.isPartialPlayersMessage(message)) {
       this.handlePlayersMessage(message, true);
     } else if (message.startsWith("----- Active Squads -----")) {
-      this.logger.debug(
-        "[RCON, %s] Received response to [%s]",
-        this.serverAddres,
-        LIST_SQUADS_REQUEST
-      );
+      this.logger.debug("Received response to [%s]", this.serverAddres, LIST_SQUADS_REQUEST);
       this.latestSquadsResponse = message;
     } else if (message.startsWith("Next level is")) {
-      this.logger.debug(
-        "[RCON, %s] Received response to [%s]",
-        this.serverAddres,
-        NEXT_LAYER_REQUEST
-      );
+      this.logger.debug("Received response to [%s]", this.serverAddres, NEXT_LAYER_REQUEST);
       this.handleNextLayerMessage(message);
     }
   }
 
-  private handlePlayersMessage(message: string, partial: boolean) {
+  private handlePlayersMessage(message: string, partial: boolean): void {
     if (this.latestPlayersResponse && partial) {
       this.latestPlayersResponse += `\n${message}`;
     } else {
@@ -166,7 +151,7 @@ export class RconConnection {
   private handleNextLayerMessage(message: string): void {
     const splitMessage = message.split(", ");
     if (splitMessage.length < 2) {
-      this.logger.warn("[RCON, %s] Could not parse next layer: [%s]", this.serverAddres, message);
+      this.logger.warn("Could not parse next layer: [%s]", this.serverAddres, message);
       this.nextLayer = "Unknown";
       return;
     }
@@ -175,7 +160,7 @@ export class RconConnection {
     const splitLayerInfo = layerInfo.split("layer is ");
 
     if (splitLayerInfo.length < 2) {
-      this.logger.warn("[RCON, %s] Could not parse next layer: [%s]", this.serverAddres, message);
+      this.logger.warn("Could not parse next layer: [%s]", this.serverAddres, message);
       this.nextLayer = "Unknown";
       return;
     }
@@ -195,7 +180,7 @@ export class RconConnection {
   }
 
   private handleReconnect(): void {
-    this.logger.info("[RCON, %s] Initiating reconnect...", this.serverAddres);
+    this.logger.info("Initiating reconnect...", this.serverAddres);
 
     clearInterval(this.rconInterval);
     this.rconInterval = undefined;

@@ -3,15 +3,20 @@ import "reflect-metadata";
 import { dirname, importx } from "@discordx/importer";
 import config from "config";
 import { GatewayIntentBits } from "discord.js";
-import { Client } from "discordx";
-import { container, singleton } from "tsyringe";
-import { Logger } from "./services/logger.service.js";
+import { Client, DIService, tsyringeDependencyRegistryEngine } from "discordx";
+import { container } from "tsyringe";
+import { Logger } from "./logger/logger.js";
 
-@singleton()
+const BOT_TOKEN = config.get<string>("discord.botToken");
+
 class Main {
+  private logger = new Logger(Main.name);
+
   private client: Client;
 
-  constructor(private logger: Logger) {
+  constructor() {
+    DIService.engine = tsyringeDependencyRegistryEngine.setInjector(container);
+
     this.client = new Client({
       intents: [GatewayIntentBits.Guilds],
       silent: false,
@@ -32,27 +37,26 @@ class Main {
     this.client.on("interactionCreate", (interaction) => {
       this.client.executeInteraction(interaction);
     });
+
+    process.addListener("SIGINT", this.shutdown.bind(this));
+    process.addListener("SIGQUIT", this.shutdown.bind(this));
+    process.addListener("SIGTERM", this.shutdown.bind(this));
+
+    this.start();
   }
 
   async start(): Promise<void> {
     await importx(dirname(import.meta.url) + "/{commands,handler}/**/*.{js,ts}");
 
-    await this.client.login(config.get<string>("discord.botToken"));
+    await this.client.login(BOT_TOKEN);
   }
 
   public shutdown(signal: string): void {
     this.logger.info("Received [%s]. Shutting down!", signal);
     this.client.destroy();
+
+    process.exit(0);
   }
 }
 
-const main = container.resolve(Main);
-main.start();
-
-function handleExit(signal: string): void {
-  main.shutdown(signal);
-  process.exit(0);
-}
-process.on("SIGINT", handleExit);
-process.on("SIGQUIT", handleExit);
-process.on("SIGTERM", handleExit);
+new Main();

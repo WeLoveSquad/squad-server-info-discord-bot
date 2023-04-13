@@ -1,5 +1,5 @@
 import { Team } from "../enums/team.enum.js";
-import { Player } from "./player.model";
+import { Player } from "./player.entity.js";
 
 const SQUAD_REGEX =
   /ID: (\d+) \| Name: (.*) \| Size: (\d+) \| Locked: (True|False) \| Creator Name: (.*) \| Creator Steam ID: (\d+)/;

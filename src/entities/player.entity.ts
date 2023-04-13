@@ -1,5 +1,4 @@
-import { Team } from "../enums/team.enum.js";
-import { TeamUtils } from "../utils/team.utils.js";
+import { Team, numberToTeam } from "../enums/team.enum.js";
 
 const PLAYER_REGEX =
   /ID: (\d+) \| SteamID: (\d+) \| Name: (.+) \| Team ID: ([12]) \| Squad ID: (\d+|N\/A) \| Is Leader: (True|False) \| Role: (\w+)/;
@@ -24,12 +23,12 @@ export class Player {
     this.steamdid = match[2];
     this.name = match[3].trim();
     this.teamId = Number.parseInt(match[4], 10);
-    this.team = TeamUtils.fromNumber(this.teamId);
+    this.team = numberToTeam(this.teamId);
     this.squadId = this.parseSquadId(match[5]);
     this.leader = this.parseIsLeader(match[6]);
   }
 
-  public static isValidPlayerString(rconPlayerString: string) {
+  public static isValidPlayerString(rconPlayerString: string): boolean {
     return PLAYER_REGEX.test(rconPlayerString);
   }
 
