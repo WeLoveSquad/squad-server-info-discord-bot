@@ -1,9 +1,11 @@
 import { ApplicationCommandOptionType, CommandInteraction } from "discord.js";
 import { Discord, Guard, Slash, SlashOption } from "discordx";
+import { injectable } from "tsyringe";
 import { UserIsAuthorized } from "../guards/auth.guard.js";
 import { SettingsService, SettingsServiceError } from "../services/settings.service.js";
 
 @Discord()
+@injectable()
 export class ManageSettingsSlashCommands {
   constructor(private settingsService: SettingsService) {}
 
