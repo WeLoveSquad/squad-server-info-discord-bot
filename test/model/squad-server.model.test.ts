@@ -123,95 +123,62 @@ describe("SquadServer", () => {
     const serverString = "12.13.14.15:12345:54321:password";
     const server = new SquadServer(serverString);
 
-    it("AUS at the beginning", () => {
-      const faction = server["parseFaction"]("AUS_LightInfantry_5RAR");
-      expect(faction).to.equal("AUS");
+    it("parses ADF correctly", () => {
+      const faction = server["parseFaction"]("AlBasrah_AAS_v3_ADF");
+      expect(faction).to.equal("ADF");
     });
-    it("AUS at the end", () => {
-      const faction = server["parseFaction"]("Albasrah_AAS_v3_AUS");
-      expect(faction).to.equal("AUS");
+
+    it("parses BAF correctly", () => {
+      const faction = server["parseFaction"]("Belaya_Invasion_v3_BAF");
+      expect(faction).to.equal("BAF");
     });
-    it("CAF at the beginning", () => {
-      const faction = server["parseFaction"]("CAF_Mechanized_Van_Doos");
+
+    it("parses CAF correctly", () => {
+      const faction = server["parseFaction"]("Yehorivka_Invasion_v3_CAF");
       expect(faction).to.equal("CAF");
     });
-    it("CAF at the end", () => {
-      const faction = server["parseFaction"]("AlBasrah_Invasion_v4_CAF");
-      expect(faction).to.equal("CAF");
+
+    it("parses IMF correctly", () => {
+      const faction = server["parseFaction"]("Tallil_Skirmish_v3_IMF");
+      expect(faction).to.equal("IMF");
     });
-    it("GB at the beginning", () => {
-      const faction = server["parseFaction"]("GB_Fallujah_RAAS_v2");
-      expect(faction).to.equal("GB");
-    });
-    it("GB at the end", () => {
-      const faction = server["parseFaction"]("Narva_AAS_v2_GB");
-      expect(faction).to.equal("GB");
-    });
-    it("INS at the beginning", () => {
-      const faction = server["parseFaction"]("INS_Chora_Insurgency_v1");
+
+    it("parses INS correctly", () => {
+      const faction = server["parseFaction"]("Sumari_Insurgency_v1_INS");
       expect(faction).to.equal("INS");
     });
-    it("INS at the end", () => {
-      const faction = server["parseFaction"]("Albasrah_AAS_v3_INS");
-      expect(faction).to.equal("INS");
-    });
-    it("MEA at the beginning", () => {
-      const faction = server["parseFaction"]("MEA_Mechanized_3rdKingQadesh");
+
+    it("parses MEA correctly", () => {
+      const faction = server["parseFaction"]("Anvil_RAAS_v2_MEA");
       expect(faction).to.equal("MEA");
     });
-    it("MEA at the end", () => {
-      const faction = server["parseFaction"]("Tallil_RAAS_v1_MEA");
-      expect(faction).to.equal("MEA");
+
+    it("parses PLA correctly", () => {
+      const faction = server["parseFaction"]("Chora_AAS_v6_PLA");
+      expect(faction).to.equal("PLA");
     });
-    it("MIL at the beginning", () => {
-      const faction = server["parseFaction"]("MIL_Belaya_AAS_v1");
-      expect(faction).to.equal("MIL");
+
+    it("parses RGF correctly", () => {
+      const faction = server["parseFaction"]("BlackCoast_Invasion_v1_RGF");
+      expect(faction).to.equal("RGF");
     });
-    it("MIL at the end", () => {
-      const faction = server["parseFaction"]("Belaya_RAAS_v2_MIL");
-      expect(faction).to.equal("MIL");
+
+    it("parses RGF correctly", () => {
+      const faction = server["parseFaction"]("BlackCoast_Invasion_v1_RGF");
+      expect(faction).to.equal("RGF");
     });
-    it("USA at the beginning", () => {
-      const faction = server["parseFaction"]("USA_Belaya_RAAS_v1");
+
+    it("parses USA correctly", () => {
+      const faction = server["parseFaction"]("FoolsRoad_AAS_v1_USA");
       expect(faction).to.equal("USA");
     });
-    it("USA at the end", () => {
-      const faction = server["parseFaction"]("Narva_AAS_v1_USA");
-      expect(faction).to.equal("USA");
-    });
-    it("USMC at the beginning", () => {
-      const faction = server["parseFaction"]("USMC_Belaya_RAAS_v2");
+
+    it("parses USMC correctly", () => {
+      const faction = server["parseFaction"]("Harju_RAAS_v1_USMC");
       expect(faction).to.equal("USMC");
     });
-    it("USMC at the end", () => {
-      const faction = server["parseFaction"]("Belaya_RAAS_v2_USMC");
-      expect(faction).to.equal("USMC");
-    });
-    it("RUS at the beginning", () => {
-      const faction = server["parseFaction"]("RUS_Skorpo_AAS_v1");
-      expect(faction).to.equal("RUS");
-    });
-    it("RUS at the end", () => {
-      const faction = server["parseFaction"]("Anvil_AAS_v1_RUS");
-      expect(faction).to.equal("RUS");
-    });
-    it("RU at the beginning", () => {
-      const faction = server["parseFaction"]("RU_Narva_Destruction_v1");
-      expect(faction).to.equal("RUS");
-    });
-    it("RU at the end", () => {
-      const faction = server["parseFaction"]("Narva_Destruction_v1_RU");
-      expect(faction).to.equal("RUS");
-    });
-    it("Logar_Seed_v1", () => {
-      const faction = server["parseFaction"]("Logar_Seed_v1");
-      expect(faction).to.equal("RUS");
-    });
-    it("Tallil_RAAS_v8", () => {
-      const faction = server["parseFaction"]("Tallil_RAAS_v8");
-      expect(faction).to.equal("GB");
-    });
-    it("Unknown", () => {
+
+    it("returns unknown if parsing fails", () => {
       const faction = server["parseFaction"]("Map_Gamemode_v1");
       expect(faction).to.equal("Unknown");
     });

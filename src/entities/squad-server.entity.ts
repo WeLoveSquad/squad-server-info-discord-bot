@@ -5,7 +5,7 @@ import { Teams } from "./teams.entity.js";
 
 const IP_REGEX = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
 
-const FACTIONS = ["AUS", "CAF", "GB", "INS", "MEA", "MIL", "RUS", "USA", "USMC", "PLA"];
+const FACTIONS = ["ADF", "BAF", "CAF", "IMF", "INS", "MEA", "PLA", "RGF", "USA", "USMC"];
 
 const SERVER_QUERY_ERROR_MESSAGE = "Server Query Endpoint is not responding";
 const RCON_ERROR_MESSAGE = "Error: Could not establish RCON connection";
@@ -160,12 +160,6 @@ export class SquadServer {
       if (teamString.includes(faction)) {
         return faction;
       }
-    }
-
-    if (teamString.includes("RU") || teamString === "Logar_Seed_v1") {
-      return "RUS";
-    } else if (teamString === "Tallil_RAAS_v8") {
-      return "GB";
     }
 
     this.logger.warn("Could not parse faction from team: [%s]", teamString);
