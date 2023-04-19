@@ -16,6 +16,7 @@ module.exports = {
       "plugin:@typescript-eslint/strict",
       "plugin:prettier/recommended"
   ],
+  ignorePatterns: [".eslintrc.cjs", "test/*"],
   rules: {
     "@typescript-eslint/explicit-function-return-type": "error",
     "prettier/prettier": "error",
