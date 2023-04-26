@@ -81,11 +81,18 @@ export class SquadServer {
   }
 
   public async getServerInfo(): Promise<ServerInfo> {
-    const server = await ServerQuery.Server({
-      ip: this.ip,
-      port: this.queryPort,
-      timeout: 3000,
-    });
+    let server: ServerQuery.Server;
+    try {
+      server = await ServerQuery.Server({
+        ip: this.ip,
+        port: this.queryPort,
+        timeout: 3000,
+      });
+    } catch (error: unknown) {
+      this.logger.warn("Connection attempt to Server-Query-Endpoint timed out");
+      throw new ServerInfoError(SERVER_QUERY_ERROR_MESSAGE);
+    }
+
     this.logger.debug("Connected to Server-Query-Endpoint");
 
     const info = await server.getInfo();

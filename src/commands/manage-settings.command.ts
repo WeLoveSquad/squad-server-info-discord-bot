@@ -86,6 +86,33 @@ export class ManageSettingsSlashCommands {
   }
 
   @Slash({
+    description:
+      "Enable or disable that an icon is shown next to the squad leaders name in the player-info-embed",
+    name: "show-squad-leader",
+  })
+  @Guard(UserIsAuthorized())
+  async setShowSquadLeader(
+    @SlashOption({
+      description:
+        "True if the squad leader should have an icon next to their name, otherwise false",
+      name: "show",
+      required: true,
+      type: ApplicationCommandOptionType.Boolean,
+    })
+    show: boolean,
+    interaction: CommandInteraction
+  ): Promise<void> {
+    await this.settingsService.setShowSquadLeader(show);
+
+    await interaction.reply({
+      content: `Succesfully ${
+        show ? "enabled" : "disabled"
+      } that the squad leader will have an icon next to their name in player-embeds`,
+      ephemeral: true,
+    });
+  }
+
+  @Slash({
     description: "Enable that squads in the player-info-embed are sorted by size from small to big",
     name: "sort-squads",
   })

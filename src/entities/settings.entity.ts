@@ -8,6 +8,7 @@ export class Settings {
   showSquadNames = true;
   sortSquadsBySize = false;
   showCommander = true;
+  showSquadLeader = true;
 
   constructor(jsonString?: string) {
     if (!jsonString) {
@@ -28,6 +29,7 @@ export class Settings {
     this.showSquadNames = settings.showSquadNames ?? true;
     this.sortSquadsBySize = settings.sortSquadsBySize ?? false;
     this.showCommander = settings.showCommander ?? true;
+    this.showSquadLeader = settings.showSquadLeader ?? true;
   }
 
   public toJsonString(): string {
