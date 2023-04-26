@@ -88,10 +88,10 @@ export class ComponentService {
     position: number,
     message?: string
   ): EmbedBuilder {
-    const embed = new EmbedBuilder();
+    const embed = new EmbedBuilder().setColor("#FF5555");
     const errorMessage = message
       ? message
-      : "Unexpected error occured. Could not retrieve server information.";
+      : "Unexpected error occurred. Could not retrieve server information.";
 
     if (squadServer.name) {
       embed
@@ -110,7 +110,12 @@ export class ComponentService {
 
   public buildPlayerInfoEmbed(serverInfo: ServerInfo, team: Team, position: number): EmbedBuilder {
     if (!serverInfo.teams || serverInfo.rconMessage) {
-      return this.buildPlayerInfoErrorEmbed(serverInfo, team, position);
+      return this.buildPlayerInfoErrorEmbed(
+        serverInfo.serverName,
+        team,
+        position,
+        serverInfo.rconMessage
+      );
     }
 
     const teams = serverInfo.teams;
@@ -137,16 +142,13 @@ export class ComponentService {
   }
 
   public buildPlayerInfoErrorEmbed(
-    serverInfo: ServerInfo,
+    serverName: string,
     team: Team,
-    position: number
+    position: number,
+    errorMessage = "Error: Could not retrieve player information"
   ): EmbedBuilder {
-    const errorMessage = serverInfo.rconMessage
-      ? serverInfo.rconMessage
-      : "Could not retrieve player information";
-
     const playerErrorEmbed = new EmbedBuilder()
-      .setTitle(`${serverInfo.serverName} - Team ${team}`)
+      .setTitle(`${serverName} - Team ${team}`)
       .setDescription(`**${errorMessage}**`)
       .setColor("#FF5555")
       .setFooter({
@@ -179,8 +181,11 @@ export class ComponentService {
       const squadName = this.settingsService.showSquadNames()
         ? `${squad.id} | ${squad.name}`
         : `Squad ${squad.id}`;
+      const players = this.settingsService.showSquadLeader()
+        ? squad.players
+        : squad.players.sort((a, b) => a.name.localeCompare(b.name));
 
-      for (const [playerIndex, player] of squad.players.entries()) {
+      for (const [playerIndex, player] of players.entries()) {
         const playerName = this.sanitizePlayerName(player.name);
         const leaderEmoji = this.getLeaderEmoji(player.leader, squad.name);
         playerValue += `**${playerIndex + 1}.** ${playerName}${leaderEmoji}\n`;
@@ -265,7 +270,7 @@ export class ComponentService {
   }
 
   private getLeaderEmoji(isLeader: boolean, squadName: string): string {
-    if (!isLeader) {
+    if (!isLeader || !this.settingsService.showSquadLeader()) {
       return "";
     }
 

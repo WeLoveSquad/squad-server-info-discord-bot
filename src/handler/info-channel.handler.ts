@@ -157,14 +157,18 @@ export class InfoChannelHandler {
         } else {
           serverEmbeds.push(this.componentService.buildServerInfoErrorEmbed(server, position));
         }
+        const serverName = server.name ? server.name : `${server.ip}:${server.rconPort}`;
+
+        playerEmbeds.push(
+          this.componentService.buildPlayerInfoErrorEmbed(serverName, Team.ONE, position),
+          this.componentService.buildPlayerInfoErrorEmbed(serverName, Team.TWO, position)
+        );
         continue;
       }
 
       if (server.rconEnabled && this.settingsService.isPlayerChannelInitialized()) {
         playerEmbeds.push(
-          this.componentService.buildPlayerInfoEmbed(serverInfo, Team.ONE, position)
-        );
-        playerEmbeds.push(
+          this.componentService.buildPlayerInfoEmbed(serverInfo, Team.ONE, position),
           this.componentService.buildPlayerInfoEmbed(serverInfo, Team.TWO, position)
         );
       }
