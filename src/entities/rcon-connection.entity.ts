@@ -7,7 +7,6 @@ import { Teams } from "./teams.entity.js";
 
 const LIST_SQUADS_REQUEST = "ListSquads";
 const LIST_PLAYERS_REQUEST = "ListPlayers";
-const NEXT_LAYER_REQUEST = "ShowNextMap";
 
 export class RconConnection {
   private logger: Logger;
@@ -21,7 +20,6 @@ export class RconConnection {
   private latestSquadsResponse?: string;
   private latestPlayersResponse?: string;
   private latestTeams?: Teams;
-  private nextLayer = "Unknown";
 
   constructor(ip: string, port: number, password: string) {
     this.logger = new Logger(`${Rcon.name}, ${ip}:${port}`);
@@ -81,10 +79,6 @@ export class RconConnection {
     return this.latestTeams;
   }
 
-  public getNextLayer(): string {
-    return this.nextLayer;
-  }
-
   private initInterval(): void {
     clearInterval(this.rconInterval);
 
@@ -98,11 +92,6 @@ export class RconConnection {
     if (!this.connected) {
       this.logger.verbose("Rcon not connected! Will not request any data");
       return;
-    }
-
-    if (this.settingsService.isServerChannelInitialized() && this.settingsService.showNextLayer()) {
-      this.logger.debug("Sending [%s] request", NEXT_LAYER_REQUEST);
-      this.rcon.send(NEXT_LAYER_REQUEST);
     }
 
     if (this.settingsService.isPlayerChannelInitialized()) {
@@ -125,9 +114,6 @@ export class RconConnection {
     } else if (message.startsWith("----- Active Squads -----")) {
       this.logger.debug("Received response to [%s]", LIST_SQUADS_REQUEST);
       this.latestSquadsResponse = message;
-    } else if (message.startsWith("Next level is")) {
-      this.logger.debug("Received response to [%s]", NEXT_LAYER_REQUEST);
-      this.handleNextLayerMessage(message);
     }
   }
 
@@ -142,27 +128,6 @@ export class RconConnection {
       this.latestTeams = new Teams(this.latestSquadsResponse, this.latestPlayersResponse);
       this.receivedPlayerData = true;
     }
-  }
-
-  private handleNextLayerMessage(message: string): void {
-    const splitMessage = message.split(", ");
-    if (splitMessage.length < 2) {
-      this.logger.warn("Could not parse next layer: [%s]", message);
-      this.nextLayer = "Unknown";
-      return;
-    }
-
-    const layerInfo = splitMessage[1];
-    const splitLayerInfo = layerInfo.split("layer is ");
-
-    if (splitLayerInfo.length < 2) {
-      this.logger.warn("Could not parse next layer: [%s]", message);
-      this.nextLayer = "Unknown";
-      return;
-    }
-
-    const layer = splitLayerInfo[1];
-    this.nextLayer = layer.replaceAll(" ", "_");
   }
 
   private isPartialPlayersMessage(message: string): boolean {
