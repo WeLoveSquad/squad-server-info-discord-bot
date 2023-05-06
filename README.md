@@ -4,14 +4,14 @@ A Discord bot to show [Squad](https://joinsquad.com/) server and player informat
 
 ## Server Information
 
-The server information is retrieved from the public query endpoint of a Squad Server and only requires the Server `IP` and `Query-Port` in the config. Only the `Next Layer` in the image below cannot be retrieved from that public endpoint and requires an optional RCON-Connection. If an RCON-Port and RCON-Password are not provided then the information about the `Next Layer` will not be shown.
+The server information is retrieved from the public query endpoint of a Squad Server and only requires the Server `IP` and `Query-Port` in the config.
 
 ![embed-showcase](https://user-images.githubusercontent.com/24782633/210274236-7f269927-467d-463c-a1cc-3305ace65045.png)
 
 ## Player Information
 
 The player information can only be retrieved from an RCON-Connection if the RCON-Port and RCON-Password are provided in the [config](#config-values).\
-If RCON is used the bot will **ONLY** use the commands `ListSquads`, `ListPlayers` and `ShowNextMap`. \
+If RCON is used the bot will **ONLY** use the commands `ListSquads`, `ListPlayers`. \
 The image below shows how an embed of a Team will look like. The bot will send a message for each Server with an RCON-Connection. Each message contains two player information embeds for both teams.
 
 ![grafik](https://user-images.githubusercontent.com/24782633/218317356-894acdc2-51c3-4141-932d-1e1cebf42e94.png)
@@ -43,7 +43,7 @@ The image below shows how an embed of a Team will look like. The bot will send a
   - The default time zone is `Europe/Berlin`
   - Example: `/set-time-zone America/New_York`
 - `/show-next-layer <True | False>`
-  - If an RCON-Port and correct RCON-Password are provided the bot will also be able to request the next layer from the Squad Server and display it in the server information embed. With this command you can configure if the next layer should be shown or not
+  - Configure whether the next layer should be shown in the server information embed
   - The default value is `True`
   - `/show-next-layer True`
 - `/show-squad-names <True | False>`
@@ -81,7 +81,7 @@ This can be done in one of two ways:
 2. Copy `default.json5` into `production.json` and configure all config values in that file. When using this approach you have to remove all unneeded environment variables in `docker-compose.yml`. Otherwise these values will overwrite the values in `production.json`.
 
 ### Starting the application
-After the bot has been added to your Discord server and the configuration has been set the bot can be started.
+Once the bot is added to your server and fully configured, the bot can be started
 ```bash
 # Build and start
 docker-compose up --build

@@ -107,12 +107,14 @@ export class SquadServer {
     const playtimeSeconds = this.getRuleNumber(rules, "PLAYTIME_i");
     const teamOne = this.parseFaction(this.getRuleString(rules, "TeamOne_s"));
     const teamTwo = this.parseFaction(this.getRuleString(rules, "TeamTwo_s"));
+    const nextLayer = this.getRuleString(rules, "NextLayer_s").replaceAll(" ", "_");
 
     this.name = info.name;
 
     const serverInfo: ServerInfo = {
       serverName: info.name,
       layer: info.map,
+      nextLayer: nextLayer,
       maxPlayerCount: info.players.max,
       playerCount,
       teamOne,
@@ -128,8 +130,6 @@ export class SquadServer {
       serverInfo.rconMessage = RCON_ERROR_MESSAGE;
       return serverInfo;
     }
-
-    serverInfo.nextLayer = this.rconConnection.getNextLayer();
 
     if (this.rconConnection.hasReceivedPlayerData()) {
       serverInfo.teams = this.rconConnection.getTeams();
