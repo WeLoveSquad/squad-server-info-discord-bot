@@ -6,7 +6,8 @@ A Discord bot to show [Squad](https://joinsquad.com/) server and player informat
 
 The server information is retrieved from the public query endpoint of a Squad Server and only requires the Server `IP` and `Query-Port` in the config.
 
-![embed-showcase](https://user-images.githubusercontent.com/24782633/210274236-7f269927-467d-463c-a1cc-3305ace65045.png)
+![embed-showcase](https://user-images.githubusercontent.com/24782633/236619031-1aacdcd9-5aaf-447d-9589-c3c058203a68.png)
+
 
 ## Player Information
 
