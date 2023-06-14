@@ -262,11 +262,11 @@ export class ComponentService {
 
   private sanitizePlayerName(name: string): string {
     return name
-      .replace("_", "\\_")
-      .replace("*", "\\*")
-      .replace("~", "\\~")
-      .replace(">", "\\>")
-      .replace("`", "\\`");
+      .replaceAll("_", "\\_")
+      .replaceAll("*", "\\*")
+      .replaceAll("~", "\\~")
+      .replaceAll(">", "\\>")
+      .replaceAll("`", "\\`");
   }
 
   private getLeaderEmoji(isLeader: boolean, squadName: string): string {
