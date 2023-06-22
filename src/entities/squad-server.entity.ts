@@ -5,7 +5,20 @@ import { Teams } from "./teams.entity.js";
 
 const IP_REGEX = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
 
-const FACTIONS = ["ADF", "BAF", "CAF", "IMF", "INS", "MEA", "PLA", "RGF", "USA", "USMC"];
+const FACTIONS = [
+  "ADF",
+  "BAF",
+  "CAF",
+  "IMF",
+  "INS",
+  "MEA",
+  "PLA",
+  "PLANMC",
+  "RGF",
+  "USA",
+  "USMC",
+  "VDV",
+];
 
 const SERVER_QUERY_ERROR_MESSAGE = "Server Query Endpoint is not responding";
 const RCON_ERROR_MESSAGE = "Error: Could not establish RCON connection";
@@ -97,6 +110,8 @@ export class SquadServer {
 
     const info = await server.getInfo();
     const rules = await server.getRules();
+
+    console.log(info);
 
     server.disconnect();
     this.logger.debug("Disconnected from Server-Query-Endpoint");
