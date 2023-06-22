@@ -111,8 +111,6 @@ export class SquadServer {
     const info = await server.getInfo();
     const rules = await server.getRules();
 
-    console.log(info);
-
     server.disconnect();
     this.logger.debug("Disconnected from Server-Query-Endpoint");
 
