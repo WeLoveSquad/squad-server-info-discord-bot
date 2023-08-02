@@ -395,6 +395,8 @@ export class InfoChannelHandler {
     for (const message of messages.values()) {
       if (!this.isBotMessage(message)) {
         this.deleteMessage(message);
+      } else if (this.serverInfoMessage && this.serverInfoMessage.id !== message.id) {
+        this.deleteMessage(message);
       }
     }
   }
@@ -405,9 +407,12 @@ export class InfoChannelHandler {
     }
 
     const messages = await this.playerInfoChannel.messages.fetch();
+    const playerInfoMessageIds = this.playerInfoMessages.map((message) => message.id);
 
     for (const message of messages.values()) {
       if (!this.isBotMessage(message)) {
+        this.deleteMessage(message);
+      } else if (playerInfoMessageIds.length > 0 && !playerInfoMessageIds.includes(message.id)) {
         this.deleteMessage(message);
       }
     }
