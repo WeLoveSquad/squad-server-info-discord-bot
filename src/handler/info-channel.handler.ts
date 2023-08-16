@@ -406,6 +406,8 @@ export class InfoChannelHandler {
       return;
     }
 
+    this.playerInfoMessages.splice(this.serverService.getRconServerCount());
+
     const messages = await this.playerInfoChannel.messages.fetch();
     const playerInfoMessageIds = this.playerInfoMessages.map((message) => message.id);
 
