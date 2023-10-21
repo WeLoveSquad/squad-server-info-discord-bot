@@ -1,5 +1,5 @@
-import { Team } from "../enums/team.enum.js";
 import { Player } from "./player.entity.js";
+import { Team } from "./teams.entity.js";
 
 const SQUAD_REGEX =
   /ID: (\d+) \| Name: (.*) \| Size: (\d+) \| Locked: (True|False) \| Creator Name: (.*) \| Creator Steam ID: (\d+)/;
@@ -19,8 +19,8 @@ export class Squad {
       throw new Error(`RCON squad string: [${rconSquadString}] is invalid`);
     }
 
-    this.team = team;
     this.id = Number.parseInt(match[1], 10);
+    this.team = team;
     this.name = match[2];
     this.size = Number.parseInt(match[3], 10);
     this.locked = this.parseLocked(match[4]);

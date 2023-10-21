@@ -1,6 +1,7 @@
-import { Team } from "../enums/team.enum.js";
 import { Player } from "./player.entity.js";
 import { Squad } from "./squad.entity.js";
+
+export type Team = 1 | 2;
 
 export class Teams {
   private teamOneSquads: Squad[] = [];
@@ -28,18 +29,17 @@ export class Teams {
 
   private parseSquads(squadsResponse: string): void {
     const splitResponse = squadsResponse.split("\n");
-
-    let team = Team.ONE;
+    let team: Team = 1;
 
     for (const line of splitResponse) {
       if (line.startsWith("Team ID: 2")) {
-        team = Team.TWO;
+        team = 2;
         continue;
       }
 
       if (Squad.isValidSquadString(line)) {
         const squad = new Squad(line, team);
-        if (team === Team.ONE) {
+        if (team === 1) {
           this.teamOneSquads.push(squad);
         } else {
           this.teamTwoSquads.push(squad);
@@ -54,7 +54,7 @@ export class Teams {
     for (const line of splitResponse) {
       if (Player.isValidPlayerString(line)) {
         const player = new Player(line);
-        if (player.team === Team.ONE) {
+        if (player.team === 1) {
           this.teamOnePlayerCount += 1;
         } else {
           this.teamTwoPlayerCount += 1;
@@ -70,7 +70,7 @@ export class Teams {
   }
 
   private insertPlayerToSquad(player: Player): void {
-    const squads = player.team === Team.ONE ? this.teamOneSquads : this.teamTwoSquads;
+    const squads = player.team === 1 ? this.teamOneSquads : this.teamTwoSquads;
 
     for (const squad of squads) {
       if (squad.id === player.squadId) {
@@ -81,7 +81,7 @@ export class Teams {
   }
 
   private insertUnassigned(player: Player): void {
-    if (player.team === Team.ONE) {
+    if (player.team === 1) {
       this.teamOneUnassigned.push(player);
     } else {
       this.teamTwoUnassigned.push(player);
@@ -89,7 +89,7 @@ export class Teams {
   }
 
   public getSquads(team: Team): Squad[] {
-    if (team === Team.ONE) {
+    if (team === 1) {
       return this.teamOneSquads;
     } else {
       return this.teamTwoSquads;
@@ -97,7 +97,7 @@ export class Teams {
   }
 
   public getUnassigned(team: Team): Player[] {
-    if (team === Team.ONE) {
+    if (team === 1) {
       return this.teamOneUnassigned;
     } else {
       return this.teamTwoUnassigned;
@@ -105,7 +105,7 @@ export class Teams {
   }
 
   public getPlayerCount(team: Team): number {
-    if (team === Team.ONE) {
+    if (team === 1) {
       return this.teamOnePlayerCount;
     } else {
       return this.teamTwoPlayerCount;

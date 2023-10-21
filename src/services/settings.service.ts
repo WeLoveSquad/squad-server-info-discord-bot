@@ -5,30 +5,30 @@ import { singleton } from "tsyringe";
 import { Settings } from "../entities/settings.entity.js";
 import { Logger } from "../logger/logger.js";
 
+const SETTINGS_DIR_PATH = "./settings";
+const SETTINGS_FILE_PATH = "./settings/settings.json";
+
+export const SERVER_CHANNEL_UPDATED_EVENT = "serverChannelUpdated";
+export const PLAYER_CHANNEL_UPDATED_EVENT = "playerChannelUpdated";
+export const SETTINGS_UPDATED_EVENT = "settingsUpdated";
+export const SETTINGS_RESET_EVENT = "settingsReset";
+
 export class SettingsServiceError extends Error {}
 
 @singleton()
 export class SettingsService extends EventEmitter {
   private logger = new Logger(SettingsService.name);
 
-  private static readonly SETTINGS_DIR_PATH = "./settings";
-  private static readonly SETTINGS_FILE_PATH = "./settings/settings.json";
-
-  public static readonly SERVER_CHANNEL_UPDATED_EVENT = "serverChannelUpdated";
-  public static readonly PLAYER_CHANNEL_UPDATED_EVENT = "playerChannelUpdated";
-  public static readonly SETTINGS_UPDATED_EVENT = "settingsUpdated";
-  public static readonly SETTINGS_RESET_EVENT = "settingsReset";
-
   private settings: Settings;
 
   constructor() {
     super();
 
-    this.logger.debug("Will store settings in file: [%s]", SettingsService.SETTINGS_FILE_PATH);
+    this.logger.debug("Will store settings in file: [%s]", SETTINGS_FILE_PATH);
 
-    if (fs.existsSync(SettingsService.SETTINGS_FILE_PATH)) {
-      this.logger.info("Found settings file: [%s]", SettingsService.SETTINGS_FILE_PATH);
-      const fileContent = fs.readFileSync(SettingsService.SETTINGS_FILE_PATH, "utf-8");
+    if (fs.existsSync(SETTINGS_FILE_PATH)) {
+      this.logger.info("Found settings file: [%s]", SETTINGS_FILE_PATH);
+      const fileContent = fs.readFileSync(SETTINGS_FILE_PATH, "utf-8");
 
       this.settings = new Settings(fileContent);
 
@@ -36,7 +36,7 @@ export class SettingsService extends EventEmitter {
     } else {
       this.logger.info(
         "Settings file at [%s] does not exist yet and default settings will be used",
-        SettingsService.SETTINGS_FILE_PATH
+        SETTINGS_FILE_PATH
       );
       this.settings = new Settings();
     }
@@ -46,7 +46,7 @@ export class SettingsService extends EventEmitter {
     this.settings.guildId = guildId;
     this.settings.serverChannelId = channelId;
     await this.updateSettings();
-    this.emit(SettingsService.SERVER_CHANNEL_UPDATED_EVENT);
+    this.emit(SERVER_CHANNEL_UPDATED_EVENT);
   }
 
   public async initPlayerChannel(playerChannelId: string): Promise<void> {
@@ -58,7 +58,7 @@ export class SettingsService extends EventEmitter {
 
     this.settings.playerChannelId = playerChannelId;
     await this.updateSettings();
-    this.emit(SettingsService.PLAYER_CHANNEL_UPDATED_EVENT);
+    this.emit(PLAYER_CHANNEL_UPDATED_EVENT);
   }
 
   public isServerChannelInitialized(): boolean {
@@ -90,7 +90,7 @@ export class SettingsService extends EventEmitter {
 
     this.settings.playerChannelId = undefined;
     await this.updateSettings();
-    this.emit(SettingsService.PLAYER_CHANNEL_UPDATED_EVENT);
+    this.emit(PLAYER_CHANNEL_UPDATED_EVENT);
   }
 
   public async setUpdateIntervalSec(interval: number): Promise<void> {
@@ -100,7 +100,7 @@ export class SettingsService extends EventEmitter {
 
     this.settings.updateIntervalSec = interval;
     await this.updateSettings();
-    this.emit(SettingsService.SETTINGS_UPDATED_EVENT);
+    this.emit(SETTINGS_UPDATED_EVENT);
   }
 
   public getUpdateIntervalSec(): number {
@@ -115,7 +115,7 @@ export class SettingsService extends EventEmitter {
 
     this.settings.timeZone = timeZone;
     await this.updateSettings();
-    this.emit(SettingsService.SETTINGS_UPDATED_EVENT);
+    this.emit(SETTINGS_UPDATED_EVENT);
   }
 
   public getTimeZone(): string {
@@ -125,7 +125,7 @@ export class SettingsService extends EventEmitter {
   public async setShowNextLayer(show: boolean): Promise<void> {
     this.settings.showNextLayer = show;
     await this.updateSettings();
-    this.emit(SettingsService.SETTINGS_UPDATED_EVENT);
+    this.emit(SETTINGS_UPDATED_EVENT);
   }
 
   public showNextLayer(): boolean {
@@ -135,7 +135,7 @@ export class SettingsService extends EventEmitter {
   public async setShowSquadNames(show: boolean): Promise<void> {
     this.settings.showSquadNames = show;
     await this.updateSettings();
-    this.emit(SettingsService.SETTINGS_UPDATED_EVENT);
+    this.emit(SETTINGS_UPDATED_EVENT);
   }
 
   public showSquadNames(): boolean {
@@ -145,7 +145,7 @@ export class SettingsService extends EventEmitter {
   public async setSortSquadsBySize(sort: boolean): Promise<void> {
     this.settings.sortSquadsBySize = sort;
     await this.updateSettings();
-    this.emit(SettingsService.SETTINGS_UPDATED_EVENT);
+    this.emit(SETTINGS_UPDATED_EVENT);
   }
 
   public sortSquadsBySize(): boolean {
@@ -155,7 +155,7 @@ export class SettingsService extends EventEmitter {
   public async setShowCommander(show: boolean): Promise<void> {
     this.settings.showCommander = show;
     await this.updateSettings();
-    this.emit(SettingsService.SETTINGS_UPDATED_EVENT);
+    this.emit(SETTINGS_UPDATED_EVENT);
   }
 
   public showCommander(): boolean {
@@ -165,7 +165,7 @@ export class SettingsService extends EventEmitter {
   public async setShowSquadLeader(show: boolean): Promise<void> {
     this.settings.showSquadLeader = show;
     await this.updateSettings();
-    this.emit(SettingsService.SETTINGS_UPDATED_EVENT);
+    this.emit(SETTINGS_UPDATED_EVENT);
   }
 
   public showSquadLeader(): boolean {
@@ -175,31 +175,24 @@ export class SettingsService extends EventEmitter {
   public async resetSettings(): Promise<void> {
     this.settings = new Settings();
     await this.updateSettings();
-    this.emit(SettingsService.SETTINGS_RESET_EVENT);
+    this.emit(SETTINGS_RESET_EVENT);
   }
 
   private async updateSettings(): Promise<void> {
-    if (!fs.existsSync(SettingsService.SETTINGS_DIR_PATH)) {
+    if (!fs.existsSync(SETTINGS_DIR_PATH)) {
       this.logger.info(
         "Settings directory: [%s] does not exist yet. Attempting to create it",
-        SettingsService.SETTINGS_DIR_PATH
+        SETTINGS_DIR_PATH
       );
       try {
-        await fs.promises.mkdir(SettingsService.SETTINGS_DIR_PATH, { recursive: true });
-        this.logger.info(
-          "Successfully created settings directory at [%s]",
-          SettingsService.SETTINGS_DIR_PATH
-        );
+        await fs.promises.mkdir(SETTINGS_DIR_PATH, { recursive: true });
+        this.logger.info("Successfully created settings directory at [%s]", SETTINGS_DIR_PATH);
       } catch (error: unknown) {
-        throw new Error(`Could not create settings file at [${SettingsService.SETTINGS_DIR_PATH}]`);
+        throw new Error(`Could not create settings file at '${SETTINGS_DIR_PATH}'`);
       }
     }
 
     this.logger.verbose("Saving settings: [%s]", this.settings.toJsonString());
-    await fs.promises.writeFile(
-      `${SettingsService.SETTINGS_FILE_PATH}`,
-      this.settings.toJsonString(),
-      "utf-8"
-    );
+    await fs.promises.writeFile(`${SETTINGS_FILE_PATH}`, this.settings.toJsonString(), "utf-8");
   }
 }

@@ -1,30 +1,44 @@
-import { Client, EmbedBuilder, Guild, Message, TextChannel } from "discord.js";
+import { Client, DiscordAPIError, EmbedBuilder, Message, TextChannel } from "discord.js";
 import { Discord, Once } from "discordx";
 import { injectable } from "tsyringe";
-import { ServerInfo, ServerInfoError } from "../entities/squad-server.entity.js";
-import { Team } from "../enums/team.enum.js";
 import { Logger } from "../logger/logger.js";
-import { ComponentService } from "../services/component.service.js";
+import { DiscordComponentService } from "../services/discord-component.service.js";
+import { DiscordService } from "../services/discord.service.js";
+import { PlayerInfoService } from "../services/player-info.service.js";
+import { ServerInfoService } from "../services/server-info.service.js";
 import { ServerService } from "../services/server.service.js";
-import { SettingsService } from "../services/settings.service.js";
+import {
+  PLAYER_CHANNEL_UPDATED_EVENT,
+  SERVER_CHANNEL_UPDATED_EVENT,
+  SETTINGS_RESET_EVENT,
+  SETTINGS_UPDATED_EVENT,
+  SettingsService,
+} from "../services/settings.service.js";
+
+const MAX_MESSAGE_EDIT_ATTEMPTS = 5;
 
 @Discord()
 @injectable()
 export class InfoChannelHandler {
   private logger = new Logger(InfoChannelHandler.name);
 
-  private guild?: Guild;
+  private failedServerInfoEditAttempts = 0;
+  private failedPlayerInfoEditAttempts = 0;
+
   private serverInfoChannel?: TextChannel;
   private serverInfoMessage?: Message;
-  private interval?: NodeJS.Timer;
+  private interval?: NodeJS.Timeout;
 
   private playerInfoChannel?: TextChannel;
   private playerInfoMessages: Message[] = [];
 
   constructor(
     private serverService: ServerService,
+    private serverInfoService: ServerInfoService,
+    private playerInfoService: PlayerInfoService,
     private settingsService: SettingsService,
-    private componentService: ComponentService
+    private discordService: DiscordService,
+    private discordComponentService: DiscordComponentService
   ) {}
 
   @Once({ event: "ready" })
@@ -32,19 +46,19 @@ export class InfoChannelHandler {
     await this.initServerInfoChannel(client);
     await this.initPlayerInfoChannel(client);
 
-    this.settingsService.addListener(SettingsService.SERVER_CHANNEL_UPDATED_EVENT, async () => {
+    this.settingsService.addListener(SERVER_CHANNEL_UPDATED_EVENT, async () => {
       await this.handleServerChannelUpdated(client);
     });
 
-    this.settingsService.addListener(SettingsService.PLAYER_CHANNEL_UPDATED_EVENT, async () => {
+    this.settingsService.addListener(PLAYER_CHANNEL_UPDATED_EVENT, async () => {
       await this.handlePlayerChannelUpdated(client);
     });
 
-    this.settingsService.addListener(SettingsService.SETTINGS_RESET_EVENT, async () => {
+    this.settingsService.addListener(SETTINGS_RESET_EVENT, async () => {
       await this.handleSettingsReset();
     });
 
-    this.settingsService.addListener(SettingsService.SETTINGS_UPDATED_EVENT, async () => {
+    this.settingsService.addListener(SETTINGS_UPDATED_EVENT, async () => {
       this.logger.debug("Settings have been updated. Will restart the update interval");
       await this.startUpdateInterval();
     });
@@ -90,12 +104,12 @@ export class InfoChannelHandler {
     this.serverInfoChannel = undefined;
 
     if (this.serverInfoMessage) {
-      await this.deleteMessage(this.serverInfoMessage);
+      await this.discordService.deleteMessage(this.serverInfoMessage);
     }
     this.serverInfoMessage = undefined;
 
     for (const message of this.playerInfoMessages) {
-      await this.deleteMessage(message);
+      await this.discordService.deleteMessage(message);
     }
     this.playerInfoMessages = [];
 
@@ -107,7 +121,7 @@ export class InfoChannelHandler {
   private async startUpdateInterval(): Promise<void> {
     clearInterval(this.interval);
 
-    if (!this.guild || !this.serverInfoChannel) {
+    if (!this.serverInfoChannel) {
       this.logger.info(
         "Will not start the update interval because the server info channel has not been initialized yet"
       );
@@ -139,43 +153,32 @@ export class InfoChannelHandler {
 
   private async syncServerInfos(): Promise<void> {
     const servers = this.serverService.getServers();
-    const serverEmbeds: EmbedBuilder[] = [];
-    const playerEmbeds: EmbedBuilder[] = [];
+    const serverInfoEmbeds: EmbedBuilder[] = [];
+    const playerInfoEmbeds: EmbedBuilder[] = [];
 
     for (const [index, server] of servers.entries()) {
       const position = index + 1;
 
-      let serverInfo: ServerInfo;
-      try {
-        serverInfo = await server.getServerInfo();
-        serverEmbeds.push(this.componentService.buildServerInfoEmbed(serverInfo, position));
-      } catch (error: unknown) {
-        if (error instanceof ServerInfoError) {
-          serverEmbeds.push(
-            this.componentService.buildServerInfoErrorEmbed(server, position, error.message)
-          );
-        } else {
-          serverEmbeds.push(this.componentService.buildServerInfoErrorEmbed(server, position));
-        }
-        const serverName = server.name ? server.name : `${server.ip}:${server.rconPort}`;
-
-        playerEmbeds.push(
-          this.componentService.buildPlayerInfoErrorEmbed(serverName, Team.ONE, position),
-          this.componentService.buildPlayerInfoErrorEmbed(serverName, Team.TWO, position)
-        );
-        continue;
-      }
+      const serverInfo = await this.serverInfoService.getServerInfo(server);
+      const serverInfoEmbed = this.discordComponentService.buildServerInfoEmbed(
+        serverInfo,
+        position
+      );
+      serverInfoEmbeds.push(serverInfoEmbed);
 
       if (server.rconEnabled && this.settingsService.isPlayerChannelInitialized()) {
-        playerEmbeds.push(
-          this.componentService.buildPlayerInfoEmbed(serverInfo, Team.ONE, position),
-          this.componentService.buildPlayerInfoEmbed(serverInfo, Team.TWO, position)
+        const teams = await this.playerInfoService.getTeams(server);
+        const [teamOneEmbed, teamTwoEmbed] = this.discordComponentService.buildPlayerInfoEmbeds(
+          serverInfo,
+          teams,
+          position
         );
+        playerInfoEmbeds.push(teamOneEmbed, teamTwoEmbed);
       }
     }
 
     try {
-      await this.updateInfoMessages(serverEmbeds, playerEmbeds);
+      await this.updateInfoMessages(serverInfoEmbeds, playerInfoEmbeds);
     } catch (error: unknown) {
       this.logger.error(
         "Unexpected error occurred while updating the info messages. Error: [%s]",
@@ -188,23 +191,53 @@ export class InfoChannelHandler {
     serverEmbeds: EmbedBuilder[],
     playerEmbeds: EmbedBuilder[]
   ): Promise<void> {
-    await this.updateServerInfoMessage(serverEmbeds);
+    try {
+      await this.updateServerInfoMessage(serverEmbeds);
+      this.failedServerInfoEditAttempts = 0;
+    } catch (error: unknown) {
+      this.failedServerInfoEditAttempts++;
+      this.logger.warn(
+        "Updating the server info message failed. Attempt %s/%s.",
+        this.failedServerInfoEditAttempts,
+        MAX_MESSAGE_EDIT_ATTEMPTS
+      );
+      if (
+        (error instanceof DiscordAPIError && error.status === 404) ||
+        this.failedServerInfoEditAttempts >= 5
+      ) {
+        this.logger.error(
+          "Could not edit the player info message. Will send a new one during the next sync"
+        );
+        this.serverInfoMessage = undefined;
+        return;
+      }
+    }
 
     if (this.settingsService.isPlayerChannelInitialized()) {
       try {
         await this.updatePlayerInfoMessages(playerEmbeds);
+        this.failedPlayerInfoEditAttempts = 0;
       } catch (error: unknown) {
-        console.log(error);
+        this.failedPlayerInfoEditAttempts++;
         this.logger.warn(
-          "An error occured while updating the player info messages. Will resend all messages"
+          "Updating the player info message failed. Attempt %s/%s.",
+          this.failedServerInfoEditAttempts,
+          MAX_MESSAGE_EDIT_ATTEMPTS
         );
-
-        await this.updatePlayerInfoMessages(playerEmbeds, true);
+        if (
+          (error instanceof DiscordAPIError && error.status === 404) ||
+          this.failedPlayerInfoEditAttempts >= 5
+        ) {
+          this.logger.error(
+            "Could not edit the server info message and will send a new one during the next sync"
+          );
+          this.playerInfoMessages = [];
+        }
       }
     }
   }
 
-  private async updateServerInfoMessage(infoEmbeds: EmbedBuilder[]): Promise<void> {
+  private async updateServerInfoMessage(serverInfoEmbeds: EmbedBuilder[]): Promise<void> {
     if (!this.serverInfoChannel) {
       this.logger.error(
         "Cannot update the server info message because serverInfoChannel is undefined"
@@ -219,7 +252,7 @@ export class InfoChannelHandler {
       this.playerInfoMessages.length >= 1 &&
       this.serverInfoChannel.id !== this.playerInfoChannel?.id
     ) {
-      const buttonRow = this.componentService.buildPlayerInfoLinkButton(
+      const buttonRow = this.discordComponentService.buildPlayerInfoLinkButton(
         this.playerInfoMessages[0].id
       );
       components.push(buttonRow);
@@ -227,32 +260,17 @@ export class InfoChannelHandler {
 
     if (!this.serverInfoMessage) {
       this.serverInfoMessage = await this.serverInfoChannel.send({
-        embeds: infoEmbeds,
+        embeds: serverInfoEmbeds,
         components,
       });
-    } else {
-      try {
-        this.logger.debug("Editing server info message [%s]", this.serverInfoMessage.id);
-        await this.serverInfoMessage.edit({ embeds: infoEmbeds, components });
-      } catch (error: unknown) {
-        this.logger.warn(
-          "Could not edit server info message with id: [%s] and will send a new message. Error: [%s]",
-          this.serverInfoMessage.id,
-          error
-        );
-
-        this.serverInfoMessage = await this.serverInfoChannel.send({
-          embeds: infoEmbeds,
-          components,
-        });
-      }
+      return;
     }
+
+    this.logger.debug("Editing server info message [%s]", this.serverInfoMessage.id);
+    await this.serverInfoMessage.edit({ embeds: serverInfoEmbeds, components });
   }
 
-  private async updatePlayerInfoMessages(
-    playerEmbeds: EmbedBuilder[],
-    resendAll = false
-  ): Promise<void> {
+  private async updatePlayerInfoMessages(playerEmbeds: EmbedBuilder[]): Promise<void> {
     if (!this.playerInfoChannel) {
       this.logger.error(
         "Cannot update the player info messages because playerInfoChannel is undefined"
@@ -260,13 +278,11 @@ export class InfoChannelHandler {
       return;
     }
 
-    if (resendAll) {
-      this.playerInfoMessages = [];
-    }
-
     const components = [];
     if (this.serverInfoMessage) {
-      components.push(this.componentService.buildServerInfoLinkButton(this.serverInfoMessage.id));
+      components.push(
+        this.discordComponentService.buildServerInfoLinkButton(this.serverInfoMessage.id)
+      );
     }
 
     let embedIndex = 0;
@@ -311,8 +327,7 @@ export class InfoChannelHandler {
       return;
     }
 
-    this.guild = await this.getGuild(client, guildId);
-    this.serverInfoChannel = await this.getDiscordChannel(client, channelId);
+    this.serverInfoChannel = await this.discordService.loadTextChannel(client, channelId);
 
     const messages = await this.serverInfoChannel.messages.fetch();
 
@@ -320,13 +335,13 @@ export class InfoChannelHandler {
       if (!this.serverInfoMessage && message.author.id === client.user?.id) {
         this.serverInfoMessage = message;
       } else {
-        await this.deleteMessage(message);
+        await this.discordService.deleteMessage(message);
       }
     }
   }
 
   private async initPlayerInfoChannel(client: Client): Promise<void> {
-    if (!this.guild) {
+    if (!this.serverInfoChannel) {
       this.logger.info(
         "Cannot init player info channel before server info channel has been initialized"
       );
@@ -341,48 +356,23 @@ export class InfoChannelHandler {
       return;
     }
 
-    this.playerInfoChannel = await this.getDiscordChannel(client, playerChannelId);
+    this.playerInfoChannel = await this.discordService.loadTextChannel(client, playerChannelId);
 
     const rconServerCount = this.serverService.getRconServerCount();
     const messages = await this.playerInfoChannel.messages.fetch();
 
     for (const message of messages.values()) {
       if (message.author.id !== client.user?.id) {
-        await this.deleteMessage(message);
+        await this.discordService.deleteMessage(message);
       } else if (
         message.id !== this.serverInfoMessage?.id &&
         this.playerInfoMessages.length < rconServerCount
       ) {
         this.playerInfoMessages.splice(0, 0, message);
       } else {
-        await this.deleteMessage(message);
+        await this.discordService.deleteMessage(message);
       }
     }
-  }
-
-  private async deleteMessage(message: Message): Promise<void> {
-    try {
-      await message.delete();
-    } catch (error: unknown) {
-      this.logger.warn("Could not delete message: [%s]. Error: [%s]", message.id, error);
-    }
-  }
-
-  private async getGuild(client: Client, guildId: string): Promise<Guild> {
-    try {
-      return await client.guilds.fetch(guildId);
-    } catch (error: unknown) {
-      throw new Error(`Could not find guild with id: '${guildId}'. Reason: '${error}'`);
-    }
-  }
-
-  private async getDiscordChannel(client: Client, channelId: string): Promise<TextChannel> {
-    const channel = await client.channels.fetch(channelId);
-    if (!channel || !(channel instanceof TextChannel)) {
-      throw new Error(`Could not find text channel with id '${channelId}'`);
-    }
-
-    return channel;
   }
 
   private async clearServerInfoChannel(): Promise<void> {
@@ -394,9 +384,9 @@ export class InfoChannelHandler {
 
     for (const message of messages.values()) {
       if (!this.isBotMessage(message)) {
-        this.deleteMessage(message);
+        await this.discordService.deleteMessage(message);
       } else if (this.serverInfoMessage && this.serverInfoMessage.id !== message.id) {
-        this.deleteMessage(message);
+        await this.discordService.deleteMessage(message);
       }
     }
   }
@@ -413,9 +403,9 @@ export class InfoChannelHandler {
 
     for (const message of messages.values()) {
       if (!this.isBotMessage(message)) {
-        this.deleteMessage(message);
+        await this.discordService.deleteMessage(message);
       } else if (playerInfoMessageIds.length > 0 && !playerInfoMessageIds.includes(message.id)) {
-        this.deleteMessage(message);
+        await this.discordService.deleteMessage(message);
       }
     }
   }

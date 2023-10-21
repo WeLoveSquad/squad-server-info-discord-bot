@@ -1,5 +1,5 @@
 import config from "config";
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, GuildMember } from "discord.js";
 import { GuardFunction } from "discordx";
 import { Logger } from "../logger/logger.js";
 
@@ -7,23 +7,14 @@ const AUTHORIZED_ROLE_IDS = config.get<string>("discord.authorizedRoles");
 
 export const UserIsAuthorized: () => GuardFunction<CommandInteraction> = () => {
   return async (interaction, _, next) => {
-    const logger = new Logger(UserIsAuthorized.name);
-
-    const messageGuild = interaction.guild;
-    if (!messageGuild) {
-      logger.warn(
-        "interaction message guild not found for interaction: [%s] by user: [%s] with id: [%s]",
-        interaction.type,
-        interaction.user.username,
-        interaction.user.id
-      );
+    if (!(interaction.member instanceof GuildMember)) {
       return;
     }
 
-    try {
-      const member = await messageGuild.members.fetch({ user: interaction.user.id });
+    const logger = new Logger(UserIsAuthorized.name);
 
-      if (member.roles.cache.hasAny(...AUTHORIZED_ROLE_IDS.split(","))) {
+    try {
+      if (interaction.member.roles.cache.hasAny(...AUTHORIZED_ROLE_IDS.split(","))) {
         await next();
       } else {
         await interaction.reply({

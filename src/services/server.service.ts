@@ -31,6 +31,10 @@ export class ServerService {
     return this.squadServers;
   }
 
+  public getRconServers(): SquadServer[] {
+    return this.squadServers.filter((server) => server.rconEnabled);
+  }
+
   public getRconServerCount(): number {
     return this.rconServerCount;
   }

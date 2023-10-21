@@ -1,6 +1,6 @@
 import {
-  ActionRowBuilder,
   APIEmbedField,
+  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
@@ -8,57 +8,125 @@ import {
 import { DateTime, Duration } from "luxon";
 import { injectable } from "tsyringe";
 import { Player } from "../entities/player.entity.js";
-import { ServerInfo, SquadServer } from "../entities/squad-server.entity.js";
 import { Squad } from "../entities/squad.entity.js";
-import { Teams } from "../entities/teams.entity.js";
-import { Team } from "../enums/team.enum.js";
+import { Team, Teams } from "../entities/teams.entity.js";
 import { Logger } from "../logger/logger.js";
+import { ServerInfoNew, ServerStatus } from "./server-info.service.js";
 import { SettingsService } from "./settings.service.js";
 
 @injectable()
-export class ComponentService {
-  private logger = new Logger(ComponentService.name);
+export class DiscordComponentService {
+  private logger = new Logger(DiscordComponentService.name);
 
   constructor(private settingsService: SettingsService) {}
 
-  public buildServerInfoEmbed(serverInfo: ServerInfo, position: number): EmbedBuilder {
-    const duration = Duration.fromObject({ seconds: serverInfo.playtimeSeconds });
+  public buildServerInfoEmbed(serverInfo: ServerInfoNew, position: number): EmbedBuilder {
+    const status = serverInfo.status == ServerStatus.Online ? "✅ **Online**" : "❌ **Offline**";
+    const title = serverInfo.serverName ?? `${serverInfo.ip}:${serverInfo.queryPort}`;
+    const layer = serverInfo.layer ?? "-";
+    const publicQueue = serverInfo.publicQueue?.toString() ?? "-";
+    const whitelistQueue = serverInfo.whitelistQueue?.toString() ?? "-";
+    const nextLayer = serverInfo.nextLayer ?? "-";
+    const thumbnail = serverInfo.layer
+      ? `https://squadmaps.com/img/maps/full_size/${serverInfo.layer}.jpg`
+      : null;
+    const teams =
+      serverInfo.teamOne && serverInfo.teamTwo
+        ? `${serverInfo.teamOne} - ${serverInfo.teamTwo}`
+        : "-";
+    const playersOnline =
+      serverInfo.playerCount && serverInfo.maxPlayerCount
+        ? `${serverInfo.playerCount.toString()}/${serverInfo.maxPlayerCount.toString()}`
+        : "-";
+    const roundTime = serverInfo.playtimeSeconds
+      ? Duration.fromObject({ seconds: serverInfo.playtimeSeconds }).toFormat("hh:mm:ss")
+      : "-";
 
     const embed = new EmbedBuilder()
-      .setTitle(serverInfo.serverName)
+      .setTitle(title)
+      .setDescription(status)
       .setColor("#FF5555")
-      .setThumbnail(`https://squadmaps.com/img/maps/full_size/${serverInfo.layer}.jpg`)
+      .setThumbnail(thumbnail)
       .addFields(
-        { name: "Layer", value: serverInfo.layer, inline: true },
-        {
-          name: "Teams",
-          value: `${serverInfo.teamOne} - ${serverInfo.teamTwo}`,
-          inline: true,
-        }
-      );
-
-    if (this.settingsService.showNextLayer() && serverInfo.nextLayer) {
-      embed.addFields({ name: "Next Layer", value: serverInfo.nextLayer, inline: true });
-    } else {
-      embed.addFields({ name: "\u200B", value: "\u200B", inline: true });
-    }
-
-    embed
-      .addFields(
-        {
-          name: "Players Online",
-          value: `${serverInfo.playerCount.toString()}/${serverInfo.maxPlayerCount.toString()}`,
-          inline: true,
-        },
-        { name: "Public Queue", value: serverInfo.publicQueue.toString(), inline: true },
-        { name: "Whitelist Queue", value: serverInfo.whitelistQueue.toString(), inline: true },
-        { name: "Round Time", value: duration.toFormat("hh:mm:ss"), inline: true }
+        { name: "Layer", value: layer, inline: true },
+        { name: "Teams", value: teams, inline: true },
+        { name: "Round Time", value: roundTime, inline: true },
+        { name: "Players Online", value: playersOnline, inline: true },
+        { name: "Public Queue", value: publicQueue, inline: true },
+        { name: "Whitelist Queue", value: whitelistQueue, inline: true }
       )
       .setFooter({
         text: this.buildFooter(position),
       });
 
+    if (this.settingsService.showNextLayer() && serverInfo.nextLayer) {
+      embed.addFields({ name: "Next Layer", value: nextLayer });
+    }
+
     return embed;
+  }
+
+  public buildPlayerInfoEmbeds(
+    serverInfo: ServerInfoNew,
+    teams: Teams | undefined,
+    position: number
+  ): [EmbedBuilder, EmbedBuilder] {
+    if (!teams) {
+      return [
+        this.buildPlayerInfoErrorEmbed(serverInfo, 1, position),
+        this.buildPlayerInfoErrorEmbed(serverInfo, 2, position),
+      ];
+    }
+
+    return [
+      this.buildPlayerInfoEmbed(serverInfo, teams, 1, position),
+      this.buildPlayerInfoEmbed(serverInfo, teams, 2, position),
+    ];
+  }
+
+  private buildPlayerInfoEmbed(
+    serverInfo: ServerInfoNew,
+    teams: Teams,
+    team: Team,
+    position: number
+  ): EmbedBuilder {
+    const teamStr = team === 1 ? serverInfo.teamOne : serverInfo.teamTwo;
+    const playerEmbed = new EmbedBuilder()
+      .setTitle(`${serverInfo.serverName}`)
+      .setDescription(
+        `**Team ${team}** - **${teams.getPlayerCount(team)} Players** - **${teamStr}**`
+      )
+      .setColor("#FF5555")
+      .setFooter({
+        text: this.buildFooter(position),
+      });
+
+    const squadFields = this.buildSquadEmbedFields(teams, team);
+    const unassignedFields = this.buildUnassignedEmbedField(teams.getUnassigned(team));
+
+    playerEmbed.addFields(squadFields);
+    if (unassignedFields) {
+      playerEmbed.addFields(unassignedFields);
+    }
+
+    return playerEmbed;
+  }
+
+  public buildPlayerInfoErrorEmbed(
+    serverInfo: ServerInfoNew,
+    team: Team,
+    position: number
+  ): EmbedBuilder {
+    const serverName = serverInfo.serverName ?? `${serverInfo.ip}`;
+    const playerErrorEmbed = new EmbedBuilder()
+      .setTitle(`${serverName} - Team ${team}`)
+      .setDescription(":x: Could not retrieve player information")
+      .setColor("#FF5555")
+      .setFooter({
+        text: this.buildFooter(position),
+      });
+
+    return playerErrorEmbed;
   }
 
   public buildPlayerInfoLinkButton(messageId: string): ActionRowBuilder<ButtonBuilder> {
@@ -81,81 +149,6 @@ export class ComponentService {
       );
 
     return new ActionRowBuilder<ButtonBuilder>().addComponents(button);
-  }
-
-  public buildServerInfoErrorEmbed(
-    squadServer: SquadServer,
-    position: number,
-    message?: string
-  ): EmbedBuilder {
-    const embed = new EmbedBuilder().setColor("#FF5555");
-    const errorMessage = message
-      ? message
-      : "Unexpected error occurred. Could not retrieve server information.";
-
-    if (squadServer.name) {
-      embed
-        .setTitle(squadServer.name)
-        .setDescription(`${squadServer.ip}:${squadServer.queryPort}\n${errorMessage}`);
-    } else {
-      embed.setTitle(`${squadServer.ip}:${squadServer.queryPort}`).setDescription(errorMessage);
-    }
-
-    embed.setFooter({
-      text: this.buildFooter(position),
-    });
-
-    return embed;
-  }
-
-  public buildPlayerInfoEmbed(serverInfo: ServerInfo, team: Team, position: number): EmbedBuilder {
-    if (!serverInfo.teams || serverInfo.rconMessage) {
-      return this.buildPlayerInfoErrorEmbed(
-        serverInfo.serverName,
-        team,
-        position,
-        serverInfo.rconMessage
-      );
-    }
-
-    const teams = serverInfo.teams;
-    const teamStr = team === Team.ONE ? serverInfo.teamOne : serverInfo.teamTwo;
-    const playerEmbed = new EmbedBuilder()
-      .setTitle(`${serverInfo.serverName} - Team ${team}`)
-      .setDescription(
-        `**${serverInfo.layer}** - **${teamStr}** - **${teams.getPlayerCount(team)} Players**`
-      )
-      .setColor("#FF5555")
-      .setFooter({
-        text: this.buildFooter(position),
-      });
-
-    const squadFields = this.buildSquadEmbedFields(teams, team);
-    const unassignedFields = this.buildUnassignedEmbedField(teams.getUnassigned(team));
-
-    playerEmbed.addFields(squadFields);
-    if (unassignedFields) {
-      playerEmbed.addFields(unassignedFields);
-    }
-
-    return playerEmbed;
-  }
-
-  public buildPlayerInfoErrorEmbed(
-    serverName: string,
-    team: Team,
-    position: number,
-    errorMessage = "Error: Could not retrieve player information"
-  ): EmbedBuilder {
-    const playerErrorEmbed = new EmbedBuilder()
-      .setTitle(`${serverName} - Team ${team}`)
-      .setDescription(`**${errorMessage}**`)
-      .setColor("#FF5555")
-      .setFooter({
-        text: this.buildFooter(position),
-      });
-
-    return playerErrorEmbed;
   }
 
   private buildSquadEmbedFields(teams: Teams, team: Team): APIEmbedField[] {
@@ -274,7 +267,7 @@ export class ComponentService {
       return "";
     }
 
-    if (this.settingsService.showCommander() && squadName === "CMD Squad") {
+    if (this.settingsService.showCommander() && squadName === "Command Squad") {
       return " :star2:";
     } else {
       return " :star:";
