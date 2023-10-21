@@ -35,7 +35,7 @@ export class DiscordComponentService {
         ? `${serverInfo.teamOne} - ${serverInfo.teamTwo}`
         : "-";
     const playersOnline =
-      serverInfo.playerCount && serverInfo.maxPlayerCount
+      serverInfo.playerCount !== undefined && serverInfo.maxPlayerCount !== undefined
         ? `${serverInfo.playerCount.toString()}/${serverInfo.maxPlayerCount.toString()}`
         : "-";
     const roundTime = serverInfo.playtimeSeconds
