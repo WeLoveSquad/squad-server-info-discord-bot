@@ -2,7 +2,6 @@ import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { Player } from "../../src/entities/player.entity.js";
 import { Squad } from "../../src/entities/squad.entity.js";
-import { Team } from "../../src/enums/team.enum.js";
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -16,7 +15,7 @@ describe("Squad", () => {
       const squad = new Squad(rconSquad, 1);
 
       expect(squad.id).to.equal(15);
-      expect(squad.team).to.equal(Team.ONE);
+      expect(squad.team).to.equal(1);
       expect(squad.name).to.equal("Test Squad 123");
       expect(squad.size).to.equal(5);
       expect(squad.locked).to.equal(false);
@@ -30,7 +29,7 @@ describe("Squad", () => {
       const squad = new Squad(rconSquad, 1);
 
       expect(squad.id).to.equal(15);
-      expect(squad.team).to.equal(Team.ONE);
+      expect(squad.team).to.equal(1);
       expect(squad.name).to.equal("Test Squad 123");
       expect(squad.size).to.equal(5);
       expect(squad.locked).to.equal(true);
@@ -44,7 +43,7 @@ describe("Squad", () => {
       const squad = new Squad(rconSquad, 2);
 
       expect(squad.id).to.equal(15);
-      expect(squad.team).to.equal(Team.TWO);
+      expect(squad.team).to.equal(2);
       expect(squad.name).to.equal("Test Squad 123");
       expect(squad.size).to.equal(5);
       expect(squad.locked).to.equal(true);

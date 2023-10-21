@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import { Teams } from "../../src/entities/teams.entity.js";
-import { Team } from "../../src/enums/team.enum.js";
 
 describe("Teams", () => {
   const squadsResponse = `
@@ -34,23 +33,23 @@ ID: 92 | SteamID: 76561199142404779 | Since Disconnect: 04m.25s | Name: Disconne
     it("parses with undefined correctly", () => {
       const teams = new Teams(undefined, undefined);
 
-      expect(teams.getPlayerCount(Team.ONE)).to.equal(0);
-      expect(teams.getPlayerCount(Team.TWO)).to.equal(0);
-      expect(teams.getSquads(Team.ONE).length).to.equal(0);
-      expect(teams.getSquads(Team.TWO).length).to.equal(0);
-      expect(teams.getUnassigned(Team.ONE).length).to.equal(0);
-      expect(teams.getUnassigned(Team.TWO).length).to.equal(0);
+      expect(teams.getPlayerCount(1)).to.equal(0);
+      expect(teams.getPlayerCount(2)).to.equal(0);
+      expect(teams.getSquads(1).length).to.equal(0);
+      expect(teams.getSquads(2).length).to.equal(0);
+      expect(teams.getUnassigned(1).length).to.equal(0);
+      expect(teams.getUnassigned(2).length).to.equal(0);
     });
 
     it("parses with squads and players correctly", () => {
       const teams = new Teams(squadsResponse, playersResponse);
-      const teamOneSquads = teams.getSquads(Team.ONE);
-      const teamTwoSquads = teams.getSquads(Team.TWO);
-      const teamOneUnassigned = teams.getUnassigned(Team.ONE);
-      const teamTwoUnassigned = teams.getUnassigned(Team.TWO);
+      const teamOneSquads = teams.getSquads(1);
+      const teamTwoSquads = teams.getSquads(2);
+      const teamOneUnassigned = teams.getUnassigned(1);
+      const teamTwoUnassigned = teams.getUnassigned(2);
 
-      expect(teams.getPlayerCount(Team.ONE)).to.equal(6);
-      expect(teams.getPlayerCount(Team.TWO)).to.equal(4);
+      expect(teams.getPlayerCount(1)).to.equal(6);
+      expect(teams.getPlayerCount(2)).to.equal(4);
 
       expect(teamOneUnassigned.length).to.equal(1);
       expect(teamOneUnassigned[0].name).to.equal("Team1UnassignedPlayer1");

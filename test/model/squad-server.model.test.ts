@@ -110,7 +110,7 @@ describe("SquadServer", () => {
   });
 
   describe("toQueryPortString", () => {
-    it("returns correct string", () => {
+    it("returns correct query port string", () => {
       const serverString = "12.13.14.15:12345:54321:password";
 
       const server = new SquadServer(serverString);
@@ -119,68 +119,13 @@ describe("SquadServer", () => {
     });
   });
 
-  describe("parseFaction", () => {
-    const serverString = "12.13.14.15:12345:54321:password";
-    const server = new SquadServer(serverString);
+  describe("toRconPortString", () => {
+    it("returns correct rcon port string", () => {
+      const serverString = "12.13.14.15:12345:54321:password";
 
-    it("parses ADF correctly", () => {
-      const faction = server["parseFaction"]("AlBasrah_AAS_v3_ADF");
-      expect(faction).to.equal("ADF");
-    });
+      const server = new SquadServer(serverString);
 
-    it("parses BAF correctly", () => {
-      const faction = server["parseFaction"]("Belaya_Invasion_v3_BAF");
-      expect(faction).to.equal("BAF");
-    });
-
-    it("parses CAF correctly", () => {
-      const faction = server["parseFaction"]("Yehorivka_Invasion_v3_CAF");
-      expect(faction).to.equal("CAF");
-    });
-
-    it("parses IMF correctly", () => {
-      const faction = server["parseFaction"]("Tallil_Skirmish_v3_IMF");
-      expect(faction).to.equal("IMF");
-    });
-
-    it("parses INS correctly", () => {
-      const faction = server["parseFaction"]("Sumari_Insurgency_v1_INS");
-      expect(faction).to.equal("INS");
-    });
-
-    it("parses MEA correctly", () => {
-      const faction = server["parseFaction"]("Anvil_RAAS_v2_MEA");
-      expect(faction).to.equal("MEA");
-    });
-
-    it("parses PLA correctly", () => {
-      const faction = server["parseFaction"]("Chora_AAS_v6_PLA");
-      expect(faction).to.equal("PLA");
-    });
-
-    it("parses RGF correctly", () => {
-      const faction = server["parseFaction"]("BlackCoast_Invasion_v1_RGF");
-      expect(faction).to.equal("RGF");
-    });
-
-    it("parses RGF correctly", () => {
-      const faction = server["parseFaction"]("BlackCoast_Invasion_v1_RGF");
-      expect(faction).to.equal("RGF");
-    });
-
-    it("parses USA correctly", () => {
-      const faction = server["parseFaction"]("FoolsRoad_AAS_v1_USA");
-      expect(faction).to.equal("USA");
-    });
-
-    it("parses USMC correctly", () => {
-      const faction = server["parseFaction"]("Harju_RAAS_v1_USMC");
-      expect(faction).to.equal("USMC");
-    });
-
-    it("returns unknown if parsing fails", () => {
-      const faction = server["parseFaction"]("Map_Gamemode_v1");
-      expect(faction).to.equal("Unknown");
+      expect(server.toRconPortString()).to.equal("12.13.14.15:54321");
     });
   });
 });

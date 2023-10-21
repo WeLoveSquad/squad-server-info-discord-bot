@@ -15,9 +15,9 @@ describe("Player", () => {
       const player = new Player(rconPlayer);
 
       expect(player.id).to.equal(23);
-      expect(player.steamdid).to.equal("76561197960287930");
+      expect(player.steamId).to.equal("76561197960287930");
       expect(player.name).to.equal("TestName");
-      expect(player.teamId).to.equal(1);
+      expect(player.team).to.equal(1);
       expect(player.squadId).to.equal(5);
       expect(player.leader).to.equal(true);
     });
@@ -38,9 +38,9 @@ describe("Player", () => {
       const player = new Player(rconPlayer);
 
       expect(player.id).to.equal(23);
-      expect(player.steamdid).to.equal("76561197960287930");
+      expect(player.steamId).to.equal("76561197960287930");
       expect(player.name).to.equal("TestName");
-      expect(player.teamId).to.equal(1);
+      expect(player.team).to.equal(1);
       expect(player.squadId).to.be.undefined;
       expect(player.leader).to.equal(false);
     });
