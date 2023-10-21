@@ -26,10 +26,6 @@ export interface RconOptions {
   autoReconnect?: boolean;
 }
 
-export enum RconEvents {
-  CONNECTED = "rconConnected",
-  CHAT_MESSAGE = "chatMessage",
-}
 enum InternalRconEvents {
   RESPONSE_EVENT = "responseEvent",
   AUTH_RESPONSE_EVENT = "authResponseEvent",
@@ -41,7 +37,7 @@ const AUTH_PACKET_ID = 1;
 const RECONNECT_TIMEOUT = 10 * 1000;
 const COMMAND_EXECUTION_TIMEOUT = 2 * 1000;
 
-export class Rcon extends EventEmitter {
+export class Rcon {
   private logger: Logger;
 
   private host: string;
@@ -57,8 +53,6 @@ export class Rcon extends EventEmitter {
   private requestId = 2;
 
   constructor(options: RconOptions) {
-    super();
-
     this.host = options.host;
     this.port = options.port;
     this.password = options.password;
@@ -113,7 +107,6 @@ export class Rcon extends EventEmitter {
 
           this.connected = true;
           this.logger.info("Successfully connected");
-          this.emit(RconEvents.CONNECTED);
           return resolve();
         } else {
           return reject(new RconError("RCON Authentication failed"));
@@ -215,8 +208,6 @@ export class Rcon extends EventEmitter {
           this.packetEvent.emit(InternalRconEvents.AUTH_RESPONSE_EVENT, packet);
         } else if (packet.type === PacketType.SERVERDATA_RESPONSE_VALUE) {
           this.packetEvent.emit(InternalRconEvents.RESPONSE_EVENT, packet);
-        } else if (packet.type === PacketType.SERVERDATA_CHAT_VALUE) {
-          this.emit(RconEvents.CHAT_MESSAGE, packet.body);
         }
       } else {
         break;
