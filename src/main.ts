@@ -42,7 +42,7 @@ class Main {
     process.addListener("SIGQUIT", this.shutdown.bind(this));
     process.addListener("SIGTERM", this.shutdown.bind(this));
 
-    this.start();
+    void this.start();
   }
 
   async start(): Promise<void> {
