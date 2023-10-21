@@ -156,7 +156,6 @@ export class ServerInfoService {
   }
 
   private parseFaction(teamString?: string): string | undefined {
-    console.log(teamString);
     if (!teamString) return undefined;
 
     for (const faction of FACTIONS) {
