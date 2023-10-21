@@ -1,6 +1,6 @@
 import { Teams } from "./teams.entity.js";
 
-const IP_REGEX = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
+const IP_REGEX_PATTERN = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
 
 export interface ServerInfo {
   serverName: string;
@@ -48,7 +48,7 @@ export class SquadServer {
   }
 
   private validateIp(ip: string): string {
-    if (!IP_REGEX.test(ip)) {
+    if (!IP_REGEX_PATTERN.test(ip)) {
       throw new Error(`IP: '${ip}' is not a valid IP-Address`);
     }
 

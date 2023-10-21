@@ -6,7 +6,7 @@ import { Logger } from "../logger/logger.js";
 
 const CACHE_TIMEOUT_SECONDS = 10;
 
-const FACTION_PATTERN = /^.+_([A-Z]{3,})$/;
+const FACTION_REGEX_PATTERN = /^.+_([A-Z]{3,})$/;
 
 interface CachedServerInfo {
   serverInfo: ServerInfo;
@@ -145,7 +145,7 @@ export class ServerInfoService {
   private parseFaction(teamString?: string): string | undefined {
     if (!teamString) return undefined;
 
-    const match = teamString.match(FACTION_PATTERN);
+    const match = teamString.match(FACTION_REGEX_PATTERN);
     if (!match || match.length != 2) {
       this.logger.warn("Could not parse faction from team: [%s]", teamString);
       return "Unknown";

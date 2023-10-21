@@ -1,6 +1,6 @@
 import { Team } from "./teams.entity";
 
-const PLAYER_REGEX =
+const PLAYER_REGEX_PATTERN =
   /ID: (\d+) \| SteamID: (\d+) \| Name: (.+) \| Team ID: ([12]) \| Squad ID: (\d+|N\/A) \| Is Leader: (True|False) \| Role: (\w+)/;
 
 export class Player {
@@ -12,7 +12,7 @@ export class Player {
   leader: boolean;
 
   constructor(rconPlayerString: string) {
-    const match = rconPlayerString.match(PLAYER_REGEX);
+    const match = rconPlayerString.match(PLAYER_REGEX_PATTERN);
 
     if (!match || match.length !== 8) {
       throw new Error(`RCON player string: '${rconPlayerString}' is invalid`);
@@ -27,7 +27,7 @@ export class Player {
   }
 
   public static isValidPlayerString(rconPlayerString: string): boolean {
-    return PLAYER_REGEX.test(rconPlayerString);
+    return PLAYER_REGEX_PATTERN.test(rconPlayerString);
   }
 
   private parseTeam(teamId: string): Team {
