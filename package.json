@@ -26,7 +26,7 @@
     ]
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "keywords": [
     "discord",
@@ -35,38 +35,37 @@
     "squad"
   ],
   "dependencies": {
-    "@discordx/importer": "^1.2.1",
+    "@discordx/importer": "^1.2.3",
     "@fabricio-191/valve-server-query": "^4.1.9",
     "config": "^3.3.9",
-    "discord.js": "^14.9.0",
-    "discordx": "^11.7.4",
-    "luxon": "^3.3.0",
-    "rcon": "^1.1.0",
+    "discord.js": "^14.13.0",
+    "discordx": "^11.7.6",
+    "luxon": "^3.4.3",
     "reflect-metadata": "^0.1.13",
-    "tsyringe": "^4.7.0",
-    "winston": "^3.8.2"
+    "tsyringe": "^4.8.0",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.4",
-    "@types/chai-as-promised": "^7.1.5",
-    "@types/config": "^3.3.0",
-    "@types/luxon": "^3.3.0",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^18.15.11",
-    "@typescript-eslint/eslint-plugin": "^5.58.0",
-    "@typescript-eslint/parser": "^5.58.0",
-    "chai": "^4.3.7",
+    "@types/chai": "^4.3.9",
+    "@types/chai-as-promised": "^7.1.7",
+    "@types/config": "^3.3.2",
+    "@types/luxon": "^3.3.3",
+    "@types/mocha": "^10.0.3",
+    "@types/node": "^20.8.7",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
-    "eslint": "^8.38.0",
-    "eslint-config-prettier": "^8.8.0",
+    "eslint": "^8.52.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-prettier": "^5.0.1",
     "mocha": "^10.2.0",
-    "nodemon": "^2.0.22",
-    "prettier": "^2.8.7",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.2.2"
   }
 }
