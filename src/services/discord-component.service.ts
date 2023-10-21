@@ -11,7 +11,7 @@ import { Player } from "../entities/player.entity.js";
 import { Squad } from "../entities/squad.entity.js";
 import { Team, Teams } from "../entities/teams.entity.js";
 import { Logger } from "../logger/logger.js";
-import { ServerInfoNew, ServerStatus } from "./server-info.service.js";
+import { ServerInfo, ServerStatus } from "./server-info.service.js";
 import { SettingsService } from "./settings.service.js";
 
 @injectable()
@@ -20,7 +20,7 @@ export class DiscordComponentService {
 
   constructor(private settingsService: SettingsService) {}
 
-  public buildServerInfoEmbed(serverInfo: ServerInfoNew, position: number): EmbedBuilder {
+  public buildServerInfoEmbed(serverInfo: ServerInfo, position: number): EmbedBuilder {
     const status = serverInfo.status == ServerStatus.Online ? "✅ **Online**" : "❌ **Offline**";
     const title = serverInfo.serverName ?? `${serverInfo.ip}:${serverInfo.queryPort}`;
     const layer = serverInfo.layer ?? "-";
@@ -67,7 +67,7 @@ export class DiscordComponentService {
   }
 
   public buildPlayerInfoEmbeds(
-    serverInfo: ServerInfoNew,
+    serverInfo: ServerInfo,
     teams: Teams | undefined,
     position: number
   ): [EmbedBuilder, EmbedBuilder] {
@@ -85,7 +85,7 @@ export class DiscordComponentService {
   }
 
   private buildPlayerInfoEmbed(
-    serverInfo: ServerInfoNew,
+    serverInfo: ServerInfo,
     teams: Teams,
     team: Team,
     position: number
@@ -113,7 +113,7 @@ export class DiscordComponentService {
   }
 
   public buildPlayerInfoErrorEmbed(
-    serverInfo: ServerInfoNew,
+    serverInfo: ServerInfo,
     team: Team,
     position: number
   ): EmbedBuilder {

@@ -9,11 +9,11 @@ const CACHE_TIMEOUT_SECONDS = 10;
 const FACTION_PATTERN = /^.+_([A-Z]{3,})$/;
 
 interface CachedServerInfo {
-  serverInfo: ServerInfoNew;
+  serverInfo: ServerInfo;
   storedAt: DateTime;
 }
 
-export interface ServerInfoNew {
+export interface ServerInfo {
   status: ServerStatus;
   ip: string;
   queryPort: string;
@@ -41,7 +41,7 @@ export class ServerInfoService {
   private serverNameCache: Map<string, string> = new Map<string, string>();
   private serverInfoCache: Map<string, CachedServerInfo> = new Map<string, CachedServerInfo>();
 
-  public async getServerInfo(server: SquadServer): Promise<ServerInfoNew> {
+  public async getServerInfo(server: SquadServer): Promise<ServerInfo> {
     const cachedServerInfo = this.loadCachedServerInfo(server);
     if (cachedServerInfo) {
       return cachedServerInfo;
@@ -85,7 +85,7 @@ export class ServerInfoService {
 
     this.serverNameCache.set(server.toQueryPortString(), info.name);
 
-    const serverInfo: ServerInfoNew = {
+    const serverInfo: ServerInfo = {
       status: ServerStatus.Online,
       ip: server.ip,
       queryPort: server.queryPort.toString(),
@@ -108,7 +108,7 @@ export class ServerInfoService {
     return serverInfo;
   }
 
-  private loadCachedServerInfo(server: SquadServer): ServerInfoNew | undefined {
+  private loadCachedServerInfo(server: SquadServer): ServerInfo | undefined {
     const cachedServerInfo = this.serverInfoCache.get(server.toQueryPortString());
     if (!cachedServerInfo) return undefined;
 
