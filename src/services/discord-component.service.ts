@@ -22,7 +22,7 @@ export class DiscordComponentService {
 
   public buildServerInfoEmbed(serverInfo: ServerInfo, position: number): EmbedBuilder {
     const status = serverInfo.status == ServerStatus.Online ? "✅ **Online**" : "❌ **Offline**";
-    const title = serverInfo.serverName ?? `${serverInfo.ip}:${serverInfo.queryPort}`;
+    const title = serverInfo.serverName ?? `${serverInfo.ip}`;
     const layer = serverInfo.layer ?? "-";
     const publicQueue = serverInfo.publicQueue?.toString() ?? "-";
     const whitelistQueue = serverInfo.whitelistQueue?.toString() ?? "-";

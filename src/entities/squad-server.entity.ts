@@ -1,50 +1,24 @@
-import { Teams } from "./teams.entity.js";
-
 const IP_REGEX_PATTERN = /^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$/;
-
-export interface ServerInfo {
-  serverName: string;
-  layer: string;
-  playerCount: number;
-  maxPlayerCount: number;
-  teamOne: string;
-  teamTwo: string;
-  publicQueue: number;
-  whitelistQueue: number;
-  playtimeSeconds: number;
-  nextLayer?: string;
-  teams?: Teams;
-  rconMessage?: string;
-}
-
-export class ServerInfoError extends Error {}
 
 export class SquadServer {
   public readonly ip: string;
-  public readonly queryPort: number;
-  public name?: string;
+  public readonly rconPort: number;
+  public readonly rconPassword: string;
 
-  public readonly rconEnabled: boolean = false;
-  public readonly rconPort?: number;
-  public readonly rconPassword?: string;
+  public name?: string;
 
   constructor(serverString: string) {
     const serverParams = serverString.split(":");
 
-    if (serverParams.length !== 2 && serverParams.length !== 4) {
+    if (serverParams.length !== 3) {
       throw new Error(
-        `'${serverString}' is not valid. The string has to follow the format: <IP>:<Query-Port> or <IP>:<Query-Port>:<RCON-Port>:<RCON-Password>`
+        `'${serverString}' is not valid. The string has to follow the format: <IP>:<RCON-Port>:<RCON-Password>`
       );
     }
 
     this.ip = this.validateIp(serverParams[0]);
-    this.queryPort = this.parsePort(serverParams[1]);
-
-    if (serverParams.length === 4) {
-      this.rconPort = this.parsePort(serverParams[2]);
-      this.rconPassword = serverParams[3];
-      this.rconEnabled = true;
-    }
+    this.rconPort = this.parsePort(serverParams[1]);
+    this.rconPassword = serverParams[2];
   }
 
   private validateIp(ip: string): string {
@@ -65,15 +39,11 @@ export class SquadServer {
     return port;
   }
 
-  public toQueryPortString(): string {
-    return `${this.ip}:${this.queryPort}`;
-  }
-
   public toRconPortString(): string {
     return `${this.ip}:${this.rconPort}`;
   }
 
   public equals(other: SquadServer): boolean {
-    return this.ip === other.ip && this.queryPort === other.queryPort;
+    return this.ip === other.ip && this.rconPort === other.rconPort;
   }
 }

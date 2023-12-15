@@ -1,10 +1,9 @@
 import { Client, DiscordAPIError, EmbedBuilder, Message, TextChannel } from "discord.js";
 import { Discord, Once } from "discordx";
-import { injectable } from "tsyringe";
+import { singleton } from "tsyringe";
 import { Logger } from "../logger/logger.js";
 import { DiscordComponentService } from "../services/discord-component.service.js";
 import { DiscordService } from "../services/discord.service.js";
-import { PlayerInfoService } from "../services/player-info.service.js";
 import { ServerInfoService } from "../services/server-info.service.js";
 import { ServerService } from "../services/server.service.js";
 import {
@@ -18,7 +17,7 @@ import {
 const MAX_MESSAGE_EDIT_ATTEMPTS = 5;
 
 @Discord()
-@injectable()
+@singleton()
 export class InfoChannelHandler {
   private logger = new Logger(InfoChannelHandler.name);
 
@@ -35,7 +34,6 @@ export class InfoChannelHandler {
   constructor(
     private serverService: ServerService,
     private serverInfoService: ServerInfoService,
-    private playerInfoService: PlayerInfoService,
     private settingsService: SettingsService,
     private discordService: DiscordService,
     private discordComponentService: DiscordComponentService
@@ -166,8 +164,8 @@ export class InfoChannelHandler {
       );
       serverInfoEmbeds.push(serverInfoEmbed);
 
-      if (server.rconEnabled && this.settingsService.isPlayerChannelInitialized()) {
-        const teams = await this.playerInfoService.getTeams(server);
+      if (this.settingsService.isPlayerChannelInitialized()) {
+        const teams = await this.serverInfoService.getTeams(server);
         const [teamOneEmbed, teamTwoEmbed] = this.discordComponentService.buildPlayerInfoEmbeds(
           serverInfo,
           teams,
@@ -358,7 +356,7 @@ export class InfoChannelHandler {
 
     this.playerInfoChannel = await this.discordService.loadTextChannel(client, playerChannelId);
 
-    const rconServerCount = this.serverService.getRconServerCount();
+    const serverCount = this.serverService.getServerCount();
     const messages = await this.playerInfoChannel.messages.fetch();
 
     for (const message of messages.values()) {
@@ -366,7 +364,7 @@ export class InfoChannelHandler {
         await this.discordService.deleteMessage(message);
       } else if (
         message.id !== this.serverInfoMessage?.id &&
-        this.playerInfoMessages.length < rconServerCount
+        this.playerInfoMessages.length < serverCount
       ) {
         this.playerInfoMessages.splice(0, 0, message);
       } else {
@@ -396,7 +394,7 @@ export class InfoChannelHandler {
       return;
     }
 
-    this.playerInfoMessages.splice(this.serverService.getRconServerCount());
+    this.playerInfoMessages.splice(this.serverService.getServerCount());
 
     const messages = await this.playerInfoChannel.messages.fetch();
     const playerInfoMessageIds = this.playerInfoMessages.map((message) => message.id);

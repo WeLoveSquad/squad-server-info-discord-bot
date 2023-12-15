@@ -5,7 +5,6 @@ import { SquadServer } from "../entities/squad-server.entity.js";
 @singleton()
 export class ServerService {
   private squadServers: SquadServer[] = [];
-  private rconServerCount = 0;
 
   constructor() {
     const serverConfig = config.get<string>("squad.servers");
@@ -15,15 +14,11 @@ export class ServerService {
       const squadServer = new SquadServer(server);
       if (this.contains(squadServer)) {
         throw new Error(
-          `The config contains the server '${squadServer.toQueryPortString()}' twice. A server can only be added once.`
+          `The config contains the server '${squadServer.toRconPortString()}' twice. A server can only be added once.`
         );
       }
 
       this.squadServers.push(squadServer);
-
-      if (squadServer.rconEnabled) {
-        this.rconServerCount++;
-      }
     }
   }
 
@@ -31,8 +26,8 @@ export class ServerService {
     return this.squadServers;
   }
 
-  public getRconServerCount(): number {
-    return this.rconServerCount;
+  public getServerCount(): number {
+    return this.squadServers.length;
   }
 
   private contains(server: SquadServer): boolean {

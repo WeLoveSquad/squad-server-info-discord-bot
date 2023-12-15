@@ -10,7 +10,7 @@ describe("Squad", () => {
   describe("constructor", () => {
     it("extracts correct information", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 steam: 76561197960287930";
 
       const squad = new Squad(rconSquad, 1);
 
@@ -24,7 +24,7 @@ describe("Squad", () => {
 
     it("extracts correct boolean", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 steam: 76561197960287930";
 
       const squad = new Squad(rconSquad, 1);
 
@@ -38,7 +38,7 @@ describe("Squad", () => {
 
     it("sets correct team", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 steam: 76561197960287930";
 
       const squad = new Squad(rconSquad, 2);
 
@@ -52,7 +52,7 @@ describe("Squad", () => {
 
     it("too few attributes throws error", () => {
       const rconSquad =
-        "ID: 15 | Size: 5 | Locked: True | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 steam: 76561197960287930";
 
       expect(() => {
         new Squad(rconSquad, 1);
@@ -61,7 +61,7 @@ describe("Squad", () => {
 
     it("invalid id format", () => {
       const rconSquad =
-        "ID: string | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: string | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 steam: 76561197960287930";
 
       expect(() => {
         new Squad(rconSquad, 1);
@@ -70,7 +70,7 @@ describe("Squad", () => {
 
     it("invalid size format", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: string | Locked: True | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: string | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 steam: 76561197960287930";
 
       expect(() => {
         new Squad(rconSquad, 1);
@@ -79,7 +79,7 @@ describe("Squad", () => {
 
     it("invalid locked format", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: string | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: string | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 steam: 76561197960287930";
 
       expect(() => {
         new Squad(rconSquad, 1);
@@ -88,7 +88,7 @@ describe("Squad", () => {
 
     it("invalid steamId format", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Steam ID: string";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 steam: string";
 
       expect(() => {
         new Squad(rconSquad, 1);
@@ -99,14 +99,14 @@ describe("Squad", () => {
   describe("addPlayer", () => {
     it("adds players correctly", () => {
       const rconPlayer1 =
-        "ID: 1 | SteamID: 76561197960287930 | Name: Player1 | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
+        "ID: 1 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: Player1 | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
       const rconPlayer2 =
-        "ID: 2 | SteamID: 76561197960287931 | Name: Player2 | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
+        "ID: 2 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798e steam: 76561197960287931 | Name: Player2 | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
       const rconPlayer3 =
-        "ID: 3 | SteamID: 76561197960287932 | Name: Player3 | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
+        "ID: 3 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798f steam: 76561197960287932 | Name: Player3 | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
 
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
       const player = new Player(rconPlayer1);
       const player2 = new Player(rconPlayer2);
@@ -128,12 +128,12 @@ describe("Squad", () => {
   describe("clearPlayers", () => {
     it("adds players correctly", () => {
       const rconPlayer1 =
-        "ID: 1 | SteamID: 76561197960287930 | Name: Player1 | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
+        "ID: 1 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: Player1 | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
       const rconPlayer2 =
-        "ID: 2 | SteamID: 76561197960287931 | Name: Player2 | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
+        "ID: 2 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798e steam: 76561197960287931 | Name: Player2 | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
 
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
       const player = new Player(rconPlayer1);
       const player2 = new Player(rconPlayer2);
@@ -153,42 +153,42 @@ describe("Squad", () => {
   describe("isValidSquadString", () => {
     it("extracts correct information", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
       expect(Squad.isValidSquadString(rconSquad)).to.be.true;
     });
 
     it("too few attributes throws error", () => {
       const rconSquad =
-        "ID: 15 | Size: 5 | Locked: True | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
       expect(Squad.isValidSquadString(rconSquad)).to.be.false;
     });
 
     it("invalid id format", () => {
       const rconSquad =
-        "ID: string | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: string | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
       expect(Squad.isValidSquadString(rconSquad)).to.be.false;
     });
 
     it("invalid size format", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: string | Locked: True | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: string | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
       expect(Squad.isValidSquadString(rconSquad)).to.be.false;
     });
 
     it("invalid locked format", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: string | Creator Name: TestName | Creator Steam ID: 76561197960287930";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: string | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
       expect(Squad.isValidSquadString(rconSquad)).to.be.false;
     });
 
     it("invalid steamId format", () => {
       const rconSquad =
-        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Steam ID: string";
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: string";
 
       expect(Squad.isValidSquadString(rconSquad)).to.be.false;
     });
