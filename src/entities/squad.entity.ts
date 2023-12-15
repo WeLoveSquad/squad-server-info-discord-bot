@@ -2,7 +2,7 @@ import { Player } from "./player.entity.js";
 import { Team } from "./teams.entity.js";
 
 const SQUAD_REGEX_PATTERN =
-  /ID: (\d+) \| Name: (.*) \| Size: (\d+) \| Locked: (True|False) \| Creator Name: (.*) \| Creator Steam ID: (\d+)/;
+  /ID: (\d+) \| Name: (.*) \| Size: (\d+) \| Locked: (True|False) \| Creator Name: (.*) \| Creator Online IDs: EOS: (.+) steam: (\d+)/;
 
 export class Squad {
   id: number;
@@ -15,7 +15,7 @@ export class Squad {
   constructor(rconSquadString: string, team: Team) {
     const match = rconSquadString.match(SQUAD_REGEX_PATTERN);
 
-    if (!match || match.length !== 7) {
+    if (!match || match.length !== 8) {
       throw new Error(`RCON squad string: [${rconSquadString}] is invalid`);
     }
 

@@ -1,19 +1,22 @@
 # Squad server info Discord bot
 
-A Discord bot to show [Squad](https://joinsquad.com/) server and player information in embeds in Discord text channels
+A Discord bot to show [Squad](https://joinsquad.com/) server and player information in embeds in Discord text channels. \
+The bot uses `RCON` to retrieve the information that is shown in the embeds.
 
 ## Server Information
 
-The server information is retrieved from the public query endpoint of a Squad Server and only requires the Server `IP` and `Query-Port` in the config.
+Prior to `Squad v7` the server information could be retrieved from a public server query endpoint that did not require any credentials to retrieve the data.
+Since Squad has been moved to Epic Online Services (EOS) with the v7 update, the squad servers do not offer such an endpoint any more.
+Due to this, the bot can now only query general server information with an authorized RCON-Connection by using the `ShowServerInfo` command. \
+
+The image below shows an example of how the embeds that contain the server information look like.
 
 ![embed-showcase](https://github.com/WeLoveSquad/squad-server-info-discord-bot/assets/24782633/01f69880-8a05-413b-885d-694983b7a676)
 
 
-
 ## Player Information
 
-The player information can only be retrieved from an RCON-Connection if the RCON-Port and RCON-Password are provided in the [config](#config-values).\
-If RCON is used the bot will **ONLY** use the commands `ListSquads`, `ListPlayers`. \
+The player information is also retrieved from an RCON-Connection by using the `ListSquads` and `ListPlayers` command. \
 The image below shows how an embed of a Team will look like. The bot will send a message for each Server with an RCON-Connection. Each message contains two player information embeds for both teams.
 
 ![grafik](https://user-images.githubusercontent.com/24782633/218317356-894acdc2-51c3-4141-932d-1e1cebf42e94.png)
@@ -117,11 +120,9 @@ npm run dev
 - `discord.authorizedRoles`: Comma separated string of IDs by roles that will be able to add and remove Squad servers to the bot. You can copy the IDs in `Server Settings > Roles` by clicking the three dots next to a role and pressing `Copy ID`
 - `squad.servers`: Comma separated string of Squad-Servers from which the bot will query information
   - Format:
-    - Without RCON: `<IP>:<Query-Port>`
-      - Example: `11.22.33.44:27165`
-    - With RCON: `<IP>:<Query-Port>:<RCON-Port>:<RCON-Password>`
-      - Example: `55.66.77.88:27165:12345:password`
+    - `<IP>:<RCON-Port>:<RCON-Password>`
+      - Example: `55.66.77.88:12345:password`
     - To use multiple servers in the config use a comma to separate the servers:
-      - `11.22.33.44:27165,55.66.77.88:27165:12345:password`
+      - `11.22.33.44:54321:password1,55.66.77.88:12345:password2`
 - `logging.level`: Log level of log messages in the console. Valid values are `debug`, `verbose`, `info`, `warn` and `error`
 - `logging.format`: Format of log messages in the console. Valid values are `default` and `json`

@@ -1,22 +1,17 @@
-import ServerQuery from "@fabricio-191/valve-server-query";
-import { DateTime } from "luxon";
 import { singleton } from "tsyringe";
 import { SquadServer } from "../entities/squad-server.entity.js";
+import { Teams } from "../entities/teams.entity.js";
 import { Logger } from "../logger/logger.js";
+import { Rcon } from "../rcon/rcon.js";
 
-const CACHE_TIMEOUT_SECONDS = 10;
-
-const FACTION_REGEX_PATTERN = /^.+_([A-Z]{3,})$/;
-
-interface CachedServerInfo {
-  serverInfo: ServerInfo;
-  storedAt: DateTime;
-}
+const LIST_SQUADS_REQUEST = "ListSquads";
+const LIST_PLAYERS_REQUEST = "ListPlayers";
+const SERVER_INFO_REQUEST = "ShowServerInfo";
 
 export interface ServerInfo {
   status: ServerStatus;
   ip: string;
-  queryPort: string;
+  rconPort: number;
   serverName?: string;
   layer?: string;
   playerCount?: number;
@@ -34,112 +29,69 @@ export enum ServerStatus {
   Offline,
 }
 
+const FACTION_REGEX_PATTERN = /^.+_([A-Z]{3,})$/;
+
 @singleton()
 export class ServerInfoService {
   private logger = new Logger(ServerInfoService.name);
 
   private serverNameCache: Map<string, string> = new Map<string, string>();
-  private serverInfoCache: Map<string, CachedServerInfo> = new Map<string, CachedServerInfo>();
+  private rconConnections: Map<string, Rcon> = new Map<string, Rcon>();
 
   public async getServerInfo(server: SquadServer): Promise<ServerInfo> {
-    const cachedServerInfo = this.loadCachedServerInfo(server);
-    if (cachedServerInfo) {
-      return cachedServerInfo;
-    }
-
-    let serverQuery: ServerQuery.Server;
     try {
-      serverQuery = await ServerQuery.Server({
+      const rcon = await this.getRconConnection(server);
+
+      const serverInfoResponse = await rcon.execute(SERVER_INFO_REQUEST);
+      const json = JSON.parse(serverInfoResponse);
+
+      const serverName = json["ServerName_s"];
+      this.serverNameCache.set(server.toRconPortString(), serverName);
+
+      return {
+        status: ServerStatus.Online,
         ip: server.ip,
-        port: server.queryPort,
-        timeout: 3000,
-      });
+        rconPort: server.rconPort,
+        serverName: serverName,
+        layer: json["MapName_s"],
+        nextLayer: json["NextLayer_s"].replaceAll(" ", "_"),
+        maxPlayerCount: parseInt(json["MaxPlayers"]),
+        playerCount: parseInt(json["PlayerCount_I"]),
+        teamOne: this.parseFaction(json["TeamOne_s"]),
+        teamTwo: this.parseFaction(json["TeamTwo_s"]),
+        publicQueue: parseInt(json["PublicQueue_I"]),
+        whitelistQueue: parseInt(json["ReservedQueue_I"]),
+        playtimeSeconds: parseInt(json["PLAYTIME_I"]),
+      };
     } catch (error: unknown) {
       this.logger.warn(
-        "Connection attempt to Server-Query-Endpoint: [%s] timed out",
-        server.toQueryPortString()
+        "Could not load server information from server: [%s]",
+        server.toRconPortString()
       );
       return {
         status: ServerStatus.Offline,
         ip: server.ip,
-        queryPort: server.queryPort.toString(),
-        serverName: this.serverNameCache.get(server.toQueryPortString()),
+        rconPort: server.rconPort,
+        serverName: this.serverNameCache.get(server.toRconPortString()),
       };
     }
-
-    this.logger.debug("Connected to Server-Query-Endpoint: [%s]", server.toQueryPortString());
-
-    const info = await serverQuery.getInfo();
-    const rules = await serverQuery.getRules();
-
-    serverQuery.disconnect();
-    this.logger.debug("Disconnected from Server-Query-Endpoint: [%s]", server.toQueryPortString());
-
-    const playerCount = this.getRuleNumber(rules, "PlayerCount_i");
-    const publicQueue = this.getRuleNumber(rules, "PublicQueue_i");
-    const whitelistQueue = this.getRuleNumber(rules, "ReservedQueue_i");
-    const playtimeSeconds = this.getRuleNumber(rules, "PLAYTIME_i");
-    const teamOne = this.parseFaction(this.getRuleString(rules, "TeamOne_s"));
-    const teamTwo = this.parseFaction(this.getRuleString(rules, "TeamTwo_s"));
-    const nextLayer = this.getRuleString(rules, "NextLayer_s")?.replaceAll(" ", "_");
-
-    this.serverNameCache.set(server.toQueryPortString(), info.name);
-
-    const serverInfo: ServerInfo = {
-      status: ServerStatus.Online,
-      ip: server.ip,
-      queryPort: server.queryPort.toString(),
-      serverName: info.name,
-      layer: info.map,
-      nextLayer: nextLayer,
-      maxPlayerCount: info.players.max,
-      playerCount,
-      teamOne,
-      teamTwo,
-      publicQueue,
-      whitelistQueue,
-      playtimeSeconds,
-    };
-
-    this.serverInfoCache.set(server.toQueryPortString(), {
-      serverInfo: serverInfo,
-      storedAt: DateTime.now(),
-    });
-    return serverInfo;
   }
 
-  private loadCachedServerInfo(server: SquadServer): ServerInfo | undefined {
-    const cachedServerInfo = this.serverInfoCache.get(server.toQueryPortString());
-    if (!cachedServerInfo) return undefined;
+  public async getTeams(server: SquadServer): Promise<Teams | undefined> {
+    try {
+      const rcon = await this.getRconConnection(server);
 
-    if (DateTime.now().minus({ seconds: CACHE_TIMEOUT_SECONDS }) > cachedServerInfo.storedAt) {
-      this.serverInfoCache.delete(server.toQueryPortString());
+      const squadsResponse = await rcon.execute(LIST_SQUADS_REQUEST);
+      const playerResponse = await rcon.execute(LIST_PLAYERS_REQUEST);
+
+      return new Teams(squadsResponse, playerResponse);
+    } catch (error: unknown) {
+      this.logger.warn(
+        "Could not load player information from server: [%s]",
+        server.toRconPortString()
+      );
       return undefined;
     }
-
-    return cachedServerInfo.serverInfo;
-  }
-
-  private getRuleNumber(rules: ServerQuery.Server.Rules, key: string): number | undefined {
-    const value = rules[key];
-
-    if (typeof value !== "number") {
-      this.logger.error("Rule with key: [%s] and value: [%s] is not a number", key, value);
-      return undefined;
-    }
-
-    return value;
-  }
-
-  private getRuleString(rules: ServerQuery.Server.Rules, key: string): string | undefined {
-    const value = rules[key];
-
-    if (typeof value !== "string") {
-      this.logger.error("Rule with key: [%s] and value: [%s] is not a string", key, value);
-      return undefined;
-    }
-
-    return value;
   }
 
   private parseFaction(teamString?: string): string | undefined {
@@ -152,5 +104,24 @@ export class ServerInfoService {
     }
 
     return match[1];
+  }
+
+  private async getRconConnection(server: SquadServer): Promise<Rcon> {
+    const connection = this.rconConnections.get(server.toRconPortString());
+    if (connection) {
+      return connection;
+    }
+
+    const rcon = new Rcon({
+      host: server.ip,
+      port: server.rconPort,
+      password: server.rconPassword,
+      autoConnect: false,
+      autoReconnect: true,
+    });
+    await rcon.connect();
+
+    this.rconConnections.set(server.toRconPortString(), rcon);
+    return rcon;
   }
 }
