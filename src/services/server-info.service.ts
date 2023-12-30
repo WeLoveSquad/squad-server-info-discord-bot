@@ -30,6 +30,7 @@ export enum ServerStatus {
 }
 
 const FACTION_REGEX_PATTERN = /^.+_([A-Z]{3,})$/;
+const PREFIX_FACTION_REGEX_PATTERN = /^([A-Z]{3,})_.+$/;
 
 @singleton()
 export class ServerInfoService {
@@ -98,12 +99,17 @@ export class ServerInfoService {
     if (!teamString) return undefined;
 
     const match = teamString.match(FACTION_REGEX_PATTERN);
-    if (!match || match.length != 2) {
-      this.logger.warn("Could not parse faction from team: [%s]", teamString);
-      return "Unknown";
+    if (match && match.length == 2) {
+      return match[1];
     }
 
-    return match[1];
+    const prefixMatch = teamString.match(PREFIX_FACTION_REGEX_PATTERN);
+    if (prefixMatch && prefixMatch.length == 2) {
+      return prefixMatch[1];
+    }
+
+    this.logger.warn("Could not parse faction from team: [%s]", teamString);
+    return "Unknown";
   }
 
   private async getRconConnection(server: SquadServer): Promise<Rcon> {
