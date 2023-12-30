@@ -200,7 +200,7 @@ export class Rcon {
     }
 
     let offset = 0;
-    while (offset < this.responseData.length) {
+    while (offset <= this.responseData.length - 4) {
       const packet = this.readPacket(this.responseData, offset);
       if (packet) {
         offset += packet.size + 4;
