@@ -16,6 +16,7 @@ services:
       traefik-static-wan-ip87:
         ipv4_address: ${TRAEFIK_IPV4_ADDRESS}
       proxy-static:
+        ipv4_address: ${SERVER_INFO_BOT_STATIC_IP}
     labels:
       - "networking.default-gateway=${GATEWAY_ADDRESS}"
     logging:
