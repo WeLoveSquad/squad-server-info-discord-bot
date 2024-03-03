@@ -7,7 +7,7 @@ The bot uses `RCON` to retrieve the information that is shown in the embeds.
 
 Prior to `Squad v7` the server information could be retrieved from a public server query endpoint that did not require any credentials to retrieve the data.
 Since Squad has been moved to Epic Online Services (EOS) with the v7 update, the squad servers do not offer such an endpoint any more.
-Due to this, the bot can now only query general server information with an authorized RCON-Connection by using the `ShowServerInfo` command. \
+Due to this, the bot can now only query general server information with an authorized RCON-Connection by using the `ShowServerInfo` command.
 
 The image below shows an example of how the embeds that contain the server information look like.
 
@@ -58,7 +58,7 @@ The image below shows how an embed of a Team will look like. The bot will send a
 - `/show-squad-leader <True | False>`
   - If set to `True`, squad leaders will have a star emoji (⭐) next to their name and will always be shown at the top of the squad in the player information embeds. If `show-squad-leader` is set to `False` then the players in the embed will be sorted by their names and the star emoji will not be set.
   - The default value is `True`
-  - Example: `/show-commander True`
+  - Example: `/show-squad-leader True`
 - `/show-commander <True | False>`
   - Will only have an effect if `show-squad-leader` is set to `True`
   - Squad leaders will have this emoji next to their name: ⭐ in the player information embeds. If `show-commander` is set to `True`, then the commander will have this emoji next to their name: 🌟. If it is set to `False` then the commander will also have the default squad leader emoji (⭐) next to their name to make them indistinguishable.
