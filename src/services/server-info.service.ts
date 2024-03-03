@@ -96,7 +96,11 @@ export class ServerInfoService {
   }
 
   private parseFaction(teamString?: string): string | undefined {
-    if (!teamString) return undefined;
+    if (!teamString) {
+      return undefined;
+    } else if (teamString === "Sanxian_RAAS_v2") {
+      return "ADF";
+    }
 
     const match = teamString.match(FACTION_REGEX_PATTERN);
     if (match && match.length == 2) {
