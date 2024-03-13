@@ -55,7 +55,7 @@ export class ServerInfoService {
         rconPort: server.rconPort,
         serverName: serverName,
         layer: json["MapName_s"],
-        nextLayer: json["NextLayer_s"].replaceAll(" ", "_"),
+        nextLayer: json["NextLayer_s"]?.replaceAll(" ", "_") ?? "Unknown",
         maxPlayerCount: parseInt(json["MaxPlayers"]),
         playerCount: parseInt(json["PlayerCount_I"]),
         teamOne: this.parseFaction(json["TeamOne_s"]),
@@ -66,8 +66,9 @@ export class ServerInfoService {
       };
     } catch (error: unknown) {
       this.logger.warn(
-        "Could not load server information from server: [%s]",
-        server.toRconPortString()
+        "Could not load server information from server: [%s]. Error: [%s]",
+        server.toRconPortString(),
+        error
       );
       return {
         status: ServerStatus.Offline,
