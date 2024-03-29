@@ -1,8 +1,8 @@
 version: "3"
 services:
-  squad-server-info-dc-bot:
-    container_name: squad-server-info-dc-bot
+  wls-squad-server-info-discord-bot:
     image: ghcr.io/welovesquad/squad-server-info-discord-bot:${BOT_IMAGE_TAG:-latest}
+    container_name: wls-squad-server-info-discord-bot
     restart: unless-stopped
     environment:
       - "DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}"
@@ -31,4 +31,4 @@ networks:
     external: true
 
 volumes:
-  squad-server-info-dc-bot-vol:
+  wls-squad-server-info-discord-bot-volume:
