@@ -10,6 +10,8 @@ services:
       - "SQUAD_SERVERS=${SQUAD_SERVERS}"
       - "LOGGING_LEVEL=${LOGGING_LEVEL}"
       - "LOGGING_FORMAT=${LOGGING_FORMAT}"
+    networks:
+      - bridge-ip163
     volumes:
       - wls-squad-server-info-discord-bot-volume:/home/node/app/settings
     logging:
@@ -19,3 +21,7 @@ services:
 
 volumes:
   wls-squad-server-info-discord-bot-volume:
+
+networks:
+  bridge-ip163:
+    external: true
