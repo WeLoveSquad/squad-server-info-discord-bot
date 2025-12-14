@@ -2,7 +2,7 @@ import fs from "fs";
 import { container } from "tsyringe";
 import { SettingsService } from "../../src/services/settings.service.js";
 
-import chai from "chai";
+import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 
 chai.use(chaiAsPromised);

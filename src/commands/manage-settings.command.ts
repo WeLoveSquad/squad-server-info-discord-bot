@@ -234,7 +234,7 @@ export class ManageSettingsSlashCommands {
         content: `Update interval has been succesfully changed to ${interval} seconds`,
         ephemeral: true,
       });
-    } catch (error: unknown) {
+    } catch {
       await interaction.reply({
         content: `${interval} seconds is not a valid interval. The smallest allowed interval is 15 seconds`,
         ephemeral: true,
@@ -263,7 +263,7 @@ export class ManageSettingsSlashCommands {
         content: `Time zone has been successfully changed to ${timeZone}`,
         ephemeral: true,
       });
-    } catch (error: unknown) {
+    } catch {
       await interaction.reply({
         content: `${timeZone} is not a valid IANA time zone!`,
         ephemeral: true,

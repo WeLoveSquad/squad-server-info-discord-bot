@@ -87,7 +87,7 @@ export class ServerInfoService {
       const playerResponse = await rcon.execute(LIST_PLAYERS_REQUEST);
 
       return new Teams(squadsResponse, playerResponse);
-    } catch (error: unknown) {
+    } catch {
       this.logger.warn(
         "Could not load player information from server: [%s]",
         server.toRconPortString()

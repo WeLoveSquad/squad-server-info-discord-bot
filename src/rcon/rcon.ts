@@ -251,7 +251,7 @@ export class Rcon {
     this.logger.info("Attempting to reconnect");
     try {
       await this.connect();
-    } catch (error: unknown) {
+    } catch {
       this.logger.warn("Reconnect failed");
       setTimeout(async () => {
         await this.reconnect();

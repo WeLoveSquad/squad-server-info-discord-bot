@@ -1,5 +1,5 @@
 ## build runner
-FROM node:20-alpine as builder
+FROM node:24-alpine as builder
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 WORKDIR /home/node/app
 USER node
@@ -12,7 +12,7 @@ RUN npm run build
 
 
 ## prod stage
-FROM node:20-alpine as prod
+FROM node:24-alpine as prod
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 WORKDIR /home/node/app
 USER node
