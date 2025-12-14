@@ -188,6 +188,11 @@ export class SettingsService extends EventEmitter {
         await fs.promises.mkdir(SETTINGS_DIR_PATH, { recursive: true });
         this.logger.info("Successfully created settings directory at [%s]", SETTINGS_DIR_PATH);
       } catch (error: unknown) {
+        this.logger.error(
+          "Could not create settings directory at [%s]. Error: [%s]",
+          SETTINGS_DIR_PATH,
+          error
+        );
         throw new Error(`Could not create settings file at '${SETTINGS_DIR_PATH}'`);
       }
     }

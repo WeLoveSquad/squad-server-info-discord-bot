@@ -1,4 +1,4 @@
-import chai from "chai";
+import * as chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { Player } from "../../src/entities/player.entity.js";
 import { Squad } from "../../src/entities/squad.entity.js";

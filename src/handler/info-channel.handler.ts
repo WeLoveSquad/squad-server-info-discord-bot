@@ -72,7 +72,7 @@ export class InfoChannelHandler {
         await this.serverInfoMessage.delete();
         this.serverInfoMessage = undefined;
         this.logger.info("Server info channel has been updated. Deleted old server info message");
-      } catch (error: unknown) {
+      } catch {
         this.logger.warn(
           "Server info channel has been updated. Could not delete old server info message"
         );
