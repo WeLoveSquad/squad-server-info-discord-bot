@@ -14,6 +14,8 @@ import { Logger } from "../logger/logger.js";
 import { ServerInfo, ServerStatus } from "./server-info.service.js";
 import { SettingsService } from "./settings.service.js";
 
+const COMMAND_SQUAD_NAME = "Command Squad";
+
 @injectable()
 export class DiscordComponentService {
   private logger = new Logger(DiscordComponentService.name);
@@ -101,13 +103,8 @@ export class DiscordComponentService {
         text: this.buildFooter(position),
       });
 
-    const squadFields = this.buildSquadEmbedFields(teams, team);
-    const unassignedFields = this.buildUnassignedEmbedField(teams.getUnassigned(team));
-
-    playerEmbed.addFields(squadFields);
-    if (unassignedFields) {
-      playerEmbed.addFields(unassignedFields);
-    }
+    const fields = this.buildPlayerinfoEmbedFields(teams, team);
+    playerEmbed.addFields(fields);
 
     return playerEmbed;
   }
@@ -151,15 +148,39 @@ export class DiscordComponentService {
     return new ActionRowBuilder<ButtonBuilder>().addComponents(button);
   }
 
-  private buildSquadEmbedFields(teams: Teams, team: Team): APIEmbedField[] {
-    const fields: APIEmbedField[] = [];
+  private buildPlayerinfoEmbedFields(teams: Teams, team: Team): APIEmbedField[] {
+    const squads = teams.getSquads(team);
+    const unassignedPlayers = teams.getUnassigned(team);
 
-    let squads = teams.getSquads(team);
+    const maxSquadFieldsCount = this.getMaxSquadFieldsCount(unassignedPlayers);
+    const squadFields = this.buildSquadEmbedFields(squads, maxSquadFieldsCount);
+    const unassignedFields = this.buildUnassignedEmbedField(unassignedPlayers);
+
+    if (!unassignedFields) {
+      return squadFields;
+    }
+
+    return [...squadFields, ...unassignedFields];
+  }
+
+  private getMaxSquadFieldsCount(unassignedPlayers: Player[]): number {
+    if (unassignedPlayers.length >= 2) {
+      return 15;
+    } else if (unassignedPlayers.length === 1) {
+      return 16;
+    }
+
+    return 17;
+  }
+
+  private buildSquadEmbedFields(squads: Squad[], maxSquadFieldsCount: number): APIEmbedField[] {
     if (this.settingsService.sortSquadsBySize()) {
       squads = this.sortSquads(squads);
     }
 
-    for (const [squadIndex, squad] of squads.entries()) {
+    let squadFields: APIEmbedField[] = [];
+
+    for (const squad of squads) {
       if (squad.players.length === 0) {
         this.logger.warn(
           "Squad [%s] has 0 players (reported size: [%s]) and will not be added to the player info embed",
@@ -169,44 +190,55 @@ export class DiscordComponentService {
         continue;
       }
 
-      let playerValue = "";
+      const squadField = this.buildSquadEmbedField(squad);
+      squadFields.push(squadField);
+    }
 
-      const squadName = this.settingsService.showSquadNames()
-        ? `${squad.id} | ${squad.name}`
-        : `Squad ${squad.id}`;
-      const players = this.settingsService.showSquadLeader()
-        ? squad.players
-        : squad.players.sort((a, b) => a.name.localeCompare(b.name));
+    let removedSquadsCount = 0;
+    if (squadFields.length > maxSquadFieldsCount) {
+      removedSquadsCount = squadFields.length - (maxSquadFieldsCount + 1);
+      squadFields = squadFields.slice(0, maxSquadFieldsCount - 1);
+    }
 
-      for (const [playerIndex, player] of players.entries()) {
-        const playerName = this.sanitizePlayerName(player.name);
-        const leaderEmoji = this.getLeaderEmoji(player.leader, squad.name);
-        playerValue += `**${playerIndex + 1}.** ${playerName}${leaderEmoji}\n`;
-      }
+    squadFields = squadFields.flatMap((field, index) => {
+      return index % 2 === 0 && index !== squadFields.length - 1
+        ? [field, { name: "\u200B", value: "\u200B", inline: true }]
+        : [field];
+    });
 
-      const lock = squad.locked ? ":lock:" : ":unlock:";
-      fields.push({
-        name: `__${squadName}__ (${squad.size}) ${lock}`,
-        value: playerValue,
-        inline: true,
+    if (removedSquadsCount > 0) {
+      squadFields.push({
+        name: `*${removedSquadsCount} more squad(s) not shown...*`,
+        value: "\u200B",
+        inline: false,
       });
-
-      if (squadIndex % 2 === 0 && squadIndex !== squads.length - 1) {
-        fields.push({
-          name: "\u200B",
-          value: "\u200B",
-          inline: true,
-        });
-      }
     }
 
-    if (fields.length % 3 === 2) {
-      fields.push({ name: "\u200B", value: "\u200B", inline: true });
-    } else if (fields.length % 3 === 1) {
-      fields[fields.length - 1].inline = false;
+    return squadFields;
+  }
+
+  private buildSquadEmbedField(squad: Squad): APIEmbedField {
+    let playerValue = "";
+
+    const squadName = this.settingsService.showSquadNames()
+      ? `${squad.id} | ${squad.name}`
+      : `Squad ${squad.id}`;
+    const players = this.settingsService.showSquadLeader()
+      ? squad.players
+      : squad.players.sort((a, b) => a.name.localeCompare(b.name));
+
+    for (const [playerIndex, player] of players.entries()) {
+      const playerName = this.sanitizePlayerName(player.name);
+      const leaderEmoji = this.getLeaderEmoji(player.leader, squad.name);
+      playerValue += `**${playerIndex + 1}.** ${playerName}${leaderEmoji}\n`;
     }
 
-    return fields;
+    const lock = squad.locked ? ":lock:" : ":unlock:";
+    return {
+      name: `__${squadName}__ (${squad.size}) ${lock}`,
+      value: playerValue,
+      inline: true,
+    };
   }
 
   private sortSquads(squads: Squad[]): Squad[] {
@@ -250,6 +282,10 @@ export class DiscordComponentService {
       }
     });
 
+    if (unassignedPlayers.length === 1) {
+      return unassignedFields.slice(0, 1);
+    }
+
     return unassignedFields;
   }
 
@@ -267,7 +303,7 @@ export class DiscordComponentService {
       return "";
     }
 
-    if (this.settingsService.showCommander() && squadName === "Command Squad") {
+    if (this.settingsService.showCommander() && squadName === COMMAND_SQUAD_NAME) {
       return " :star2:";
     } else {
       return " :star:";
