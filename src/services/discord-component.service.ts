@@ -214,6 +214,10 @@ export class DiscordComponentService {
       });
     }
 
+    if (removedSquadsCount === 0 && squadFields.length % 3 === 1) {
+      squadFields[squadFields.length - 1].inline = false;
+    }
+
     return squadFields;
   }
 
