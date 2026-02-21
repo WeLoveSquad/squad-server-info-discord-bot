@@ -1,5 +1,5 @@
 ## build runner
-FROM node:24-alpine as builder
+FROM node:24-alpine AS builder
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 WORKDIR /home/node/app
 USER node
@@ -12,13 +12,13 @@ RUN npm run build
 
 
 ## prod stage
-FROM node:24-alpine as prod
+FROM node:24-alpine AS prod
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 WORKDIR /home/node/app
 USER node
 
 ARG NODE_ENV=production
-ENV NODE_ENV $NODE_ENV
+ENV NODE_ENV=$NODE_ENV
 
 COPY --chown=node:node package*.json .
 RUN npm clean-install && npm cache clean --force

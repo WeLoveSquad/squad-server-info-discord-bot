@@ -8,7 +8,7 @@ const expect = chai.expect;
 
 describe("Player", () => {
   describe("constructor", () => {
-    it("extracts correct information", () => {
+    it("extracts correct information for steam user", () => {
       const rconPlayer =
         "ID: 23 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: TestName | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
 
@@ -17,6 +17,23 @@ describe("Player", () => {
       expect(player.id).to.equal(23);
       expect(player.steamId).to.equal("76561197960287930");
       expect(player.eosId).to.equal("000212345678912bbbcc5a40edc3798d");
+      expect(player.epicId).to.equal(undefined);
+      expect(player.name).to.equal("TestName");
+      expect(player.team).to.equal(1);
+      expect(player.squadId).to.equal(5);
+      expect(player.leader).to.equal(true);
+    });
+
+    it("extracts correct information for epic user", () => {
+      const rconPlayer =
+        "ID: 23 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d epic: 1234567890abcdef | Name: TestName | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
+
+      const player = new Player(rconPlayer);
+
+      expect(player.id).to.equal(23);
+      expect(player.steamId).to.equal(undefined);
+      expect(player.eosId).to.equal("000212345678912bbbcc5a40edc3798d");
+      expect(player.epicId).to.equal("1234567890abcdef");
       expect(player.name).to.equal("TestName");
       expect(player.team).to.equal(1);
       expect(player.squadId).to.equal(5);
@@ -43,7 +60,7 @@ describe("Player", () => {
       expect(player.eosId).to.equal("000212345678912bbbcc5a40edc3798d");
       expect(player.name).to.equal("TestName");
       expect(player.team).to.equal(1);
-      expect(player.squadId).to.be.undefined;
+      expect(player.squadId).to.equal(undefined);
       expect(player.leader).to.equal(false);
     });
 
@@ -107,49 +124,49 @@ describe("Player", () => {
       const rconPlayer =
         "ID: 23 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: TestName | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
 
-      expect(Player.isValidPlayerString(rconPlayer)).to.be.true;
+      expect(Player.isValidPlayerString(rconPlayer)).to.equal(true);
     });
 
     it("too few attributes returns false", () => {
       const rconPlayer =
         "Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: TestName | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
 
-      expect(Player.isValidPlayerString(rconPlayer)).to.be.false;
+      expect(Player.isValidPlayerString(rconPlayer)).to.equal(false);
     });
 
     it("too many attributes returns false", () => {
       const rconPlayer =
         " ID: 23 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | NewValue: Test | Name: TestName | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
 
-      expect(Player.isValidPlayerString(rconPlayer)).to.be.false;
+      expect(Player.isValidPlayerString(rconPlayer)).to.equal(false);
     });
 
     it("invalid id type returns false", () => {
       const rconPlayer =
         "ID: string | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: TestName | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
 
-      expect(Player.isValidPlayerString(rconPlayer)).to.be.false;
+      expect(Player.isValidPlayerString(rconPlayer)).to.equal(false);
     });
 
     it("invalid steamId type returns false", () => {
       const rconPlayer =
         "ID: 23 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: string | Name: TestName | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
 
-      expect(Player.isValidPlayerString(rconPlayer)).to.be.false;
+      expect(Player.isValidPlayerString(rconPlayer)).to.equal(false);
     });
 
     it("invalid teamId type returns false", () => {
       const rconPlayer =
         "ID: 23 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: TestName | Team ID: string | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
 
-      expect(Player.isValidPlayerString(rconPlayer)).to.be.false;
+      expect(Player.isValidPlayerString(rconPlayer)).to.equal(false);
     });
 
     it("invalid squadId type returns false", () => {
       const rconPlayer =
         "ID: 23 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: TestName | Team ID: 1 | Squad ID: string | Is Leader: True | Role: USA_Recruit";
 
-      expect(Player.isValidPlayerString(rconPlayer)).to.be.false;
+      expect(Player.isValidPlayerString(rconPlayer)).to.equal(false);
     });
   });
 });
