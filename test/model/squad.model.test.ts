@@ -8,9 +8,23 @@ const expect = chai.expect;
 
 describe("Squad", () => {
   describe("constructor", () => {
-    it("extracts correct information", () => {
+    it("extracts correct information with steam creator", () => {
       const rconSquad =
         "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 steam: 76561197960287930";
+
+      const squad = new Squad(rconSquad, 1);
+
+      expect(squad.id).to.equal(15);
+      expect(squad.team).to.equal(1);
+      expect(squad.name).to.equal("Test Squad 123");
+      expect(squad.size).to.equal(5);
+      expect(squad.locked).to.equal(false);
+      expect(squad.players.length).to.equal(0);
+    });
+
+    it("extracts correct information with epic creator", () => {
+      const rconSquad =
+        "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Online IDs: EOS: 00024b689cd348dab06858cf004a9a85 epic: 1234567890abcdef";
 
       const squad = new Squad(rconSquad, 1);
 
@@ -155,42 +169,42 @@ describe("Squad", () => {
       const rconSquad =
         "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
-      expect(Squad.isValidSquadString(rconSquad)).to.be.true;
+      expect(Squad.isValidSquadString(rconSquad)).to.equal(true);
     });
 
     it("too few attributes throws error", () => {
       const rconSquad =
         "ID: 15 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
-      expect(Squad.isValidSquadString(rconSquad)).to.be.false;
+      expect(Squad.isValidSquadString(rconSquad)).to.equal(false);
     });
 
     it("invalid id format", () => {
       const rconSquad =
         "ID: string | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
-      expect(Squad.isValidSquadString(rconSquad)).to.be.false;
+      expect(Squad.isValidSquadString(rconSquad)).to.equal(false);
     });
 
     it("invalid size format", () => {
       const rconSquad =
         "ID: 15 | Name: Test Squad 123 | Size: string | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
-      expect(Squad.isValidSquadString(rconSquad)).to.be.false;
+      expect(Squad.isValidSquadString(rconSquad)).to.equal(false);
     });
 
     it("invalid locked format", () => {
       const rconSquad =
         "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: string | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
 
-      expect(Squad.isValidSquadString(rconSquad)).to.be.false;
+      expect(Squad.isValidSquadString(rconSquad)).to.equal(false);
     });
 
     it("invalid steamId format", () => {
       const rconSquad =
         "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: True | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: string";
 
-      expect(Squad.isValidSquadString(rconSquad)).to.be.false;
+      expect(Squad.isValidSquadString(rconSquad)).to.equal(false);
     });
   });
 });
