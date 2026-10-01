@@ -1,7 +1,7 @@
 import { Team } from "./teams.entity";
 
 const PLAYER_REGEX_PATTERN =
-  /ID: (\d+) \| Online IDs: EOS: ([a-zA-Z0-9]+) (?:steam: (\d+)|epic: ([a-zA-Z0-9]+)) \| Name: (.+) \| Team ID: ([12]) \| Squad ID: (\d+|N\/A) \| Is Leader: (True|False) \| Role: (\w+)/;
+  /ID: (\d+) \| Online IDs: EOS: ([a-zA-Z0-9]+) (?:steam: (\d+)|epic: ([a-zA-Z0-9]+)) \| Name: (.+) \| Team ID: ([12]) \| Party ID: (#\d+|N\/A) \| Squad ID: (\d+|N\/A) \| Is Leader: (True|False) \| Role: (\w+) \| Vehicle: (.+)/;
 
 export class Player {
   id: number;
@@ -10,13 +10,16 @@ export class Player {
   epicId?: string;
   name: string;
   team: Team;
+  partyId: number | undefined;
   squadId: number | undefined;
   leader: boolean;
+  role: string;
+  vehicle: string | undefined;
 
   constructor(rconPlayerString: string) {
     const match = rconPlayerString.match(PLAYER_REGEX_PATTERN);
 
-    if (!match || match.length !== 10) {
+    if (!match || match.length !== 12) {
       throw new Error(`RCON player string: '${rconPlayerString}' is invalid`);
     }
 
@@ -26,8 +29,11 @@ export class Player {
     this.epicId = match[4];
     this.name = match[5].trim();
     this.team = this.parseTeam(match[6]);
-    this.squadId = this.parseSquadId(match[7]);
-    this.leader = this.parseIsLeader(match[8]);
+    this.partyId = match[7] !== "N/A" ? Number.parseInt(match[7].slice(1), 10) : undefined;
+    this.squadId = this.parseSquadId(match[8]);
+    this.leader = this.parseIsLeader(match[9]);
+    this.role = match[10];
+    this.vehicle = match[11].trim() !== "N/A" ? match[11].trim() : undefined;
   }
 
   public static isValidPlayerString(rconPlayerString: string): boolean {

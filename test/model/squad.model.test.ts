@@ -113,11 +113,11 @@ describe("Squad", () => {
   describe("addPlayer", () => {
     it("adds players correctly", () => {
       const rconPlayer1 =
-        "ID: 1 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: Player1 | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
+        "ID: 1 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: Player1 | Team ID: 1 | Party ID: N/A | Squad ID: 5 | Is Leader: True | Role: USA_Recruit | Vehicle: N/A";
       const rconPlayer2 =
-        "ID: 2 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798e steam: 76561197960287931 | Name: Player2 | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
+        "ID: 2 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798e steam: 76561197960287931 | Name: Player2 | Team ID: 1 | Party ID: N/A | Squad ID: 5 | Is Leader: False | Role: USA_Recruit | Vehicle: N/A";
       const rconPlayer3 =
-        "ID: 3 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798f steam: 76561197960287932 | Name: Player3 | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
+        "ID: 3 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798f steam: 76561197960287932 | Name: Player3 | Team ID: 1 | Party ID: N/A | Squad ID: 5 | Is Leader: False | Role: USA_Recruit | Vehicle: N/A";
 
       const rconSquad =
         "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";
@@ -142,9 +142,9 @@ describe("Squad", () => {
   describe("clearPlayers", () => {
     it("adds players correctly", () => {
       const rconPlayer1 =
-        "ID: 1 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: Player1 | Team ID: 1 | Squad ID: 5 | Is Leader: True | Role: USA_Recruit";
+        "ID: 1 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930 | Name: Player1 | Team ID: 1 | Party ID: N/A | Squad ID: 5 | Is Leader: True | Role: USA_Recruit | Vehicle: N/A";
       const rconPlayer2 =
-        "ID: 2 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798e steam: 76561197960287931 | Name: Player2 | Team ID: 1 | Squad ID: 5 | Is Leader: False | Role: USA_Recruit";
+        "ID: 2 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798e steam: 76561197960287931 | Name: Player2 | Team ID: 1 | Party ID: N/A | Squad ID: 5 | Is Leader: False | Role: USA_Recruit | Vehicle: N/A";
 
       const rconSquad =
         "ID: 15 | Name: Test Squad 123 | Size: 5 | Locked: False | Creator Name: TestName | Creator Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197960287930";

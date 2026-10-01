@@ -14,17 +14,17 @@ ID: 2 | Name: Team2Squad2 | Size: 1 | Locked: True | Creator Name: Team2Squad2Pl
 
   const playersResponse = `
 ----- Active Players -----
-ID: 1 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198287492345 | Name: Team1Squad1Player1 | Team ID: 1 | Squad ID: 1 | Is Leader: True | Role: USMC_Marksman_01
-ID: 2 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197966340835 | Name: Team1Squad2Player1 | Team ID: 1 | Squad ID: 2 | Is Leader: True | Role: USMC_Rifleman_01
-ID: 3 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198287492345 | Name: Team2Squad1Player1 | Team ID: 2 | Squad ID: 1 | Is Leader: True | Role: RUS_Marksman_01
-ID: 4 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197966340835 | Name: Team2Squad2Player1 | Team ID: 2 | Squad ID: 2 | Is Leader: True | Role: RUS_Rifleman_01
+ID: 1 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198287492345 | Name: Team1Squad1Player1 | Team ID: 1 | Party ID: N/A | Squad ID: 1 | Is Leader: True | Role: USMC_Marksman_01 | Vehicle: N/A
+ID: 2 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197966340835 | Name: Team1Squad2Player1 | Team ID: 1 | Party ID: N/A | Squad ID: 2 | Is Leader: True | Role: USMC_Rifleman_01 | Vehicle: N/A
+ID: 3 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198287492345 | Name: Team2Squad1Player1 | Team ID: 2 | Party ID: N/A | Squad ID: 1 | Is Leader: True | Role: RUS_Marksman_01 | Vehicle: N/A
+ID: 4 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561197966340835 | Name: Team2Squad2Player1 | Team ID: 2 | Party ID: N/A | Squad ID: 2 | Is Leader: True | Role: RUS_Rifleman_01 | Vehicle: N/A
 
-ID: 5 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198006594412 | Name: Team1Squad1Player2 | Team ID: 1 | Squad ID: 1 | Is Leader: False | Role: USMC_Medic_02
-ID: 6 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198108974422 | Name: Team1Squad2Player2 | Team ID: 1 | Squad ID: 2 | Is Leader: False | Role: USMC_Grenadier_01
-ID: 7 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561199386953097 | Name: Team1Squad2Player3 | Team ID: 1 | Squad ID: 2 | Is Leader: False | Role: USMC_Marksman_01
-ID: 8 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198879719852 | Name: Team2Squad1Player2 | Team ID: 2 | Squad ID: 1 | Is Leader: False | Role: RUS_Recruit
-ID: 9 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198011242851 | Name: Team2Squad1Player3 | Team ID: 2 | Squad ID: 1 | Is Leader: False | Role: RUS_Rifleman_03
-ID: 10 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561143232242851 | Name: Team1UnassignedPlayer1 | Team ID: 1 | Squad ID: N/A | Is Leader: False | Role: RUS_Rifleman_03
+ID: 5 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198006594412 | Name: Team1Squad1Player2 | Team ID: 1 | Party ID: N/A | Squad ID: 1 | Is Leader: False | Role: USMC_Medic_02 | Vehicle: N/A
+ID: 6 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198108974422 | Name: Team1Squad2Player2 | Team ID: 1 | Party ID: N/A | Squad ID: 2 | Is Leader: False | Role: USMC_Grenadier_01 | Vehicle: N/A
+ID: 7 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561199386953097 | Name: Team1Squad2Player3 | Team ID: 1 | Party ID: N/A | Squad ID: 2 | Is Leader: False | Role: USMC_Marksman_01 | Vehicle: N/A
+ID: 8 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198879719852 | Name: Team2Squad1Player2 | Team ID: 2 | Party ID: N/A | Squad ID: 1 | Is Leader: False | Role: RUS_Recruit | Vehicle: N/A
+ID: 9 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561198011242851 | Name: Team2Squad1Player3 | Team ID: 2 | Party ID: N/A | Squad ID: 1 | Is Leader: False | Role: RUS_Rifleman_03 | Vehicle: N/A
+ID: 10 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561143232242851 | Name: Team1UnassignedPlayer1 | Team ID: 1 | Party ID: N/A | Squad ID: N/A | Is Leader: False | Role: RUS_Rifleman_03 | Vehicle: N/A
 ----- Recently Disconnected Players [Max of 15] -----
 ID: 92 | Online IDs: EOS: 000212345678912bbbcc5a40edc3798d steam: 76561199142404779 | Since Disconnect: 04m.25s | Name: DisconnectedPlayer
 `;
